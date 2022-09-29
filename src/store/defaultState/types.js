@@ -1,0 +1,1 @@
+export const SET_STORAGE_STATUS = 'SET_STORAGE_STATUS';
