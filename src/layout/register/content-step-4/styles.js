@@ -20,7 +20,7 @@ export default StyleSheet.create({
   },
   inputWrapper: {
     marginBottom: moderateScale(20),
-    marginTop: moderateScale(30),
+    marginTop: moderateScale(16),
   },
   txtInput: {
     marginHorizontal: moderateScale(20),

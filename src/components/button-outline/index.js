@@ -10,6 +10,8 @@ export default function ButtonOutline({
   isSelected,
   isLoading,
   btnStyle,
+  defaultTextColor,
+  theme,
 }) {
   function getBgColor() {
     if (isSelected) {
@@ -21,6 +23,9 @@ export default function ButtonOutline({
   function getTextColor() {
     if (isSelected) {
       return {color: colors.white};
+    }
+    if (defaultTextColor) {
+      return {color: defaultTextColor};
     }
     return {};
   }

@@ -24,10 +24,24 @@ export default StyleSheet.create({
   },
   txtInput: {
     marginHorizontal: moderateScale(20),
-    marginBottom: moderateScale(20),
     fontFamily: fonts.InterSemiBold,
     color: colors.black,
     textAlign: 'center',
     fontSize: moderateScale(16),
+    lineHeight: moderateScale(24),
+  },
+  ctnRowInput: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    paddingHorizontal: moderateScale(20),
+    marginTop: moderateScale(12),
+  },
+  btnStyle: {
+    width: '48%',
+    marginHorizontal: 0,
+    marginTop: moderateScale(0),
+    marginBottom: moderateScale(12),
   },
 });

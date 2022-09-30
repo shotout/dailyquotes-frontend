@@ -8,7 +8,7 @@ export default StyleSheet.create({
     marginVertical: moderateScale(20),
     height: moderateScale(48),
     backgroundColor: colors.purple,
-    borderRadius: moderateScale(18),
+    borderRadius: moderateScale(12),
     justifyContent: 'center',
     alignItems: 'center',
   },

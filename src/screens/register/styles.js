@@ -6,6 +6,7 @@ export default StyleSheet.create({
   ctnRoot: {
     flex: 1,
     position: 'relative',
+    backgroundColor: colors.white,
   },
   ctnBackgroundImage: {
     width: '100%',
@@ -43,5 +44,11 @@ export default StyleSheet.create({
   ctnScroll: {
     flexGrow: 1,
   },
-  btnWrapper: {},
+  txtSubscription: {
+    color: colors.black,
+    fontSize: moderateScale(14),
+    textAlign: 'center',
+    fontFamily: fonts.InterRegular,
+    marginBottom: moderateScale(16),
+  },
 });

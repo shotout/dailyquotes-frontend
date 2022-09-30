@@ -5,11 +5,15 @@ import ContentStep1 from '../../layout/register/content-step-1';
 import ContentStep2 from '../../layout/register/content-step-2';
 import ContentStep3 from '../../layout/register/content-step-3';
 import ContentStep4 from '../../layout/register/content-step-4';
+import ContentStep5 from '../../layout/register/content-step-5';
+import ContentStep6 from '../../layout/register/content-step-6';
+import ContentStep7 from '../../layout/register/content-step-7';
+import ContentStep8 from '../../layout/register/content-step-8';
 import HeaderStep from '../../layout/register/header-step';
 import styles from './styles';
 
 export default function Register() {
-  const [registerStep, setRegisterStep] = useState(4);
+  const [registerStep, setRegisterStep] = useState(1);
   const [values, setFormValues] = useState({
     name: '',
     gender: 'Male',
@@ -29,6 +33,18 @@ export default function Register() {
   };
 
   function renderContent() {
+    if (registerStep === 8) {
+      return <ContentStep8 />;
+    }
+    if (registerStep === 7) {
+      return <ContentStep7 />;
+    }
+    if (registerStep === 6) {
+      return <ContentStep6 />;
+    }
+    if (registerStep === 5) {
+      return <ContentStep5 />;
+    }
     if (registerStep === 4) {
       return <ContentStep4 />;
     }
@@ -44,6 +60,39 @@ export default function Register() {
       );
     }
     return <ContentStep1 />;
+  }
+
+  function renderSkipButton() {
+    if (registerStep === 5 || registerStep === 6) {
+      return null;
+    }
+    if (registerStep === 8) {
+      return (
+        <Text style={styles.txtSubscription}>
+          3 days free, then just USD 20/year
+        </Text>
+      );
+    }
+    if (registerStep === 7) {
+      return (
+        <TouchableOpacity
+          style={styles.btnSkip}
+          onPress={() => {
+            setRegisterStep(registerStep + 1);
+          }}>
+          <Text style={styles.txtSkip}>I want to improve everything</Text>
+        </TouchableOpacity>
+      );
+    }
+    return (
+      <TouchableOpacity
+        style={styles.btnSkip}
+        onPress={() => {
+          setRegisterStep(registerStep + 1);
+        }}>
+        <Text style={styles.txtSkip}>Skip for now</Text>
+      </TouchableOpacity>
+    );
   }
 
   function renderButton() {
@@ -62,13 +111,7 @@ export default function Register() {
     }
     return (
       <View style={styles.btnWrapper}>
-        <TouchableOpacity
-          style={styles.btnSkip}
-          onPress={() => {
-            setRegisterStep(registerStep + 1);
-          }}>
-          <Text style={styles.txtSkip}>Skip for now</Text>
-        </TouchableOpacity>
+        {renderSkipButton()}
         <Button
           btnStyle={styles.btnContinue}
           label="Continue"
