@@ -12,7 +12,7 @@ export default StyleSheet.create({
   txtInput: {
     marginHorizontal: moderateScale(20),
     marginBottom: moderateScale(20),
-    fontFamily: fonts.InterSemiBold,
+    fontFamily: fonts.InterMedium,
     color: colors.black,
     textAlign: 'center',
     fontSize: moderateScale(18),

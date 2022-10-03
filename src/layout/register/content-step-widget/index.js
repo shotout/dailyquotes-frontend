@@ -1,11 +1,10 @@
 import React from 'react';
 import {Image, Text, View} from 'react-native';
-import Input from '../../../components/input';
 import styles from './styles';
 
-const bannerImage = require('../../../assets/images/name_app.png');
+const bannerImage = require('../../../assets/images/widget_app.png');
 
-export default function ContentStep1(props) {
+export default function ContentStepWidget(props) {
   function renderBanner() {
     return (
       <View style={styles.ctnBanner}>
@@ -17,8 +16,14 @@ export default function ContentStep1(props) {
   function renderInput() {
     return (
       <View style={styles.inputWrapper}>
-        <Text style={styles.txtInput}>What sould we call you?</Text>
-        <Input placeholder="Your name" {...props} />
+        <Text style={styles.txtInput}>Add a widget to your home screen</Text>
+        <Text style={styles.txtInput}>
+          From the Home Screen, touch and hold an empty area until the apps
+          jiggle.
+        </Text>
+        <Text style={styles.txtInput}>
+          Then tap the + button in the upper corner to add the widget.
+        </Text>
       </View>
     );
   }

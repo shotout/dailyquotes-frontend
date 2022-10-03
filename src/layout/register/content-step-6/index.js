@@ -10,7 +10,7 @@ const healthIcon = require('../../../assets/icons/cause_feeling/health.png');
 const relationshipIcon = require('../../../assets/icons/cause_feeling/relationship.png');
 const otherIcon = require('../../../assets/icons/cause_feeling/other.png');
 
-export default function ContentStep6() {
+export default function ContentStep6(props) {
   const listFeeling = [
     {name: 'Family', icon: familyIcon},
     {name: 'Friends', icon: friendIcon},
@@ -27,7 +27,7 @@ export default function ContentStep6() {
         <Text style={styles.txtFeelingdesc}>
           You can select more than one option
         </Text>
-        <FeelingCard isMultiple listData={listFeeling} />
+        <FeelingCard isMultiple listData={listFeeling} {...props} />
       </View>
     );
   }

@@ -4,6 +4,7 @@ import styles from './styles';
 
 const bannerImage = require('../../../assets/images/subscription_app.png');
 const iconChecklist = require('../../../assets/icons/checklist.png');
+const iconClose = require('../../../assets/icons/close.png');
 
 export default function ContentStep8() {
   const listItem = [
@@ -50,6 +51,11 @@ export default function ContentStep8() {
     <View style={styles.ctnRoot}>
       {renderBanner()}
       {renderInput()}
+      <View style={styles.ctnClose}>
+        <TouchableOpacity>
+          <Image source={iconClose} style={styles.icnCloseStyle} />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }

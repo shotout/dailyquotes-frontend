@@ -1,5 +1,6 @@
 import {StyleSheet} from 'react-native';
 import {moderateScale} from 'react-native-size-matters';
+import {isIphoneXorAbove} from '../../shared/devices';
 
 export default StyleSheet.create({
   ctnRoot: {
@@ -20,5 +21,8 @@ export default StyleSheet.create({
     resizeMode: 'contain',
     alignSelf: 'center',
     marginTop: '30%',
+  },
+  btnWrapper: {
+    paddingBottom: isIphoneXorAbove() ? moderateScale(20) : 0,
   },
 });

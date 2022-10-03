@@ -11,7 +11,7 @@ const Stack = createNativeStackNavigator();
 
 function Routes() {
   function getInitialRoute() {
-    return 'Register';
+    return 'WelcomePage';
     // return 'WelcomePage';
   }
 

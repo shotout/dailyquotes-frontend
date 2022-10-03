@@ -10,7 +10,7 @@ const feelingBad = require('../../../assets/icons/recent_feeling/bad.png');
 const feelingTerrible = require('../../../assets/icons/recent_feeling/terrible.png');
 const feelingOther = require('../../../assets/icons/recent_feeling/other.png');
 
-export default function ContentStep5() {
+export default function ContentStep5(props) {
   const listFeeling = [
     {name: 'Awesome', icon: feelingAwesome},
     {name: 'Good', icon: feelingGood},
@@ -29,7 +29,7 @@ export default function ContentStep5() {
           {'\n'}
           How are you feeling recently?
         </Text>
-        <FeelingCard listData={listFeeling} />
+        <FeelingCard listData={listFeeling} {...props} />
         <Text style={styles.txtFeelingdesc}>
           Tell us about your mood to get individual quotes that are most
           suitable for you.

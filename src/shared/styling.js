@@ -1,3 +1,5 @@
+import {Dimensions} from 'react-native';
+
 export const colors = {
   white: '#fff',
   black: '#000',
@@ -18,4 +20,9 @@ export const fonts = {
   InterRegular: 'Inter-Regular',
   InterSemiBold: 'Inter-SemiBold',
   InterThin: 'Inter-Thin',
+};
+
+export const sizing = {
+  getDimensionWidth: value => Dimensions.get('screen').width * value,
+  getDimensionHeight: value => Dimensions.get('screen').height * value,
 };

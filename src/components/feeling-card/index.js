@@ -1,11 +1,19 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Text, View, Image, TouchableWithoutFeedback} from 'react-native';
 import styles from './styles';
 
 const checklistIcon = require('../../assets/icons/checklist_default.png');
 
-export default function FeelingCard({listData = [], isMultiple}) {
+export default function FeelingCard({
+  listData = [],
+  isMultiple,
+  onSelect = () => {},
+}) {
   const [selectedCard, setSelectedCard] = useState([]);
+
+  useEffect(() => {
+    onSelect(selectedCard);
+  }, [selectedCard]);
 
   const isDataSelected = value => {
     const findItem = selectedCard.find(item => item === value);
@@ -32,10 +40,11 @@ export default function FeelingCard({listData = [], isMultiple}) {
     <View style={styles.ctnRowIcon}>
       {listData.map(item => (
         <TouchableWithoutFeedback
+          key={item.name}
           onPress={() => {
             onPressSelect(item.name);
           }}>
-          <View style={styles.ctnFeeling} key={item.name}>
+          <View style={styles.ctnFeeling}>
             <View style={styles.ctnChecklist}>
               {isDataSelected(item.name) && (
                 <Image source={checklistIcon} style={styles.iconChecklist} />

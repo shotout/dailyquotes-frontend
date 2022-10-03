@@ -1,35 +1,81 @@
 import React, {useState} from 'react';
 import {ScrollView, Text, TouchableOpacity, View} from 'react-native';
 import Button from '../../components/button';
-import ContentStep1 from '../../layout/register/content-step-1';
-import ContentStep2 from '../../layout/register/content-step-2';
-import ContentStep3 from '../../layout/register/content-step-3';
+import ContentName from '../../layout/register/content-step-1';
+import ContentGender from '../../layout/register/content-step-2';
+import ContentNotification from '../../layout/register/content-step-3';
 import ContentStep4 from '../../layout/register/content-step-4';
 import ContentStep5 from '../../layout/register/content-step-5';
 import ContentStep6 from '../../layout/register/content-step-6';
 import ContentStep7 from '../../layout/register/content-step-7';
 import ContentStep8 from '../../layout/register/content-step-8';
+import ContentStepWidget from '../../layout/register/content-step-widget';
 import HeaderStep from '../../layout/register/header-step';
 import styles from './styles';
 
 export default function Register() {
   const [registerStep, setRegisterStep] = useState(1);
+  const [feelingStep, setFeelingStep] = useState(1);
+  const [toggleRandomCategories, setToggleRandomCategories] = useState(false);
   const [values, setFormValues] = useState({
     name: '',
     gender: 'Male',
     motivate_often: '10x',
     start_at: new Date(),
     end_at: new Date(),
-    selectedFeeling: null,
-    causeFeeling: null,
+    selectedFeeling: [],
+    causeFeeling: [],
     selectedCategory: [],
   });
+
+  function getStatusDisable() {
+    if (registerStep === 1) {
+      if (!values.name) {
+        return true;
+      }
+    }
+    if (registerStep === 7 && !values.selectedCategory.length) {
+      return true;
+    }
+    return false;
+  }
+
+  function getLabelDarkButton() {
+    if (registerStep === 4) {
+      return 'Got it!';
+    }
+    return 'Continue';
+  }
+
+  const handleContinueStep = () => {
+    if (registerStep === 6) {
+      if (feelingStep === 1) {
+        if (values.selectedFeeling.length > 0) {
+          setFeelingStep(2);
+        } else {
+          setRegisterStep(registerStep + 1);
+        }
+      }
+      if (feelingStep === 2) {
+        setRegisterStep(registerStep + 1);
+      }
+      return true;
+    }
+    if (registerStep < 8) {
+      setRegisterStep(registerStep + 1);
+      return true;
+    }
+    return true;
+  };
 
   const handleChangeValue = (stateName, value) => {
     setFormValues({
       ...values,
       [stateName]: value,
     });
+    if (stateName === 'gender') {
+      setRegisterStep(registerStep + 1);
+    }
   };
 
   function renderContent() {
@@ -37,33 +83,68 @@ export default function Register() {
       return <ContentStep8 />;
     }
     if (registerStep === 7) {
-      return <ContentStep7 />;
+      return (
+        <ContentStep7
+          toggleRandomCategories={toggleRandomCategories}
+          setOffToggleCategories={() => {
+            setToggleRandomCategories(false);
+          }}
+          onSelect={value => {
+            handleChangeValue('selectedCategory', value);
+          }}
+        />
+      );
     }
     if (registerStep === 6) {
-      return <ContentStep6 />;
+      if (feelingStep === 2) {
+        return (
+          <ContentStep6
+            onSelect={value => {
+              handleChangeValue('causeFeeling', value);
+            }}
+          />
+        );
+      }
+      return (
+        <ContentStep5
+          onSelect={value => {
+            handleChangeValue('selectedFeeling', value);
+          }}
+        />
+      );
     }
     if (registerStep === 5) {
-      return <ContentStep5 />;
-    }
-    if (registerStep === 4) {
       return <ContentStep4 />;
     }
-    if (registerStep === 3) {
-      return <ContentStep3 />;
+    if (registerStep === 4) {
+      return <ContentStepWidget />;
     }
-    if (registerStep === 2) {
+    if (registerStep === 3) {
       return (
-        <ContentStep2
+        <ContentGender
           selectedGender={values.gender}
           handleSelect={handleChangeValue}
         />
       );
     }
-    return <ContentStep1 />;
+    if (registerStep === 2) {
+      return <ContentNotification />;
+    }
+    return (
+      <ContentName
+        value={values.name}
+        onChangeText={name => {
+          setFormValues({
+            ...values,
+            name,
+          });
+        }}
+      />
+    );
   }
 
   function renderSkipButton() {
-    if (registerStep === 5 || registerStep === 6) {
+    if (registerStep === 4 || registerStep === 5 || registerStep === 6) {
       return null;
     }
     if (registerStep === 8) {
@@ -78,9 +159,20 @@ export default function Register() {
         <TouchableOpacity
           style={styles.btnSkip}
           onPress={() => {
+            setToggleRandomCategories(true);
+          }}>
+          <Text style={styles.txtSkip}>Give me anything</Text>
+        </TouchableOpacity>
+      );
+    }
+    if (registerStep === 2) {
+      return (
+        <TouchableOpacity
+          style={styles.btnSkip}
+          onPress={() => {
             setRegisterStep(registerStep + 1);
           }}>
-          <Text style={styles.txtSkip}>I want to improve everything</Text>
+          <Text style={styles.txtSkip}>Motivate me any time</Text>
         </TouchableOpacity>
       );
     }
@@ -96,7 +188,7 @@ export default function Register() {
   }
 
   function renderButton() {
-    if (registerStep === 2) {
+    if (registerStep === 3) {
       return (
         <View style={styles.btnWrapper}>
           <TouchableOpacity
@@ -114,10 +206,9 @@ export default function Register() {
         {renderSkipButton()}
         <Button
           btnStyle={styles.btnContinue}
-          label="Continue"
-          onPress={() => {
-            setRegisterStep(registerStep + 1);
-          }}
+          label={getLabelDarkButton()}
+          isDisable={getStatusDisable()}
+          onPress={handleContinueStep}
         />
       </View>
     );

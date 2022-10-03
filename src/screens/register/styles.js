@@ -1,6 +1,7 @@
 import {StyleSheet} from 'react-native';
 import {moderateScale} from 'react-native-size-matters';
-import {colors, fonts} from '../../shared/styling';
+import {isIphoneXorAbove} from '../../shared/devices';
+import {colors, fonts, sizing} from '../../shared/styling';
 
 export default StyleSheet.create({
   ctnRoot: {
@@ -43,6 +44,7 @@ export default StyleSheet.create({
   },
   ctnScroll: {
     flexGrow: 1,
+    minHeight: sizing.getDimensionHeight(0.9),
   },
   txtSubscription: {
     color: colors.black,
@@ -50,5 +52,8 @@ export default StyleSheet.create({
     textAlign: 'center',
     fontFamily: fonts.InterRegular,
     marginBottom: moderateScale(16),
+  },
+  btnWrapper: {
+    paddingBottom: isIphoneXorAbove() ? moderateScale(10) : 0,
   },
 });

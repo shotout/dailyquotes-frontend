@@ -63,4 +63,14 @@ export default StyleSheet.create({
     height: '100%',
     resizeMode: 'contain',
   },
+  ctnClose: {
+    position: 'absolute',
+    top: 0,
+    left: moderateScale(20),
+  },
+  icnCloseStyle: {
+    width: moderateScale(22),
+    height: moderateScale(22),
+    resizeMode: 'contain',
+  },
 });

@@ -1,12 +1,16 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Image, Text, View} from 'react-native';
+import _ from 'lodash';
 import ButtonOutline from '../../../components/button-outline';
-import {colors} from '../../../shared/styling';
 import styles from './styles';
 
 const bannerImage = require('../../../assets/images/category_app.png');
 
-export default function ContentStep7({selectedGender, handleSelect}) {
+export default function ContentStep7({
+  onSelect = () => {},
+  setOffToggleCategories = () => {},
+  toggleRandomCategories,
+}) {
   const [selectedCategory, setSelectedCategory] = useState([]);
   const listImprovement = [
     'Productivity',
@@ -18,6 +22,21 @@ export default function ContentStep7({selectedGender, handleSelect}) {
     'Self-esteem',
     'Achieving goals',
   ];
+
+  useEffect(() => {
+    onSelect(selectedCategory);
+  }, [selectedCategory]);
+
+  useEffect(() => {
+    if (toggleRandomCategories) {
+      const valueRandom = _.sampleSize(
+        listImprovement,
+        Math.random() * listImprovement.length,
+      );
+      setSelectedCategory(valueRandom);
+      setOffToggleCategories();
+    }
+  }, [toggleRandomCategories]);
 
   const isDataSelected = value => {
     const findItem = selectedCategory.find(item => item === value);
