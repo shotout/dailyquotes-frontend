@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {ScrollView, Text, TouchableOpacity, View} from 'react-native';
 import Button from '../../components/button';
+import ModalIconChanged from '../../components/modal-icon-changed';
 import ContentName from '../../layout/register/content-step-1';
 import ContentGender from '../../layout/register/content-step-2';
 import ContentNotification from '../../layout/register/content-step-3';
@@ -17,6 +18,7 @@ export default function Register() {
   const [registerStep, setRegisterStep] = useState(1);
   const [feelingStep, setFeelingStep] = useState(1);
   const [toggleRandomCategories, setToggleRandomCategories] = useState(false);
+  const [showModalIcon, setShowModalIcon] = useState(false);
   const [values, setFormValues] = useState({
     name: '',
     gender: 'Male',
@@ -114,7 +116,13 @@ export default function Register() {
       );
     }
     if (registerStep === 5) {
-      return <ContentStep4 />;
+      return (
+        <ContentStep4
+          onSelect={value => {
+            setShowModalIcon(value);
+          }}
+        />
+      );
     }
     if (registerStep === 4) {
       return <ContentStepWidget />;
@@ -222,6 +230,13 @@ export default function Register() {
         {renderContent()}
         {renderButton()}
       </ScrollView>
+      <ModalIconChanged
+        isVisible={showModalIcon !== false}
+        selectedIcon={showModalIcon}
+        onClose={() => {
+          setShowModalIcon(false);
+        }}
+      />
     </View>
   );
 }
