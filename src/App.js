@@ -2,38 +2,66 @@ import React, {useEffect} from 'react';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/lib/integration/react';
 import {LocalizeProvider} from 'react-localize-redux';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {LogBox} from 'react-native';
+import {LogBox, Platform, StatusBar} from 'react-native';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import {Provider as PaperProvider} from 'react-native-paper';
+import Purchasely, {RunningMode} from 'react-native-purchasely';
+import {Adjust, AdjustConfig} from 'react-native-adjust';
+import FullScreenChz from 'react-native-fullscreen-chz';
+
 import Navigator from './screens/app-routes';
 import store, {persistor} from './store/configure-store';
 import {networkDebugger} from './shared/networkDebugger';
+import ModalLock from './layout/main-page/modal-lock';
+import ModalFirstPremium from './components/modal-first-premium';
+import ModalLoadingInitial from './components/modal-loading-initial';
 
 LogBox.ignoreAllLogs();
 
+Purchasely.startWithAPIKey(
+  'e179f325-e556-4b4e-8b2e-5c0b0e1cfa6d',
+  ['Google'],
+  null,
+  Purchasely.logLevelDebug,
+  RunningMode.FULL,
+);
+
 const App = () => {
-  const getData = async () => {
-    try {
-      const value = await AsyncStorage.getItem('@notification');
-      console.log('Async value:', value);
-    } catch (e) {
-      // error reading value
-      console.log('ASync error:', e);
-    }
+  const configTracker = () => {
+    const adjustConfig = new AdjustConfig(
+      'rkrky0am4phc',
+      // AdjustConfig.EnvironmentSandbox,
+      AdjustConfig.EnvironmentProduction,
+    );
+    adjustConfig.setLogLevel(AdjustConfig.LogLevelVerbose);
+    Adjust.create(adjustConfig);
+    console.log('Finish set configtracker');
   };
 
   useEffect(() => {
     networkDebugger();
-    getData();
+    configTracker();
+    if (Platform.OS === 'android') {
+      FullScreenChz.enable();
+    }
   }, []);
 
   return (
-    <Provider store={store}>
-      <LocalizeProvider store={store}>
-        <PersistGate persistor={persistor}>
-          <Navigator />
-        </PersistGate>
-      </LocalizeProvider>
-    </Provider>
+    <GestureHandlerRootView style={{flex: 1}}>
+      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+      <Provider store={store}>
+        <LocalizeProvider store={store}>
+          <PersistGate persistor={persistor}>
+            <PaperProvider>
+              <Navigator />
+              <ModalLock />
+              <ModalFirstPremium />
+              {/* <ModalLoadingInitial /> */}
+            </PaperProvider>
+          </PersistGate>
+        </LocalizeProvider>
+      </Provider>
+    </GestureHandlerRootView>
   );
 };
 

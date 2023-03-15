@@ -20,6 +20,8 @@ export default function Button({
         return {backgroundColor: colors.dark};
       case 'green':
         return {backgroundColor: colors.green};
+      case 'tosca':
+        return {backgroundColor: colors.tosca};
       default:
         if (isDisable) {
           return {backgroundColor: colors.gray};

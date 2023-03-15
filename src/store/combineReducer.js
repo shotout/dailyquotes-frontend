@@ -6,6 +6,8 @@ import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 import {localizeReducer} from 'react-localize-redux';
 import {composeWithDevTools} from 'redux-devtools-extension';
 
+import defaultState from './defaultState/states';
+import widgetState from './widgetState/states';
 import {setStorageStatus} from './defaultState/actions';
 import {SET_STORAGE_STATUS} from './defaultState/types';
 
@@ -14,8 +16,27 @@ const persistConfig = {
   storage: AsyncStorage,
   stateReconciler: autoMergeLevel2,
 };
+const commonPersistConfig = {
+  key: 'defaultState',
+  storage: AsyncStorage,
+  whitelist: [
+    'userProfile',
+    'defaultData',
+    'activeVersion',
+    'haveBeenAskRating',
+    'quotes',
+    'registerData',
+  ],
+  blacklist: ['showModalPremium'],
+};
+const widgetPersistConfig = {
+  key: 'widgetState',
+  storage: AsyncStorage,
+};
 
 const rootReducers = combineReducers({
+  defaultState: persistReducer(commonPersistConfig, defaultState),
+  widgetState: persistReducer(widgetPersistConfig, widgetState),
   localize: localizeReducer,
 });
 

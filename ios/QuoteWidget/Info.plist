@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>NSExtension</key>
+	<dict>
+		<key>NSExtensionPointIdentifier</key>
+		<string>com.apple.widgetkit-extension</string>
+	</dict>
+  
+  
+  <key>UIAppFonts</key>
+  <array>
+    <string>Inter-Black.ttf</string>
+    <string>Inter-Bold.ttf</string>
+    <string>Inter-ExtraBold.ttf</string>
+    <string>Inter-ExtraLight.ttf</string>
+    <string>Inter-Light.ttf</string>
+    <string>Inter-Medium.ttf</string>
+    <string>Inter-Regular.ttf</string>
+    <string>Inter-SemiBold.ttf</string>
+    <string>Inter-Thin.ttf</string>
+    <string>Koulen-Regular.ttf</string>
+    <string>EBGaramond-Medium.ttf</string>
+    <string>EBGaramond-MediumItalic.ttf</string>
+    <string>FjallaOne-Regular.ttf</string>
+    <string>Montserrat-SemiBold.ttf</string>
+    <string>PatuaOne-Regular.ttf</string>
+    <string>AnticDidone-Regular.ttf</string>
+    <string>BethEllen-Regular.ttf</string>
+    <string>Calistoga-Regular.ttf</string>
+    <string>Caveat-Medium.ttf</string>
+    <string>DeliusSwashCaps-Regular.ttf</string>
+    <string>Fondamento-Regular.ttf</string>
+    <string>Kreon-Regular.ttf</string>
+    <string>Caveat-Bold.ttf</string>
+    <string>YesevaOne-Regular.ttf</string>
+    <string>Merriweather-Regular.ttf</string>
+    <string>Farsan-Regular.ttf</string>
+    <string>Gaegu-Regular.ttf</string>
+    <string>Girassol-Regular.ttf</string>
+    <string>Hoefler-Text.ttf</string>
+    <string>IbarraRealNova-VariableFont_wght.ttf</string>
+    <string>Iceberg-Regular.ttf</string>
+    <string>Merienda-Bold.ttf</string>
+    <string>PlayfairDisplay-VariableFont_wght.ttf</string>
+    <string>Rowdies-Regular.ttf</string>
+    <string>PlayfairDisplay-Bold.ttf</string>
+    <string>IbarraRealNova-Bold.ttf</string>
+    <string>Hoefler Text Black.ttf</string>
+    <string>IM FELL DW Pica.ttf</string>
+    <string>Capriola-Regular.ttf</string>
+    <string>Palatino.ttf</string>
+    <string>PalatinoLTPro-Medium.ttf</string>
+    <string>Gloria Hallelujah.ttf</string>
+    <string>Optima.ttf</string>
+    <string>CarterOne.ttf</string>
+  </array>
+
+</dict>
+</plist>

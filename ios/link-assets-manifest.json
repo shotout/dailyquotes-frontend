@@ -1,0 +1,181 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "src/assets/fonts/AnticDidone-Regular.ttf",
+      "sha1": "fdddbca69b6fa8494ce86416451b41a645a3ab95"
+    },
+    {
+      "path": "src/assets/fonts/BethEllen-Regular.ttf",
+      "sha1": "8c0b83fe09d04c9d1a28a76a4f8be4f3df7d1b62"
+    },
+    {
+      "path": "src/assets/fonts/Calistoga-Regular.ttf",
+      "sha1": "14035c6703e7980699c923775412cf30d940cca0"
+    },
+    {
+      "path": "src/assets/fonts/Capriola-Regular.ttf",
+      "sha1": "ec69043386039501413f306e38217c843b63dd75"
+    },
+    {
+      "path": "src/assets/fonts/CarterOne.ttf",
+      "sha1": "088987baf523ac206b1d9b9e350bc72bf3949bd3"
+    },
+    {
+      "path": "src/assets/fonts/Caveat-Bold.ttf",
+      "sha1": "b8cf7188694f0ad229fec80e8074b1df6305cdfa"
+    },
+    {
+      "path": "src/assets/fonts/Caveat-Medium.ttf",
+      "sha1": "0cd0d0e17561fad5254d00dfc406e0662495de09"
+    },
+    {
+      "path": "src/assets/fonts/DeliusSwashCaps-Regular.ttf",
+      "sha1": "f162a8e2fd50219b68deaf18a8750c527560ef41"
+    },
+    {
+      "path": "src/assets/fonts/EBGaramond-Medium.ttf",
+      "sha1": "8bde5da8e80492e6ef0e58919d4cad8c13d3a423"
+    },
+    {
+      "path": "src/assets/fonts/EBGaramond-MediumItalic.ttf",
+      "sha1": "040640ed7929f35508638f68463553ffbe43e48b"
+    },
+    {
+      "path": "src/assets/fonts/Farsan-Regular.ttf",
+      "sha1": "79f4af0653d591f6c638ac9ff01c9ce462115f92"
+    },
+    {
+      "path": "src/assets/fonts/FjallaOne-Regular.ttf",
+      "sha1": "5e0cfba624fd975200908d47b8672490b2b75dcf"
+    },
+    {
+      "path": "src/assets/fonts/Fondamento-Regular.ttf",
+      "sha1": "72f3bc87c12cf6923df928237b9e2fa0970dceea"
+    },
+    {
+      "path": "src/assets/fonts/Gaegu-Regular.ttf",
+      "sha1": "21933927fff6381dd7d758ad4a89c845abfa9e73"
+    },
+    {
+      "path": "src/assets/fonts/Girassol-Regular.ttf",
+      "sha1": "5bfe1bc7381e5c474b5980f953af4918d9f6c527"
+    },
+    {
+      "path": "src/assets/fonts/Gloria Hallelujah.ttf",
+      "sha1": "f8daece907bf486d3ccf7138f34027e37583c862"
+    },
+    {
+      "path": "src/assets/fonts/Hoefler Text Black.ttf",
+      "sha1": "0a661fb7f8a73fbc88b72392e9e3caadd3b9f7a8"
+    },
+    {
+      "path": "src/assets/fonts/Hoefler-Text.ttf",
+      "sha1": "aba12680af43044034e9e2d5f926739ad060f0cc"
+    },
+    {
+      "path": "src/assets/fonts/IM FELL DW Pica.ttf",
+      "sha1": "fb0dc84d07898b696db3ec1e25c440e0c8e377b0"
+    },
+    {
+      "path": "src/assets/fonts/IbarraRealNova-Bold.ttf",
+      "sha1": "8fe2113cb018f437625f395c52fb68123b2bc345"
+    },
+    {
+      "path": "src/assets/fonts/IbarraRealNova-VariableFont_wght.ttf",
+      "sha1": "78578e2a73418f6b618cdd9da13723c6650f1aab"
+    },
+    {
+      "path": "src/assets/fonts/Iceberg-Regular.ttf",
+      "sha1": "d5195beaa49ad05a4562acc2c36f405adb853af0"
+    },
+    {
+      "path": "src/assets/fonts/Inter-Black.ttf",
+      "sha1": "283fa65b96dc1f2d71c6504afb9610447bdcdf1b"
+    },
+    {
+      "path": "src/assets/fonts/Inter-Bold.ttf",
+      "sha1": "48747b7a60086f97af0d373febcbd1f1bee87f17"
+    },
+    {
+      "path": "src/assets/fonts/Inter-ExtraBold.ttf",
+      "sha1": "bff772be6bca9895c6fdcd57e5d5be9a47f2e058"
+    },
+    {
+      "path": "src/assets/fonts/Inter-ExtraLight.ttf",
+      "sha1": "421072aef8610cb0f79661b494442a4b9363b43f"
+    },
+    {
+      "path": "src/assets/fonts/Inter-Light.ttf",
+      "sha1": "dd9ec1ae67dd85143bacf7a3cb37e9f0ac979843"
+    },
+    {
+      "path": "src/assets/fonts/Inter-Medium.ttf",
+      "sha1": "a418a8ba73bbcfa8c131c426ab836d78457afa9b"
+    },
+    {
+      "path": "src/assets/fonts/Inter-Regular.ttf",
+      "sha1": "7237d9cf55f177702066a28a4dde1e4c7e8ab576"
+    },
+    {
+      "path": "src/assets/fonts/Inter-SemiBold.ttf",
+      "sha1": "431007da316de60d85174aeec9b8389b5c73e7d6"
+    },
+    {
+      "path": "src/assets/fonts/Inter-Thin.ttf",
+      "sha1": "297919d59c9ba4fa17251cdb9f06c26ca906e593"
+    },
+    {
+      "path": "src/assets/fonts/Koulen-Regular.ttf",
+      "sha1": "f7e8dded278ed9b0c78fb3680ec4cb64f32f04f5"
+    },
+    {
+      "path": "src/assets/fonts/Kreon-Regular.ttf",
+      "sha1": "5666f8626396cc76f805c1ebe49a9dac919316d2"
+    },
+    {
+      "path": "src/assets/fonts/Merienda-Bold.ttf",
+      "sha1": "e1dc5f565e097a8baac890482de96e7ec887af89"
+    },
+    {
+      "path": "src/assets/fonts/Merriweather-Regular.ttf",
+      "sha1": "f4e7810e4e20d1932d3d7994bb6f6456280ee6bd"
+    },
+    {
+      "path": "src/assets/fonts/Montserrat-SemiBold.ttf",
+      "sha1": "8580dec824bbdb6ce24d04d3aaf360776339f0a7"
+    },
+    {
+      "path": "src/assets/fonts/Optima.ttf",
+      "sha1": "abab7b462f565a85d1cec0ab048031d05d9eb5e7"
+    },
+    {
+      "path": "src/assets/fonts/Palatino.ttf",
+      "sha1": "3f51e1f039bc048f43005583ae508092cdaa3280"
+    },
+    {
+      "path": "src/assets/fonts/PalatinoLTPro-Medium.ttf",
+      "sha1": "2a6c5b0c7fe81674be3a0cb28fca58292e26e9fe"
+    },
+    {
+      "path": "src/assets/fonts/PatuaOne-Regular.ttf",
+      "sha1": "d9c0328bc6188860c9bfa1d67e2f53fd64f49bfb"
+    },
+    {
+      "path": "src/assets/fonts/PlayfairDisplay-Bold.ttf",
+      "sha1": "a01693c7d32826d9626013a283d22748314a2157"
+    },
+    {
+      "path": "src/assets/fonts/PlayfairDisplay-VariableFont_wght.ttf",
+      "sha1": "498c73c1c9ba334f4764af03435adc02ef3c5100"
+    },
+    {
+      "path": "src/assets/fonts/Rowdies-Regular.ttf",
+      "sha1": "2f7b1ab72139c78cfe7abbd49fab9b1bebf44d57"
+    },
+    {
+      "path": "src/assets/fonts/YesevaOne-Regular.ttf",
+      "sha1": "8dc9c17c5c4e6224755e0863eee59a088eb78228"
+    }
+  ]
+}

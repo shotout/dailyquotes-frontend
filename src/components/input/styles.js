@@ -16,7 +16,7 @@ export default StyleSheet.create({
   inputStyle: {
     flex: 1,
     fontFamily: fonts.InterRegular,
-    color: colors.blue,
+    color: colors.black,
     fontSize: moderateScale(14),
   },
   txtLimit: {

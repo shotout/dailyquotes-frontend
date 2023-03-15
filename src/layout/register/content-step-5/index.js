@@ -1,39 +1,23 @@
-import React from 'react';
+import React, {Fragment} from 'react';
 import {Text, View} from 'react-native';
 import FeelingCard from '../../../components/feeling-card';
 import styles from './styles';
 
-const feelingAwesome = require('../../../assets/icons/recent_feeling/awesome.png');
-const feelingGood = require('../../../assets/icons/recent_feeling/good.png');
-const feelingOk = require('../../../assets/icons/recent_feeling/ok.png');
-const feelingBad = require('../../../assets/icons/recent_feeling/bad.png');
-const feelingTerrible = require('../../../assets/icons/recent_feeling/terrible.png');
-const feelingOther = require('../../../assets/icons/recent_feeling/other.png');
-
-export default function ContentStep5() {
-  const listFeeling = [
-    {name: 'Awesome', icon: feelingAwesome},
-    {name: 'Good', icon: feelingGood},
-    {name: 'Ok', icon: feelingOk},
-    {name: 'Bad', icon: feelingBad},
-    {name: 'Terrible', icon: feelingTerrible},
-    {name: 'Other', icon: feelingOther},
-  ];
-
+export default function ContentStep5(props) {
   function renderSelect() {
+    const userName = props?.userName;
+    // const userName = 'Mynamei spa';
     return (
       <View style={styles.inputWrapper}>
         <Text style={styles.txtInput}>
-          Hey
-          <Text style={styles.txtBold}>{` John! `}</Text>
-          {'\n'}
-          How are you feeling recently?
+          {userName !== ''
+            ? `${userName}, how are you feeling recently?`
+            : 'How are you feeling recently?'}
         </Text>
-        <FeelingCard listData={listFeeling} />
         <Text style={styles.txtFeelingdesc}>
-          Tell us about your mood to get individual quotes that are most
-          suitable for you.
+          {`Tell us about your mood\nto personalize your experience.`}
         </Text>
+        <FeelingCard {...props} />
       </View>
     );
   }

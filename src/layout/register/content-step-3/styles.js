@@ -13,22 +13,35 @@ export default StyleSheet.create({
     alignItems: 'center',
   },
   iconBanner: {
-    width: moderateScale(217),
-    height: moderateScale(201),
+    width: moderateScale(207),
+    height: moderateScale(181),
     resizeMode: 'contain',
     alignSelf: 'center',
   },
   inputWrapper: {
     marginBottom: moderateScale(20),
     marginTop: moderateScale(16),
+    flex: 1,
   },
   txtInput: {
     marginHorizontal: moderateScale(20),
-    fontFamily: fonts.InterSemiBold,
+    fontFamily: fonts.YesevaOne,
+    color: colors.purple,
+    textAlign: 'center',
+    fontSize: moderateScale(24),
+    lineHeight: moderateScale(34),
+  },
+  txtNotif: {
+    marginTop: moderateScale(20),
+    marginHorizontal: moderateScale(20),
+    fontFamily: fonts.InterMedium,
     color: colors.black,
     textAlign: 'center',
-    fontSize: moderateScale(16),
-    lineHeight: moderateScale(24),
+    fontSize: moderateScale(14),
+    lineHeight: moderateScale(22),
+  },
+  txtBlod: {
+    fontFamily: fonts.InterBold,
   },
   ctnInput: {
     marginHorizontal: moderateScale(20),
@@ -81,5 +94,15 @@ export default StyleSheet.create({
     color: colors.blue,
     fontSize: moderateScale(18),
     marginTop: moderateScale(-3),
+  },
+  ctnCenter: {
+    // flex: 1,
+    paddingTop: moderateScale(60),
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  ctnBannerAlt: {
+    paddingTop: 0,
+    marginTop: moderateScale(-30),
   },
 });

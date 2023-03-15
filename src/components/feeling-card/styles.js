@@ -57,4 +57,9 @@ export default StyleSheet.create({
     fontFamily: fonts.InterRegular,
     marginTop: moderateScale(8),
   },
+  imgStyle: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'contain',
+  },
 });

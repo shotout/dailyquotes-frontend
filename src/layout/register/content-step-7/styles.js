@@ -8,13 +8,13 @@ export default StyleSheet.create({
   },
   ctnBanner: {
     position: 'relative',
-    paddingTop: moderateScale(20),
+    paddingTop: moderateScale(0),
     justifyContent: 'center',
     alignItems: 'center',
   },
   iconBanner: {
-    width: moderateScale(217),
-    height: moderateScale(201),
+    width: moderateScale(177),
+    height: moderateScale(161),
     resizeMode: 'contain',
     alignSelf: 'center',
   },
@@ -23,12 +23,21 @@ export default StyleSheet.create({
     marginTop: moderateScale(16),
   },
   txtInput: {
+    marginHorizontal: moderateScale(12),
+    fontFamily: fonts.YesevaOne,
+    color: colors.purple,
+    textAlign: 'center',
+    fontSize: moderateScale(24),
+    lineHeight: moderateScale(34),
+  },
+  txtDesc: {
     marginHorizontal: moderateScale(20),
-    fontFamily: fonts.InterSemiBold,
+    fontFamily: fonts.InterMedium,
     color: colors.black,
     textAlign: 'center',
-    fontSize: moderateScale(16),
-    lineHeight: moderateScale(24),
+    fontSize: moderateScale(14),
+    lineHeight: moderateScale(22),
+    marginTop: moderateScale(18),
   },
   ctnRowInput: {
     flexDirection: 'row',
@@ -43,5 +52,14 @@ export default StyleSheet.create({
     marginHorizontal: 0,
     marginTop: moderateScale(0),
     marginBottom: moderateScale(12),
+  },
+
+  ctnInputWrapper: {
+    flex: 1,
+    justifyContent: 'space-between',
+    paddingBottom: moderateScale(90),
+  },
+  ctnGoalsInput: {
+    paddingTop: moderateScale(65),
   },
 });

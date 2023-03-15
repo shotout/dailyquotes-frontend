@@ -4,15 +4,16 @@ import styles from './styles';
 
 const bannerImage = require('../../../assets/images/subscription_app.png');
 const iconChecklist = require('../../../assets/icons/checklist.png');
+const iconClose = require('../../../assets/icons/close.png');
 
-export default function ContentStep8() {
+export default function ContentStep8({onClose}) {
   const listItem = [
     'Enjoy your first 3 days for free',
     'Cancel from the app or your iCloud account',
     'Quotes you can’t find anywhere else',
     'Categories for any situation',
     '3 days Free Trial',
-    'Only USD 2/month, billed annually',
+    'Only USD 1.67/month, billed annually',
   ];
 
   function renderBanner() {
@@ -50,6 +51,11 @@ export default function ContentStep8() {
     <View style={styles.ctnRoot}>
       {renderBanner()}
       {renderInput()}
+      <View style={styles.ctnClose}>
+        <TouchableOpacity onPress={onClose}>
+          <Image source={iconClose} style={styles.icnCloseStyle} />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
