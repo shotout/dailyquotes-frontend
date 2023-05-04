@@ -351,6 +351,8 @@ function Routes({
       appState.current = nextAppState;
       setAppStateVisible(appState.current);
     });
+
+    // throw new Error('My first Sentry error!');
     return () => {
       subscription.remove();
       Purchasely.removeEventListener();

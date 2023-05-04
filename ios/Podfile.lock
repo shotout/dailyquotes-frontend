@@ -470,16 +470,17 @@ PODS:
     - React-Core
   - RNGestureHandler (2.7.0):
     - React-Core
-  - RNNotifee (5.3.0):
+  - RNNotifee (7.6.1):
     - React-Core
-    - RNNotifee/NotifeeCore (= 5.3.0)
-  - RNNotifee/NotifeeCore (5.3.0):
+    - RNNotifee/NotifeeCore (= 7.6.1)
+  - RNNotifee/NotifeeCore (7.6.1):
     - React-Core
-  - RNReactNativeSharedGroupPreferences (1.1.23):
-    - React
   - RNScreens (3.17.0):
     - React-Core
     - React-RCTImage
+  - RNSentry (5.3.0):
+    - React-Core
+    - Sentry/HybridSDK (= 8.3.3)
   - RNShare (8.0.0):
     - React-Core
   - RNSVG (13.2.0):
@@ -490,6 +491,9 @@ PODS:
   - SDWebImageWebPCoder (0.8.5):
     - libwebp (~> 1.0)
     - SDWebImage/Core (~> 5.10)
+  - Sentry/HybridSDK (8.3.3):
+    - SentryPrivate (= 8.3.3)
+  - SentryPrivate (8.3.3)
   - Yoga (1.14.0)
 
 DEPENDENCIES:
@@ -549,8 +553,8 @@ DEPENDENCIES:
   - RNFS (from `../node_modules/react-native-fs`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - "RNNotifee (from `../node_modules/@notifee/react-native`)"
-  - RNReactNativeSharedGroupPreferences (from `../node_modules/react-native-shared-group-preferences`)
   - RNScreens (from `../node_modules/react-native-screens`)
+  - "RNSentry (from `../node_modules/@sentry/react-native`)"
   - RNShare (from `../node_modules/react-native-share`)
   - RNSVG (from `../node_modules/react-native-svg`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
@@ -576,6 +580,8 @@ SPEC REPOS:
     - Purchasely
     - SDWebImage
     - SDWebImageWebPCoder
+    - Sentry
+    - SentryPrivate
 
 EXTERNAL SOURCES:
   boost:
@@ -682,10 +688,10 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-gesture-handler"
   RNNotifee:
     :path: "../node_modules/@notifee/react-native"
-  RNReactNativeSharedGroupPreferences:
-    :path: "../node_modules/react-native-shared-group-preferences"
   RNScreens:
     :path: "../node_modules/react-native-screens"
+  RNSentry:
+    :path: "../node_modules/@sentry/react-native"
   RNShare:
     :path: "../node_modules/react-native-share"
   RNSVG:
@@ -762,13 +768,15 @@ SPEC CHECKSUMS:
   RNFBMessaging: 222e5afdc1469720c42474c19fb4b9cad10ed74d
   RNFS: 4ac0f0ea233904cb798630b3c077808c06931688
   RNGestureHandler: 7673697e7c0e9391adefae4faa087442bc04af33
-  RNNotifee: e98a6bb4add6f05e9421ba02683d619b0146d902
-  RNReactNativeSharedGroupPreferences: de0121a4224c267bc7e9fb16c398f3f087c8da81
+  RNNotifee: bdc064c29f4d558046f51f0c3ae02bab4fd3cd85
   RNScreens: 0df01424e9e0ed7827200d6ed1087ddd06c493f9
+  RNSentry: 8363f1eff1c685a502e15080b5e2f447969897c5
   RNShare: 36aa3e6958373a0ad1c95a1c960adef589da3794
   RNSVG: 07037623c36f12e41312730622d5f6b3656227ca
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
   SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
+  Sentry: 8ffc397d98fe58d693e73959b26ed0eaee55646a
+  SentryPrivate: bf776a47a131648f5023097215987b40fbd47025
   Yoga: 75bf4b0131cfb46a659cd0c13309b79a6fcff66d
 
 PODFILE CHECKSUM: 2af647d47f8e22745fce41b97f3e87bb92a3792a

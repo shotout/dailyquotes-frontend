@@ -7,6 +7,7 @@ import {
   Image,
   KeyboardAvoidingView,
   Keyboard,
+  BackHandler,
 } from 'react-native';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
@@ -120,15 +121,7 @@ function Register({
     setCounterNumber(99);
   };
 
-  const checkIsTablet = async () => {
-    // const res = await DeviceInfo.getSystemName();
-    console.log('Check is tablet:', DeviceInfo.getSystemName());
-  };
-
-  console.log('Check purchasely_id:', mutateForm.purchasely_id);
-
   useEffect(() => {
-    checkIsTablet();
     const handleInitial = async () => {
       setSubstep(registerData?.substep || substep);
       setRegisterStep(registerData?.registerStep || registerStep);
@@ -161,6 +154,17 @@ function Register({
       }
     });
     handleInitial();
+    const backAction = () => {
+      console.log('Back press');
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+
+    return () => backHandler.remove();
   }, []);
 
   useEffect(() => {
@@ -256,6 +260,7 @@ function Register({
         ways: values.causeFeeling,
         areas: values.selectedCategory,
         timezone: timeZone,
+        device_id: Date.now().toString(),
       };
       const res = await postRegister(payload);
       handleSetProfile(res);

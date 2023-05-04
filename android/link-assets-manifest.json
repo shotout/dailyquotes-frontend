@@ -142,8 +142,16 @@
       "sha1": "f4e7810e4e20d1932d3d7994bb6f6456280ee6bd"
     },
     {
+      "path": "src/assets/fonts/Montserrat-Bold.ttf",
+      "sha1": "04052dc3b846609216de1e0cbcec337c6b6e74f6"
+    },
+    {
       "path": "src/assets/fonts/Montserrat-SemiBold.ttf",
       "sha1": "8580dec824bbdb6ce24d04d3aaf360776339f0a7"
+    },
+    {
+      "path": "src/assets/fonts/Optima-ExtraBlack.otf",
+      "sha1": "45632e34b56fd9e828ec221f6ee31cbd7cc75c0f"
     },
     {
       "path": "src/assets/fonts/Optima.ttf",

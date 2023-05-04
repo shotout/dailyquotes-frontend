@@ -21,11 +21,18 @@ import dispatcher from './dispatcher';
 import {handlePayment, isUserPremium} from '../../helpers/user';
 import LoadingIndicator from '../loading-indicator';
 import {themesData} from '../../shared/static/themes';
-import {listTheme} from '../../shared/useBackgroundQuotes';
+import {handleShuffleTheme, listTheme} from '../../shared/useBackgroundQuotes';
 
 const iconSuffle = require('../../assets/icons/random_theme.png');
 
-function CardTheme({listData, userProfile, handleSetProfile, onClose}) {
+function CardTheme({
+  listData,
+  userProfile,
+  handleSetProfile,
+  onClose,
+  onCustomSelectTheme,
+  customSelected,
+}) {
   const shuffleData = {
     background: null,
     background_color: null,
@@ -45,7 +52,9 @@ function CardTheme({listData, userProfile, handleSetProfile, onClose}) {
   }, [userProfile]);
 
   const isDataSelected = value => {
-    const findItem = selectedCard.find(item => item === value);
+    const findItem = customSelected
+      ? value === customSelected
+      : selectedCard.find(item => item === value);
     if (findItem) return true;
     return false;
   };
@@ -116,6 +125,28 @@ function CardTheme({listData, userProfile, handleSetProfile, onClose}) {
       return findItem.imgLocal;
     }
     return null;
+  };
+
+  const checkSelectedTheme = async item => {
+    if (typeof onCustomSelectTheme === 'function') {
+      if (item.id === 6) {
+        const res = await handleShuffleTheme();
+        const localImg = getLocalImage(res.id);
+        onCustomSelectTheme({
+          ...res,
+          imgLocal: localImg,
+        });
+      } else {
+        const imgLocal = getLocalImage(item.id);
+        onCustomSelectTheme({
+          ...item,
+          imgLocal,
+        });
+      }
+      onClose();
+    } else {
+      handleItem(item);
+    }
   };
 
   function renderLogo(item, isGetSelect) {
@@ -191,7 +222,7 @@ function CardTheme({listData, userProfile, handleSetProfile, onClose}) {
             <TouchableWithoutFeedback
               key={item.id}
               onPress={() => {
-                handleItem(item);
+                checkSelectedTheme(item);
               }}>
               <View
                 style={[
@@ -217,7 +248,7 @@ function CardTheme({listData, userProfile, handleSetProfile, onClose}) {
       <View style={styles.shuffleWrapper}>
         <TouchableWithoutFeedback
           onPress={() => {
-            handleItem(shuffleData);
+            checkSelectedTheme(shuffleData);
           }}>
           <View style={[styles.ctnCard, styles.firstItem]}>
             <View style={styles.ctnRowCard}>

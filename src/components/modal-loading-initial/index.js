@@ -2,6 +2,7 @@ import React, {useEffect} from 'react';
 import {Modal, View, Text, Image} from 'react-native';
 import LottieView from 'lottie-react-native';
 import {connect} from 'react-redux';
+import {Portal} from 'react-native-paper';
 import styles from './styles';
 import states from './states';
 import dispatcher from './dispatcher';
@@ -29,34 +30,36 @@ function ModalLoadingInitial({loadingModal}) {
   }, [loadingModal.counter]);
 
   return (
-    <Modal
-      animationType="slide"
-      transparent
-      // visible
-      visible={loadingModal.visible}
-      onRequestClose={() => {}}>
-      <View style={styles.ctnContent}>
-        <Image source={registerBackground} style={styles.registerStyle} />
-        <View style={styles.lottieWrapper}>
-          <View style={styles.counterWrapper}>
-            <Text style={[styles.txtPercentage]}>
-              {loadingModal.counter >= 99 ? 99 : loadingModal.counter}
-              {/* 22 */}
-            </Text>
-            <Text style={styles.percent}>%</Text>
+    <Portal>
+      <Modal
+        animationType="slide"
+        transparent
+        // visible
+        visible={loadingModal.visible}
+        onRequestClose={() => {}}>
+        <View style={styles.ctnContent}>
+          <Image source={registerBackground} style={styles.registerStyle} />
+          <View style={styles.lottieWrapper}>
+            <View style={styles.counterWrapper}>
+              <Text style={[styles.txtPercentage]}>
+                {loadingModal.counter >= 99 ? 99 : loadingModal.counter}
+                {/* 22 */}
+              </Text>
+              <Text style={styles.percent}>%</Text>
+            </View>
+            <LottieView
+              source={loadingImage}
+              autoPlay
+              loop
+              style={styles.lottieStyle}
+            />
           </View>
-          <LottieView
-            source={loadingImage}
-            autoPlay
-            loop
-            style={styles.lottieStyle}
-          />
-        </View>
-        {/* <Text style={styles.txtLoader}>
+          {/* <Text style={styles.txtLoader}>
           {'NO FOMO...\nScanning the chain for hottest NFT...'}
         </Text> */}
-      </View>
-    </Modal>
+        </View>
+      </Modal>
+    </Portal>
   );
 }
 

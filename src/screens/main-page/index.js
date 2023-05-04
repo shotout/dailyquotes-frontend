@@ -1,5 +1,6 @@
 import React, {createRef, useEffect, useRef, useState} from 'react';
 import {
+  BackHandler,
   FlatList,
   ImageBackground,
   Modal,
@@ -21,7 +22,6 @@ import {
 } from 'react-native-gesture-handler';
 import moment from 'moment';
 import RNFS from 'react-native-fs';
-import messaging from '@react-native-firebase/messaging';
 
 import ButtonIcon from '../../components/button-icon';
 import ModalCategories from '../../layout/main-page/modal-categories';
@@ -156,7 +156,7 @@ function MainPage({
       if (paywallObj) {
         handlePayment(paywallObj?.placement);
       } else {
-        handlePayment();
+        handlePayment('offer_no_purchase_after_onboarding_paywall');
       }
     } else {
       handleRatingStatus();
@@ -205,6 +205,17 @@ function MainPage({
     // setSubcription({
     //   subscription_type: 4,
     // });
+    const backAction = () => {
+      console.log('Back press');
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+
+    return () => backHandler.remove();
   }, []);
 
   useEffect(() => {
@@ -456,10 +467,10 @@ function MainPage({
         onPress={() => {
           handlePayment('in_app_paywall');
         }}>
-        <Text style={styles.txtFreeBadge}>Try it free</Text>
         <View style={styles.ctnIconCrown}>
           <Crown width="100%" height="100%" />
         </View>
+        <Text style={styles.txtFreeBadge}>Go Premium!</Text>
       </TouchableOpacity>
     );
   }

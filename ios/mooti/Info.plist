@@ -128,6 +128,10 @@
 	<string>Our application needs permission to share images.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Our application needs to access library to share images.</string>
+	<key>NSUserActivityTypes</key>
+	<array>
+		<string>ConfigurationIntent</string>
+	</array>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>Your data will be used to check if you are using in-app features, this will be used for future updates and development purposes.</string>
 	<key>UIAppFonts</key>
@@ -176,6 +180,7 @@
 		<string>Gloria Hallelujah.ttf</string>
 		<string>Optima.ttf</string>
 		<string>CarterOne.ttf</string>
+		<string>Montserrat-Bold.ttf</string>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>

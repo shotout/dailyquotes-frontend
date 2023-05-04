@@ -17,7 +17,7 @@ import LineGestureSlide from '../../../components/line-gesture-slide';
 import {listTheme} from '../../../shared/useBackgroundQuotes';
 
 export default function ModalTheme(props) {
-  const {contentRef, onClose, listData} = props;
+  const {contentRef, onClose, onCustomSelectTheme, customSelected} = props;
 
   function renderIconClose() {
     return (
@@ -60,7 +60,12 @@ export default function ModalTheme(props) {
               style={styles.ctnRoot}
               contentContainerStyle={styles.ctnScroll}
               showsVerticalScrollIndicator={false}>
-              <CardTheme onClose={onClose} listData={listTheme} />
+              <CardTheme
+                onCustomSelectTheme={onCustomSelectTheme}
+                onClose={onClose}
+                listData={listTheme}
+                customSelected={customSelected}
+              />
             </ScrollView>
           </View>
         </View>

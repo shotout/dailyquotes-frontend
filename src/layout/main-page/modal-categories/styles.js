@@ -93,4 +93,7 @@ export default StyleSheet.create({
   ctnClose: {
     paddingTop: isIphoneXorAbove() ? moderateScale(78) : moderateScale(60),
   },
+  ctnStyle: {
+    marginBottom: isIphoneXorAbove() ? moderateScale(120) : moderateScale(120),
+  },
 });

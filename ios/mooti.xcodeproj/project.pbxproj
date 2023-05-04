@@ -45,6 +45,7 @@
 		1157914228F2F7AF00902404 /* 512x512.png in Resources */ = {isa = PBXBuildFile; fileRef = 1157913128F2F7AE00902404 /* 512x512.png */; };
 		1157914328F2F7AF00902404 /* 64x64.png in Resources */ = {isa = PBXBuildFile; fileRef = 1157913228F2F7AE00902404 /* 64x64.png */; };
 		1157914428F2F7AF00902404 /* second@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1157913328F2F7AE00902404 /* second@3x.png */; };
+		11643DB529C83B00001EE26D /* QuoteWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 111DC8CA29A76BCA00279994 /* QuoteWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		1197B1C929ADC382000510F2 /* Inter-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 161ADCBB1F064A978FC4607F /* Inter-Black.ttf */; };
 		1197B1CA29ADC382000510F2 /* Inter-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A71D6D59E4FA4CBA8F35E9D1 /* Inter-Bold.ttf */; };
 		1197B1CB29ADC382000510F2 /* Inter-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5014481E81C74144A3E52D81 /* Inter-ExtraBold.ttf */; };
@@ -97,6 +98,7 @@
 		172CB515B0DD4BA99EE55E0E /* Inter-ExtraLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D6DCC2C0C82E432C8FDEE57E /* Inter-ExtraLight.ttf */; };
 		1AD200A8AC1A4BAF8C56DF10 /* IbarraRealNova-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8AFD1CE882244E1180142B8B /* IbarraRealNova-Bold.ttf */; };
 		1B7ECBEFCBF84A85B9D8E36E /* IbarraRealNova-VariableFont_wght.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96DFE4BBF3EB49C6B5333BD7 /* IbarraRealNova-VariableFont_wght.ttf */; };
+		2062C82D2CB643568EA00C24 /* Montserrat-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 66FDE3891C8D46A1992881F0 /* Montserrat-Bold.ttf */; };
 		29EC03CA00D149F3840D2640 /* Inter-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9D02007DB4814B1A9A63EDB6 /* Inter-Medium.ttf */; };
 		2FF3675356CC4DC18905E220 /* Inter-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 126A2D82ABA24F968BA150EA /* Inter-Regular.ttf */; };
 		3963B3F63DBB44468926DD6A /* IM FELL DW Pica.ttf in Resources */ = {isa = PBXBuildFile; fileRef = ABCC5621A5144E4AB37D1DA4 /* IM FELL DW Pica.ttf */; };
@@ -147,7 +149,28 @@
 			remoteGlobalIDString = 13B07F861A680F5B00A75B9A;
 			remoteInfo = mooti;
 		};
+		11643DB629C83B00001EE26D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 111DC8C929A76BCA00279994;
+			remoteInfo = QuoteWidgetExtension;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		11643DB829C83B00001EE26D /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				11643DB529C83B00001EE26D /* QuoteWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		00E356EE1AD99517003FC87E /* mootiTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = mootiTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -219,6 +242,7 @@
 		5DCACB8F33CDC322A6C60F78 /* libPods-mooti.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-mooti.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		63B42DC9847F4DC4A1FF617E /* Gloria Hallelujah.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Gloria Hallelujah.ttf"; path = "../src/assets/fonts/Gloria Hallelujah.ttf"; sourceTree = "<group>"; };
 		654C8413A9C94B32AAE41418 /* Girassol-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Girassol-Regular.ttf"; path = "../src/assets/fonts/Girassol-Regular.ttf"; sourceTree = "<group>"; };
+		66FDE3891C8D46A1992881F0 /* Montserrat-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Montserrat-Bold.ttf"; path = "../src/assets/fonts/Montserrat-Bold.ttf"; sourceTree = "<group>"; };
 		72CD9D52818B40D8990921ED /* Kreon-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Kreon-Regular.ttf"; path = "../src/assets/fonts/Kreon-Regular.ttf"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = mooti/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-mooti-mootiTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-mooti-mootiTests.release.xcconfig"; path = "Target Support Files/Pods-mooti-mootiTests/Pods-mooti-mootiTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -461,6 +485,7 @@
 				63B42DC9847F4DC4A1FF617E /* Gloria Hallelujah.ttf */,
 				34AEB16D3F0847299C8DC05C /* Optima.ttf */,
 				A0F65CDB7FB94EEDBCBA1200 /* CarterOne.ttf */,
+				66FDE3891C8D46A1992881F0 /* Montserrat-Bold.ttf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -519,10 +544,13 @@
 				E235C05ADACE081382539298 /* [CP] Copy Pods Resources */,
 				006667996D18BF39C40616D0 /* [CP-User] [RNFB] Core Configuration */,
 				B78AD096E3EAAD106F9FD49D /* [CP] Embed Pods Frameworks */,
+				11643DB829C83B00001EE26D /* Embed Foundation Extensions */,
+				2372A40202AB4983BAD8F922 /* Upload Debug Symbols to Sentry */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				11643DB729C83B00001EE26D /* PBXTargetDependency */,
 			);
 			name = mooti;
 			productName = mooti;
@@ -699,6 +727,7 @@
 				5231D8CEC5ED4D5EAEF8E3E3 /* Gloria Hallelujah.ttf in Resources */,
 				9581D989DC2C40C98834F945 /* Optima.ttf in Resources */,
 				E17924950CD248D89C709F85 /* CarterOne.ttf in Resources */,
+				2062C82D2CB643568EA00C24 /* Montserrat-Bold.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -732,7 +761,21 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"../node_modules/react-native/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"../node_modules/react-native/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"\n";
+			shellScript = "export SENTRY_PROPERTIES=sentry.properties\nexport EXTRA_PACKAGER_ARGS=\"--sourcemap-output $DERIVED_FILE_DIR/main.jsbundle.map\"\nset -e\n\nWITH_ENVIRONMENT=\"../node_modules/react-native/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"../node_modules/react-native/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT \\\"../node_modules/@sentry/cli/bin/sentry-cli react-native xcode $REACT_NATIVE_XCODE\\\"\"\n\n/bin/sh ../node_modules/@sentry/react-native/scripts/collect-modules.sh\n";
+		};
+		2372A40202AB4983BAD8F922 /* Upload Debug Symbols to Sentry */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Upload Debug Symbols to Sentry";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\nexport SENTRY_PROPERTIES=sentry.properties\n[[ $SENTRY_INCLUDE_NATIVE_SOURCES == \"true\" ]] && INCLUDE_SOURCES_FLAG=\"--include-sources\" || INCLUDE_SOURCES_FLAG=\"\"\n../node_modules/@sentry/cli/bin/sentry-cli debug-files upload \"$INCLUDE_SOURCES_FLAG\" \"$DWARF_DSYM_FOLDER_PATH\"\n";
 		};
 		A55EABD7B0C7F3A422A6CC61 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -912,6 +955,11 @@
 			target = 13B07F861A680F5B00A75B9A /* mooti */;
 			targetProxy = 00E356F41AD99517003FC87E /* PBXContainerItemProxy */;
 		};
+		11643DB729C83B00001EE26D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 111DC8C929A76BCA00279994 /* QuoteWidgetExtension */;
+			targetProxy = 11643DB629C83B00001EE26D /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
@@ -1059,7 +1107,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = mooti/mooti.entitlements;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = PQ7KYCJA35;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = mooti/Info.plist;
@@ -1067,7 +1115,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.11;
+				MARKETING_VERSION = 1.0.12;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1089,14 +1137,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = mooti/mooti.entitlements;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = PQ7KYCJA35;
 				INFOPLIST_FILE = mooti/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.11;
+				MARKETING_VERSION = 1.0.12;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",

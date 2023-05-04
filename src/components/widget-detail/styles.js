@@ -5,16 +5,18 @@ import {fonts} from '../../shared/styling';
 export default StyleSheet.create({
   ctnRoot: {
     backgroundColor: '#E2F9FA',
-    marginHorizontal: moderateScale(20),
+    marginHorizontal: moderateScale(12),
     borderRadius: moderateScale(12),
     marginTop: moderateScale(20),
-    padding: moderateScale(20),
+    paddingHorizontal: moderateScale(12),
+    paddingVertical: moderateScale(16),
   },
   ctnTitle: {
     paddingBottom: moderateScale(16),
     borderColor: '#ccc',
     borderBottomWidth: 1,
     flexDirection: 'row',
+    // justifyContent: 'space-between',
   },
   txtTitle: {
     fontFamily: fonts.InterRegular,
@@ -75,5 +77,29 @@ export default StyleSheet.create({
   ctnLastOption: {
     borderBottomWidth: 0,
     paddingBottom: moderateScale(8),
+  },
+  txtEnable: {
+    color: '#43538A',
+    fontFamily: fonts.InterSemiBold,
+  },
+  txtBlack: {
+    color: '#000',
+  },
+  ctnArrowRight: {
+    width: moderateScale(16),
+    height: moderateScale(16),
+  },
+  titleWrapper: {
+    flex: 1,
+  },
+  subValueWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    maxWidth: '40%',
+  },
+  ctnArrowBottom: {
+    width: moderateScale(12),
+    height: moderateScale(12),
+    marginLeft: moderateScale(8),
   },
 });

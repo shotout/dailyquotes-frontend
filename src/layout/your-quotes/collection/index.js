@@ -14,13 +14,13 @@ import {SwipeListView} from 'react-native-swipe-list-view';
 import {moderateScale} from 'react-native-size-matters';
 import styles from './styles';
 import IconRight from '../../../assets/svg/icon_right.svg';
-import PencilIcon from '../../../assets/svg/pencil.svg';
 import states from './states';
 import Button from '../../../components/button';
 import HeaderButton from '../../../components/header-button';
 import MyCollectionDetail from '../my-collection';
 import IconLove from '../../../assets/svg/icon_love_tap.svg';
 import ModalNewCollection from '../../main-page/modal-new-collection';
+import PencilIcon from '../../../assets/svg/pencil.svg';
 import IconDelete from '../../../assets/svg/ic_delete.svg';
 import {setCollectionData} from '../../../helpers/user';
 import {

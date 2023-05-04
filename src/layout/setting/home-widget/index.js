@@ -6,21 +6,30 @@ import {
   TouchableWithoutFeedback,
   FlatList,
   Image,
+  ScrollView,
+  TouchableOpacity,
 } from 'react-native';
 // import * as RNPaper from 'react-native-paper';
 import {connect} from 'react-redux';
 import {Modal, Portal} from 'react-native-paper';
+import {SwipeListView} from 'react-native-swipe-list-view';
 import HeaderButton from '../../../components/header-button';
 import styles from './styles';
 import states from './states';
 import {colors, sizing} from '../../../shared/styling';
 import WidgetDetail from '../../../components/widget-detail';
 import {listTutorialWidget} from '../../../shared/static/tutorialWidget';
+import Button from '../../../components/button';
+import FormInputCustomWidget from '../../../components/form-input-custom-widget';
+import PencilIcon from '../../../assets/svg/pencil.svg';
+import IconDelete from '../../../assets/svg/ic_delete.svg';
+import {setWidgetData} from '../../../store/widgetState/actions';
 
-function HomeWidget({isVisible, onClose, standardWidget}) {
+function HomeWidget({isVisible, onClose, standardWidget, listCustomWidget}) {
   const [selectedTheme, setSelectedTheme] = useState(null);
   const [showTutorialWidget, setShowTutorialWidget] = useState(false);
   const [activeIndexTutorial, setActiveIndexTutorial] = useState(0);
+  const [showCustomInputWidget, setCustomInputWidget] = useState(false);
 
   const onMomentoumScrollEnd = e => {
     const width = sizing.getDimensionWidth(1);
@@ -67,8 +76,87 @@ function HomeWidget({isVisible, onClose, standardWidget}) {
     return null;
   }
 
+  const renderHiddenItem = (data, rowMap) => (
+    <View style={styles.hiddenWrapper}>
+      <TouchableOpacity
+        style={[styles.ctnHidden, styles.bgBlue]}
+        onPress={() => {
+          setSelectedTheme(data.item);
+          setCustomInputWidget(true);
+        }}>
+        <View style={styles.ctnAction}>
+          <PencilIcon width="100%" height="100%" color="#fff" />
+        </View>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.ctnHidden}
+        onPress={() => {
+          const newData = [...listCustomWidget];
+          const prevIndex = listCustomWidget.findIndex(
+            item => item.id === data.item.id,
+          );
+          newData.splice(prevIndex, 1);
+          setWidgetData(
+            listCustomWidget.filter(item => item.id !== data.item.id),
+          );
+        }}>
+        <View style={styles.ctnAction}>
+          <IconDelete width="100%" height="100%" color="#fff" />
+        </View>
+      </TouchableOpacity>
+    </View>
+  );
+
   function renderListWidget() {
-    return <View style={styles.ctnListWidget}>{renderStandardWidget()}</View>;
+    return (
+      <View style={styles.ctnListWidget}>
+        {renderStandardWidget()}
+
+        <SwipeListView
+          style={{flex: 1}}
+          disableRightSwipe
+          showsVerticalScrollIndicator={false}
+          data={listCustomWidget}
+          renderHiddenItem={renderHiddenItem}
+          renderItem={({item, index}) => (
+            <View style={[styles.themeWrapper, styles.pdTopCtn]}>
+              <View style={styles.ctnWidgetText}>
+                <Text style={styles.txtTheme}>{item.widgetName}</Text>
+              </View>
+              <View style={styles.ctnImg}>
+                <ImageBackground
+                  source={item.themes.imgLocal}
+                  style={styles.imgTheme}>
+                  <Text
+                    ellipsizeMode="tail"
+                    numberOfLines={3}
+                    style={[
+                      styles.txtPlaceholder,
+                      {
+                        fontFamily:
+                          item?.font_family || item?.themes?.font_family,
+                        color:
+                          item?.text_color ||
+                          item?.themes?.text_color ||
+                          colors.white,
+                      },
+                    ]}>
+                    Big journeys begin with small steps.
+                  </Text>
+                </ImageBackground>
+              </View>
+            </View>
+          )}
+          keyExtractor={item => item.id}
+          leftOpenValue={75}
+          rightOpenValue={-150}
+          previewRowKey="0"
+          previewOpenValue={-40}
+          previewOpenDelay={3000}
+          // onRowDidOpen={onRowDidOpen}
+        />
+      </View>
+    );
   }
 
   function renderContent() {
@@ -81,6 +169,7 @@ function HomeWidget({isVisible, onClose, standardWidget}) {
               onPress={() => {
                 setShowTutorialWidget(false);
                 setActiveIndexTutorial(0);
+                setCustomInputWidget(false);
               }}
             />
             <View style={styles.ctnDescDetail}>
@@ -129,6 +218,31 @@ function HomeWidget({isVisible, onClose, standardWidget}) {
         </View>
       );
     }
+    if (showCustomInputWidget) {
+      return (
+        <View style={styles.ctnRoot}>
+          <View style={styles.ctnContent}>
+            <HeaderButton
+              title="Widgets"
+              onPress={() => {
+                setCustomInputWidget(false);
+                setSelectedTheme(null);
+              }}
+              rightText
+              labelRight="See tutorial"
+              onRightText={() => {
+                setShowTutorialWidget(true);
+              }}
+            />
+            <FormInputCustomWidget
+              defaultName={`Custom #${listCustomWidget.length + 1}`}
+              defaultTheme={standardWidget}
+              editTheme={selectedTheme}
+            />
+          </View>
+        </View>
+      );
+    }
     if (selectedTheme) {
       return (
         <View style={styles.ctnRoot}>
@@ -160,12 +274,22 @@ function HomeWidget({isVisible, onClose, standardWidget}) {
       <View style={styles.ctnRoot}>
         <View style={styles.ctnContent}>
           <HeaderButton title="Widgets" onPress={onClose} />
-          <View style={styles.ctnDesc}>
-            <Text style={styles.txtContent}>
-              Customize your Widgets for your Home Screen.
-            </Text>
-          </View>
-          {renderListWidget()}
+          <ScrollView>
+            <View style={styles.ctnWrapper}>
+              <View style={styles.ctnDesc}>
+                <Text style={styles.txtContent}>
+                  Customize your Widgets for your Home Screen.
+                </Text>
+              </View>
+              {renderListWidget()}
+            </View>
+          </ScrollView>
+          <Button
+            label="Add Custom Widget"
+            onPress={() => {
+              setCustomInputWidget(true);
+            }}
+          />
         </View>
       </View>
     );

@@ -18,6 +18,9 @@ export default function QuotesContent({item, themeUser, source}) {
               style={[
                 styles.ctnQuotes,
                 {
+                  fontSize: themeUser.font_size
+                    ? moderateScale(Number(themeUser.font_size))
+                    : moderateScale(18),
                   backgroundColor: themeUser.background_color || undefined,
                   color: themeUser.text_color || colors.white,
                   fontFamily: themeUser.font_family,
@@ -27,9 +30,6 @@ export default function QuotesContent({item, themeUser, source}) {
                     ? JSON.parse(themeUser.text_shadow_offset)
                     : undefined,
                   textShadowRadius: themeUser.text_shadow ? 10 : undefined,
-                  fontSize: themeUser.font_size
-                    ? moderateScale(Number(themeUser.font_size))
-                    : moderateScale(18),
                   lineHeight: themeUser.line_height
                     ? moderateScale(Number(themeUser.line_height))
                     : moderateScale(24),
@@ -43,11 +43,18 @@ export default function QuotesContent({item, themeUser, source}) {
                 style={[
                   styles.ctnQuotes,
                   {
+                    backgroundColor: themeUser.background_color || undefined,
                     color: themeUser.text_color || colors.white,
                     fontFamily: themeUser.font_family,
-                    fontSize: themeUser.font_size
-                      ? moderateScale(Number(themeUser.font_size) - 2)
-                      : moderateScale(16),
+                    // fontFamily: 'Iceberg-Regular',
+                    textShadowColor: themeUser.text_shadow,
+                    textShadowOffset: themeUser.text_shadow_offset
+                      ? JSON.parse(themeUser.text_shadow_offset)
+                      : undefined,
+                    textShadowRadius: themeUser.text_shadow ? 10 : undefined,
+                    lineHeight: themeUser.line_height
+                      ? moderateScale(Number(themeUser.line_height))
+                      : moderateScale(24),
                   },
                 ]}>
                 - {item.author}

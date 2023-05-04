@@ -1,5 +1,5 @@
 import moment from 'moment';
-import {Linking} from 'react-native';
+import {Linking, Platform} from 'react-native';
 import Purchasely, {ProductResult} from 'react-native-purchasely';
 import {getUserProfile, setSubcription} from '../shared/request';
 import store from '../store/configure-store';
@@ -143,10 +143,19 @@ export const handlePayment = async (vendorId, cb) =>
           break;
         case ProductResult.PRODUCT_RESULT_CANCELLED:
           console.log('Payment cancel');
-          await setSubcription({
-            subscription_type: 1,
-            purchasely_id: purchaseId,
-          });
+          if (Platform.OS === 'android') {
+            if (
+              !vendorId ||
+              vendorId === 'onboarding' ||
+              vendorId === 'offer_no_purchase_after_onboarding_paywall'
+            ) {
+              handlePayment(vendorId);
+            }
+          }
+          // await setSubcription({
+          //   subscription_type: 1,
+          //   purchasely_id: purchaseId,
+          // });
           break;
         default:
           break;
@@ -227,4 +236,15 @@ export const handleSubscriptionStatus = async (subscription = {}) => {
 
 export const setCollectionData = payload => {
   store.dispatch({type: SUCCESS_FETCH_COLLECTION, payload});
+};
+
+export const makeid = length => {
+  let result = '';
+  const characters =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const charactersLength = characters.length;
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
 };

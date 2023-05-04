@@ -21,6 +21,7 @@ import states from './states';
 import ModalCategoriesSearch from '../modal-categories-search';
 import {handlePayment, isUserPremium} from '../../../helpers/user';
 import {sizing} from '../../../shared/styling';
+import Button from '../../../components/button';
 
 const ios = Platform.OS === 'ios';
 
@@ -31,9 +32,11 @@ function ModalCategories({
   categories,
   userProfile,
   contentRef,
-  panelRef,
   fullSize,
+  onCustomSelectCategory,
+  customSelected,
 }) {
+  const [categoryValue, setCategoryValue] = useState([]);
   const draggableRange = {
     top: fullSize
       ? sizing.getDimensionHeight(1)
@@ -109,6 +112,9 @@ function ModalCategories({
   }, []);
 
   const getInitialCategory = () => {
+    if (customSelected && customSelected.length > 0) {
+      return customSelected.map(item => item.id);
+    }
     if (userProfile.data.categories?.length > 0) {
       return userProfile.data.categories.map(item => item.id);
     }
@@ -155,6 +161,19 @@ function ModalCategories({
   }
 
   function renderIconClose() {
+    if (onCustomSelectCategory) {
+      return (
+        <Button
+          btnStyle={styles.ctnStyle}
+          label="Save"
+          onPress={() => {
+            onCustomSelectCategory(categoryValue);
+            setCategoryValue([]);
+            onClose();
+          }}
+        />
+      );
+    }
     return (
       <TouchableOpacity style={styles.btnStyle} onPress={onClose}>
         <Image source={iconClose} style={styles.btnClose} />
@@ -198,6 +217,10 @@ function ModalCategories({
                 {/* <View style={{height: sizing.getDimensionHeight(200)}} /> */}
                 <CardCategories
                   initialSelect={getInitialCategory()}
+                  customSelected={customSelected}
+                  onCustomSelectCategory={val => {
+                    setCategoryValue(val);
+                  }}
                   listData={categories}
                 />
               </ScrollView>

@@ -130,7 +130,7 @@ function ModalSetting({contentRef, onClose, collections}) {
               setShowModalReminder(true);
             }}
           />
-          {/* {Platform.OS === 'ios' && (
+          {Platform.OS === 'ios' && (
             <ListContent
               title="Home Screen Widgets"
               icon={<WidgetIcon width="90%" height="90%" />}
@@ -147,7 +147,7 @@ function ModalSetting({contentRef, onClose, collections}) {
                 setModalLockScreenWidget(true);
               }}
             />
-          )} */}
+          )}
         </View>
         <View style={styles.separator} />
       </View>

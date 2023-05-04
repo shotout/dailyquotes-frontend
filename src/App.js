@@ -9,12 +9,19 @@ import Purchasely, {RunningMode} from 'react-native-purchasely';
 import {Adjust, AdjustConfig} from 'react-native-adjust';
 import FullScreenChz from 'react-native-fullscreen-chz';
 
+import * as Sentry from '@sentry/react-native';
 import Navigator from './screens/app-routes';
 import store, {persistor} from './store/configure-store';
 import {networkDebugger} from './shared/networkDebugger';
 import ModalLock from './layout/main-page/modal-lock';
 import ModalFirstPremium from './components/modal-first-premium';
-import ModalLoadingInitial from './components/modal-loading-initial';
+
+Sentry.init({
+  dsn: 'https://3e765c1b1c404989ace20873bc1dac63@o4504973387300864.ingest.sentry.io/4504973397786624',
+  // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
+  // We recommend adjusting this value in production.
+  tracesSampleRate: 1.0,
+});
 
 LogBox.ignoreAllLogs();
 
@@ -65,4 +72,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default Sentry.wrap(App);

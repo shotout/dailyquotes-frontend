@@ -36,8 +36,11 @@ function CardCategories({
   additionalContent,
   fetchListQuote,
   isSearch,
+  onCustomSelectCategory,
+  customSelected,
 }) {
   const [selectedCard, setSelectedCard] = useState(initialSelect);
+  const [objCard, setObjCard] = useState(customSelected);
 
   // console.log('Check selectedCard:', selectedCard);
 
@@ -52,7 +55,7 @@ function CardCategories({
   }, []);
 
   useEffect(() => {
-    if (initialSelect !== selectedCard) {
+    if (initialSelect !== selectedCard && !onCustomSelectCategory) {
       setSelectedCard(initialSelect);
     }
   }, [initialSelect]);
@@ -94,22 +97,29 @@ function CardCategories({
     return false;
   };
 
-  const onPressSelect = value => {
+  const onPressSelect = (value, objFull) => {
     const isSelected = isDataSelected(value);
     let mainData = [...selectedCard];
+    let objData = [...objCard];
     if (isSelected) {
       mainData = selectedCard.filter(card => card !== value);
+      objData = objCard.filter(card => card.id !== value);
       setSelectedCard(mainData);
     } else {
       mainData.push(value);
+      objData.push(objFull);
       setSelectedCard(mainData);
     }
-    updateFieldCategory(mainData);
+    setObjCard(objData);
+    onCustomSelectCategory(objData);
+    if (!onCustomSelectCategory) {
+      updateFieldCategory(mainData);
+    }
   };
 
   const handleOnpress = card => {
     if (card.is_free === 1 || isUserPremium()) {
-      onPressSelect(card.id);
+      onPressSelect(card.id, card);
     }
     if (card.is_free === 0 && !isUserPremium()) {
       handlePayment('in_app_paywall');

@@ -5,6 +5,7 @@ import {
   Animated,
   TouchableWithoutFeedback,
   View,
+  Platform,
 } from 'react-native';
 import moment from 'moment';
 import Lottie from 'lottie-react-native';
@@ -12,6 +13,11 @@ import {createAnimatableComponent} from 'react-native-animatable';
 import styles from './styles';
 
 const ViewAnimation = createAnimatableComponent(View);
+
+const textiOS =
+  'I understand it will take months to create this new habit\nof self-reflection. I am aware of this and fully willing to\nconstruct a better version of myself, week after week,\nby following the guidance and help of Mooti.';
+const textAndroid =
+  'I understand it will take months to create this new habit of self-reflection. I am aware of this and fully willing to construct a better version of myself, week after week, by following the guidance and help of Mooti.';
 
 const listData = [
   {name: '1 year', value: '12'},
@@ -260,9 +266,7 @@ export default function Contract({values, substep, onLongPress, listCategory}) {
             duration={1500}
             style={styles.ctnDesc}>
             <Text style={styles.txtDesc}>
-              {
-                'I understand it will take months to create this new habit\nof self-reflection. I am aware of this and fully willing to\nconstruct a better version of myself, week after week,\nby following the guidance and help of Mooti.'
-              }
+              {Platform.OS === 'android' ? textAndroid : textiOS}
             </Text>
           </ViewAnimation>
         </View>

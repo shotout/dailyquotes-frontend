@@ -46,11 +46,7 @@ export default StyleSheet.create({
     marginHorizontal: moderateScale(20),
     borderRadius: moderateScale(12),
     marginTop: moderateScale(20),
-    padding: moderateScale(20),
-  },
-  themeWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    paddingVertical: moderateScale(20),
   },
   ctnWidgetText: {
     flex: 1,
@@ -146,5 +142,43 @@ export default StyleSheet.create({
   },
   blackDot: {
     backgroundColor: '#000',
+  },
+  ctnWrapper: {
+    flex: 1,
+  },
+  pdTopCtn: {
+    paddingTop: moderateScale(20),
+    borderTopWidth: 1,
+    borderColor: '#ddd',
+    // borderColor: 'red',
+    paddingBottom: moderateScale(20),
+  },
+  hiddenWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    // backgroundColor: 'red',
+  },
+  ctnHidden: {
+    backgroundColor: colors.pink,
+    height: moderateScale(140),
+    width: moderateScale(68),
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  ctnAction: {
+    width: moderateScale(26),
+    height: moderateScale(26),
+  },
+  bgBlue: {
+    backgroundColor: colors.darkBlue,
+  },
+  themeWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: moderateScale(140),
+    backgroundColor: '#E2F9FA',
+    paddingHorizontal: moderateScale(20),
+    overflow: 'hidden',
   },
 });

@@ -170,9 +170,9 @@ export default StyleSheet.create({
     fontSize: moderateScale(14)
   },
   ctnIconCrown:{
-    width: moderateScale(20),
-    height: moderateScale(20),
-    marginLeft: moderateScale(12)
+    width: moderateScale(26),
+    height: moderateScale(26),
+    marginRight: moderateScale(6)
   },
   ctnShare: {
     position: 'relative'
