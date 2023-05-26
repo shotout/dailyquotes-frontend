@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import React from 'react';
+import React, {Fragment} from 'react';
 import {Text, TouchableOpacity, ActivityIndicator} from 'react-native';
 import {colors} from '../../shared/styling';
 import styles from './styles';
@@ -11,6 +11,8 @@ export default function Button({
   isLoading,
   btnStyle,
   isDisable,
+  prependIcon,
+  txtStyle,
 }) {
   function getBgColor() {
     switch (type) {
@@ -50,7 +52,12 @@ export default function Button({
       {isLoading ? (
         <ActivityIndicator size="small" color="#fff" />
       ) : (
-        <Text style={[styles.txtButton, getTextColor()]}>{label}</Text>
+        <>
+          {prependIcon}
+          <Text style={[styles.txtButton, getTextColor(), txtStyle]}>
+            {label}
+          </Text>
+        </>
       )}
     </TouchableOpacity>
   );

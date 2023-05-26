@@ -284,12 +284,12 @@ function HomeWidget({isVisible, onClose, standardWidget, listCustomWidget}) {
               {renderListWidget()}
             </View>
           </ScrollView>
-          <Button
+          {/* <Button
             label="Add Custom Widget"
             onPress={() => {
               setCustomInputWidget(true);
             }}
-          />
+          /> */}
         </View>
       </View>
     );

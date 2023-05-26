@@ -26,8 +26,16 @@ const commonPersistConfig = {
     'haveBeenAskRating',
     'quotes',
     'registerData',
+    'todayAdsLimit',
+    'restPassLength',
   ],
-  blacklist: ['showModalPremium'],
+  blacklist: [
+    'showModalPremium',
+    'finishInitialLoader',
+    'runAnimationSlide',
+    'paywallNotifcation',
+    'animationCounter',
+  ],
 };
 const widgetPersistConfig = {
   key: 'widgetState',

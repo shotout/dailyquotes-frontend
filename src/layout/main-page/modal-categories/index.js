@@ -14,6 +14,7 @@ import {Portal} from 'react-native-paper';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import SlidingUpPanel from 'rn-sliding-up-panel';
+import {BannerAd, BannerAdSize} from 'react-native-google-mobile-ads';
 import Search from '../../../components/search';
 import styles from './styles';
 import CardCategories from '../../../components/card-categories';
@@ -22,6 +23,7 @@ import ModalCategoriesSearch from '../modal-categories-search';
 import {handlePayment, isUserPremium} from '../../../helpers/user';
 import {sizing} from '../../../shared/styling';
 import Button from '../../../components/button';
+import {getAdaptiveBannerID} from '../../../shared/static/adsId';
 
 const ios = Platform.OS === 'ios';
 
@@ -215,15 +217,35 @@ function ModalCategories({
                 contentContainerStyle={styles.ctnScroll}>
                 {renderLabel()}
                 {/* <View style={{height: sizing.getDimensionHeight(200)}} /> */}
-                <CardCategories
-                  initialSelect={getInitialCategory()}
-                  customSelected={customSelected}
-                  onCustomSelectCategory={val => {
-                    setCategoryValue(val);
-                  }}
-                  listData={categories}
-                />
+                {onCustomSelectCategory ? (
+                  <CardCategories
+                    initialSelect={getInitialCategory()}
+                    customSelected={customSelected}
+                    onCustomSelectCategory={val => {
+                      setCategoryValue(val);
+                    }}
+                    listData={categories}
+                  />
+                ) : (
+                  <CardCategories
+                    initialSelect={getInitialCategory()}
+                    customSelected={customSelected}
+                    listData={categories}
+                  />
+                )}
               </ScrollView>
+
+              {!isUserPremium() && (
+                <View style={styles.ctnBanner}>
+                  <BannerAd
+                    unitId={getAdaptiveBannerID()}
+                    size={BannerAdSize.BANNER}
+                    requestOptions={{
+                      requestNonPersonalizedAdsOnly: true,
+                    }}
+                  />
+                </View>
+              )}
               {renderIconClose()}
             </View>
             {showModalSearch && (

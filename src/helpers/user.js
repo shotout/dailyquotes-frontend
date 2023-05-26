@@ -52,6 +52,18 @@ export const isUserPremium = () => {
   return true;
 };
 
+export const isPremiumToday = () => {
+  const todayLimit = store.getState().defaultState.todayAdsLimit;
+  const {restPassLength} = store.getState().defaultState;
+  if (isUserPremium()) {
+    return true;
+  }
+  if (12 + (restPassLength || 0) === todayLimit) {
+    return false;
+  }
+  return true;
+};
+
 export const isCompletedOnboarding = () => {
   const profile = store.getState().defaultState.userProfile;
   const {type} = profile.data.subscription;
@@ -112,12 +124,10 @@ export const handlePayment = async (vendorId, cb) =>
           purchasely_id: purchaseId,
         });
       }
-      console.log('Get anonymous id after chang status to 5:', purchaseId);
       const res = await Purchasely.presentPresentationForPlacement({
         placementVendorId: vendorId || 'onboarding',
         isFullscreen: true,
       });
-      console.log('Res purchase:', res);
       const user = store.getState().defaultState.userProfile;
       switch (res.result) {
         case ProductResult.PRODUCT_RESULT_PURCHASED:
@@ -149,7 +159,7 @@ export const handlePayment = async (vendorId, cb) =>
               vendorId === 'onboarding' ||
               vendorId === 'offer_no_purchase_after_onboarding_paywall'
             ) {
-              handlePayment(vendorId);
+              // handlePayment(vendorId);
             }
           }
           // await setSubcription({
@@ -247,4 +257,24 @@ export const makeid = length => {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;
+};
+
+export const reformatDate = valueDate => {
+  if (valueDate) {
+    const formatYears = moment(valueDate).format('YYYY');
+    const formatMonth = moment(valueDate).format('MM');
+    const formatDay = moment(valueDate).format('DD');
+    const formatHours = moment(valueDate).format('HH');
+    const minutes = moment(valueDate).format('mm');
+    return new Date(
+      formatYears,
+      formatMonth - 1,
+      formatDay,
+      formatHours,
+      minutes,
+      0,
+      0,
+    );
+  }
+  return new Date();
 };

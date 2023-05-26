@@ -94,13 +94,13 @@ function Register({
   const [values, setFormValues] = useState({
     name: '',
     gender: '',
-    start_at: moment(new Date(2018, 11, 24, 8, 0, 30, 0)).format(
+    start_at: moment(new Date(2018, 11, 24, 8, 0, 0, 0)).format(
       'YYYY-MM-DD HH:mm',
     ),
-    end_at: moment(new Date(2018, 11, 24, 21, 0, 30, 0)).format(
+    end_at: moment(new Date(2018, 11, 24, 20, 0, 0, 0)).format(
       'YYYY-MM-DD HH:mm',
     ),
-    often: 10,
+    often: 15,
     selectedFeeling: [],
     causeFeeling: [],
     selectedCategory: [],
@@ -130,7 +130,12 @@ function Register({
       setHasRegister(registerData?.isHasRegister || isHasRegister);
       setNotificationStep(registerData?.notificationStep || notificationStep);
       setInitial(false);
-      if (registerData.registerStep === 8 && registerData.substep === 'a') {
+      if (
+        registerData &&
+        registerData.registerStep &&
+        registerData.registerStep === 8 &&
+        registerData.substep === 'a'
+      ) {
         nextStepAnimate();
       }
       await AsyncStorage.removeItem('isFinishTutorial');
@@ -260,7 +265,6 @@ function Register({
         ways: values.causeFeeling,
         areas: values.selectedCategory,
         timezone: timeZone,
-        device_id: Date.now().toString(),
       };
       const res = await postRegister(payload);
       handleSetProfile(res);
@@ -447,6 +451,7 @@ function Register({
       }
     } else if (registerStep === 7) {
       handleChangeValue('isAnytime', 1);
+      // FOR WIDGET QUOTE
       // if (notificationStep === 4) {
       //   setRegisterStep(8);
       //   setSubstep('a');
@@ -781,7 +786,7 @@ function Register({
           contentContainerStyle={styles.ctnScroll}
           scrollEnabled={
             (!isIphoneXorAbove() && registerStep === 8) ||
-            (isIpad && registerStep !== 1)
+            (!isIphoneXorAbove() && registerStep !== 1)
           }>
           {renderHeader()}
           {renderContent()}

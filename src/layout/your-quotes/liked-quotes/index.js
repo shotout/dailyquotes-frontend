@@ -9,7 +9,6 @@ import {
 import {connect} from 'react-redux';
 import Share from 'react-native-share';
 import {Modal, Portal} from 'react-native-paper';
-import SlidingUpPanel from 'rn-sliding-up-panel';
 import HeaderButton from '../../../components/header-button';
 import Search from '../../../components/search';
 import styles from './styles';

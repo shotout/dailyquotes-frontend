@@ -1,4 +1,7 @@
 import FastImage from 'react-native-fast-image';
+import {isArray} from 'lodash';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import moment from 'moment';
 import {
   getListArea,
   getlistFeel,
@@ -14,6 +17,8 @@ import {
 import {APP_VERSION, BACKEND_URL} from '../../shared/static';
 import store from '../configure-store';
 import * as types from './types';
+import {isPremiumToday, isUserPremium} from '../../helpers/user';
+import dummyPastQuotes from '../../shared/static/dummyPastQuotes';
 
 export const setModalFirstPremium = payload => ({
   type: types.SET_MODAL_FIRST_PREMIUM,
@@ -35,17 +40,80 @@ export const handleSetProfile = payload => ({
   payload,
 });
 
-export const fetchListQuote = params => async dispatch =>
+export const fetchListQuote = (params, isPassPremium) => async dispatch =>
   new Promise(async (resolve, reject) => {
     try {
       dispatch({type: types.START_FETCH_QUOTES});
       const quote = await getListQuotes({
-        length: 1000,
+        length: isPremiumToday() || isPassPremium ? 1000 : 10,
         page: 1,
         ...params,
       });
+      let restPas = [];
+      if (!isUserPremium()) {
+        const pastQuote = await getListPastQuotes({length: 5, page: 1});
+        restPas = isArray(pastQuote?.data)
+          ? pastQuote?.data
+          : pastQuote?.data?.data || dummyPastQuotes;
+      }
       if (quote.data?.data?.length > 0) {
-        dispatch({type: types.SUCCESS_FETCH_QUOTE, payload: quote.data});
+        let overallData = [
+          ...[{item_type: 'countdown_page'}],
+          ...restPas,
+          ...quote.data.data,
+          ...[{item_type: 'countdown_page'}],
+        ];
+        if (!isPremiumToday() && !isPassPremium) {
+          overallData = overallData.map((ctn, itemIndex) => {
+            if (
+              itemIndex === 2 ||
+              itemIndex === 5 ||
+              itemIndex === 8 ||
+              itemIndex === 12
+            ) {
+              return {
+                ...ctn,
+                item_type: 'in_app_ads',
+              };
+            }
+            return ctn;
+          });
+        } else if (!isUserPremium()) {
+          overallData.map((ctn, itemIndex) => {
+            if (
+              itemIndex === 2 ||
+              itemIndex === 5 ||
+              itemIndex === 8 ||
+              itemIndex === 12 ||
+              itemIndex === 16
+            ) {
+              return {
+                ...ctn,
+                item_type: 'in_app_ads',
+              };
+            }
+            if (itemIndex > 16) {
+              if (itemIndex % 4 === 0) {
+                overallData.splice(itemIndex + 1, 0, {item_type: 'in_app_ads'});
+              }
+            }
+          });
+        }
+        dispatch({
+          type: types.SUCCESS_FETCH_QUOTE,
+          payload: quote.data,
+          arrData: overallData,
+          listBasicQuote:
+            isPremiumToday() || isPassPremium ? [] : quote.data.data,
+          restPassLength: restPas?.length,
+          isPassPremium,
+        });
+      }
+      if (isPassPremium) {
+        AsyncStorage.setItem(
+          'quotePremiumDate:',
+          moment().format('YYYY-MM-DD'),
+        );
       }
       resolve(quote);
     } catch (err) {
@@ -187,6 +255,52 @@ export const hideLoadingModal = () => {
 export const setCounterNumber = payload => {
   store.dispatch({
     type: types.CHANGE_COUNTER_LOADING_MODAL,
+    payload,
+  });
+};
+
+export const setTodayAdsLimit = payload => {
+  store.dispatch(fetchListQuote({}, true));
+};
+
+export const setNewQuoteData = payload => {
+  store.dispatch({
+    type: types.SET_NEW_QUOTE_DATA,
+    payload,
+  });
+};
+
+export const resetTodayAdsLimit = payload => {
+  store.dispatch({
+    type: types.SET_TODAY_ADS_LIMIT,
+    payload,
+  });
+};
+
+export const setAnimationSlideStatus = payload => {
+  store.dispatch({
+    type: types.SET_ANIMATION_SLIDE_DATA,
+    payload,
+  });
+};
+
+export const setInitialLoaderStatus = payload => {
+  store.dispatch({
+    type: types.SET_INITIAL_FINISH_LOADER,
+    payload,
+  });
+};
+
+export const setPaywallNotification = payload => {
+  store.dispatch({
+    type: types.SET_PAYWALL_NOTIFICATION,
+    payload,
+  });
+};
+
+export const setAnimationCounter = payload => {
+  store.dispatch({
+    type: types.SET_ANIMATION_COUNTER,
     payload,
   });
 };

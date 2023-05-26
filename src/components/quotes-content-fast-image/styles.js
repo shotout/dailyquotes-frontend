@@ -5,6 +5,9 @@ import { isIphoneXorAbove } from '../../shared/devices';
 import { colors, fonts, sizing } from '../../shared/styling';
 
 export default StyleSheet.create({
+  ctnWrapper:{
+    position: 'relative'
+  },
   ctnBackgroundImage: {
     resizeMode: 'cover',
     width: sizing.getWindowWidth(1),
@@ -14,6 +17,9 @@ export default StyleSheet.create({
     flex: 1,
     // backgroundColor: 'red',
     marginBottom: isIphoneXorAbove() ? moderateScale(90) : moderateScale(70)
+  },
+  ctnPdAds:{
+    marginBottom: isIphoneXorAbove() ? moderateScale(150) : moderateScale(130)
   },
   quotesWrapper: {
     flex: 1,
@@ -38,4 +44,7 @@ export default StyleSheet.create({
     lineHeight: moderateScale(24),
     padding: moderateScale(4)
   },
+  ctnAbsolute:{
+    position: 'absolute'
+  }
 });

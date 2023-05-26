@@ -13,17 +13,20 @@ import FastImage from 'react-native-fast-image';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {BACKEND_URL} from '../../shared/static';
 import styles from './styles';
-import IconLockWhite from '../../assets/svg/icon_lock_color_white.svg';
+import IconLockWhite from '../../assets/svg/icon_lock.svg';
 import IconChecklist from '../../assets/svg/icon_checklist.svg';
-import {selectTheme} from '../../shared/request';
+import {selectTheme, unlockByAdmob} from '../../shared/request';
 import states from './states';
 import dispatcher from './dispatcher';
 import {handlePayment, isUserPremium} from '../../helpers/user';
 import LoadingIndicator from '../loading-indicator';
 import {themesData} from '../../shared/static/themes';
 import {handleShuffleTheme, listTheme} from '../../shared/useBackgroundQuotes';
+import ModalUnlockCategory from '../modal-unlock-ads';
 
 const iconSuffle = require('../../assets/icons/random_theme.png');
+const adsIcon = require('../../assets/icons/ads_icon.png');
+const themesBanner = require('../../assets/icons/themes_banner.png');
 
 function CardTheme({
   listData,
@@ -43,6 +46,8 @@ function CardTheme({
   };
   const [selectedCard, setSelectedCard] = useState([]);
   const [isLoading, setLoading] = useState(null);
+  const [showUnlockCardAds, setUnlockCards] = useState(false);
+  const [selectedTheme, setSelectedCategory] = useState(null);
 
   useEffect(() => {
     if (userProfile.data.themes?.length) {
@@ -60,17 +65,21 @@ function CardTheme({
   };
 
   const handleSubmit = async item => {
-    console.log('Check submit item:', item);
     try {
       const objData =
         item[0] === 6
           ? shuffleData
           : listData.find(content => content.id === item[0]);
-      console.log('Check obj:', objData);
       selectTheme({
         _method: 'PATCH',
         themes: item,
       });
+      if (!isUserPremium()) {
+        unlockByAdmob({
+          custom_data: `theme_${item[0]}`,
+          user_id: userProfile?.data?.id || '',
+        });
+      }
       // fetchListQuote();
       handleSetProfile({
         ...userProfile,
@@ -96,9 +105,10 @@ function CardTheme({
     //   setSelectedCard(mainData);
     //   handleSubmit(value);
     // }
-    const arrSelected = [value];
+    const getItemId = value === 'theme_selected' ? selectedTheme.id : value;
+    const arrSelected = [getItemId];
     if (value !== selectedCard[0]) {
-      setLoading(value);
+      setLoading(getItemId);
       setSelectedCard(arrSelected);
       handleSubmit(arrSelected);
     }
@@ -113,7 +123,10 @@ function CardTheme({
       return true;
     }
     if (!isUserPremium()) {
-      handlePayment('in_app_paywall');
+      setSelectedCategory(item);
+      setTimeout(() => {
+        setUnlockCards(true);
+      });
     }
     return true;
     // onPressSelect(item.id);
@@ -121,7 +134,7 @@ function CardTheme({
 
   const getLocalImage = id => {
     const findItem = listTheme.find(content => content.id === id);
-    if (id && findItem.imgLocal) {
+    if (id && findItem && findItem.imgLocal) {
       return findItem.imgLocal;
     }
     return null;
@@ -150,18 +163,6 @@ function CardTheme({
   };
 
   function renderLogo(item, isGetSelect) {
-    if (item.is_free === 0 && !isUserPremium()) {
-      return (
-        <View style={styles.ctnIcon}>
-          <View style={styles.ctnIconItem}>
-            <IconLockWhite width="100%" height="100%" />
-          </View>
-        </View>
-      );
-    }
-    if (!isGetSelect) {
-      return <View style={styles.whiteBg} />;
-    }
     if (isGetSelect) {
       return (
         <View style={styles.whiteBg}>
@@ -170,6 +171,24 @@ function CardTheme({
           </View>
         </View>
       );
+    }
+    if (item.is_free === 0 && !isUserPremium()) {
+      return (
+        <View style={styles.ctnLock}>
+          <View style={styles.ctnIcon}>
+            <View style={styles.ctnIconItem}>
+              <IconLockWhite color="#000" width="100%" height="100%" />
+            </View>
+          </View>
+          <View style={styles.ctnAdsIcon}>
+            <Image source={adsIcon} style={styles.iconAds} />
+            <Text style={styles.txtAds}>Free</Text>
+          </View>
+        </View>
+      );
+    }
+    if (!isGetSelect) {
+      return <View style={styles.whiteBg} />;
     }
     return null;
   }
@@ -268,6 +287,23 @@ function CardTheme({
       </View>
       {renderListTheme()}
       {/* <View style={[styles.ctnRowIcon]}>{renderContent()}</View> */}
+
+      {showUnlockCardAds && (
+        <ModalUnlockCategory
+          visible={showUnlockCardAds}
+          handleClose={() => {
+            setUnlockCards(false);
+          }}
+          successMessage="Congrats! You have unlocked the selected Premium Theme."
+          title={'Unlock\nthis Theme for free now'}
+          label="Watch a Video to unlock this Theme for Free or go Premium for full access!"
+          imgSource={themesBanner}
+          selectedCategory={selectedTheme}
+          handleUnlock={() => {
+            onPressSelect('theme_selected');
+          }}
+        />
+      )}
     </View>
   );
 }

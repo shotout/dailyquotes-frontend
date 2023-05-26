@@ -73,7 +73,8 @@ function ModalShare(props) {
   }, [captureUri]);
 
   const handleShareStorage = async submitObj => {
-    await AsyncStorage.setItem('freeShareDaily', JSON.stringify(submitObj));
+    const stringStorage = JSON.stringify(submitObj);
+    await AsyncStorage.setItem('freeShareDaily', stringStorage);
   };
 
   const eventShare = () => {
@@ -435,41 +436,43 @@ function ModalShare(props) {
         top: sizing.getDimensionHeight(1),
         bottom: 0,
       }}>
-      <View style={styles.ctnRoot}>
-        <TouchableWithoutFeedback onPress={onClose}>
-          <View style={styles.ctnClose} />
-        </TouchableWithoutFeedback>
-        <View style={styles.ctnContent}>
-          <LineGestureSlide />
-          {renderCard()}
-          <View style={styles.ctnFooter}>{renderFooter()}</View>
-          {renderIconClose()}
+      {dragHandler => (
+        <View style={styles.ctnRoot}>
+          <TouchableWithoutFeedback onPress={onClose}>
+            <View style={styles.ctnClose} />
+          </TouchableWithoutFeedback>
+          <View style={styles.ctnContent}>
+            <LineGestureSlide />
+            {renderCard()}
+            <View style={styles.ctnFooter}>{renderFooter()}</View>
+            {renderIconClose()}
+          </View>
+          {renderModalDislike()}
+          {renderModalSave()}
+          {renderModalCopy()}
+
+          <ModalAddCollection
+            isVisible={showModalAddCollection}
+            onClose={() => {
+              setShowModalAddCollection(false);
+            }}
+            idQuote={idQuote}
+          />
+
+          <ModalCollection
+            isVisible={showModalCollection}
+            onClose={() => {
+              setShowModalCollection(false);
+            }}
+            onFinish={() => {
+              setShowModalCollection(false);
+              setTimeout(() => {
+                setShowModalAddCollection(true);
+              }, 1000);
+            }}
+          />
         </View>
-      </View>
-      {renderModalDislike()}
-      {renderModalSave()}
-      {renderModalCopy()}
-
-      <ModalAddCollection
-        isVisible={showModalAddCollection}
-        onClose={() => {
-          setShowModalAddCollection(false);
-        }}
-        idQuote={idQuote}
-      />
-
-      <ModalCollection
-        isVisible={showModalCollection}
-        onClose={() => {
-          setShowModalCollection(false);
-        }}
-        onFinish={() => {
-          setShowModalCollection(false);
-          setTimeout(() => {
-            setShowModalAddCollection(true);
-          }, 1000);
-        }}
-      />
+      )}
     </SlidingUpPanel>
   );
 }

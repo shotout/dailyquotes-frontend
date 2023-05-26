@@ -16,12 +16,14 @@ import {networkDebugger} from './shared/networkDebugger';
 import ModalLock from './layout/main-page/modal-lock';
 import ModalFirstPremium from './components/modal-first-premium';
 
-Sentry.init({
-  dsn: 'https://3e765c1b1c404989ace20873bc1dac63@o4504973387300864.ingest.sentry.io/4504973397786624',
-  // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
-  // We recommend adjusting this value in production.
-  tracesSampleRate: 1.0,
-});
+if (!__DEV__) {
+  Sentry.init({
+    dsn: 'https://3e765c1b1c404989ace20873bc1dac63@o4504973387300864.ingest.sentry.io/4504973397786624',
+    // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
+    // We recommend adjusting this value in production.
+    tracesSampleRate: 1.0,
+  });
+}
 
 LogBox.ignoreAllLogs();
 

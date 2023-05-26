@@ -1,11 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {
-  FlatList,
-  Image,
-  Text,
-  TouchableWithoutFeedback,
-  View,
-} from 'react-native';
+import {Image, Text, TouchableWithoutFeedback, View} from 'react-native';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {moderateScale} from 'react-native-size-matters';
@@ -22,8 +16,10 @@ import dispatcher from './dispatcher';
 import {updateCategory} from '../../shared/request';
 import {handlePayment, isUserPremium} from '../../helpers/user';
 import {scrollToTopQuote} from '../../store/defaultState/selector';
+import ModalUnlockCategory from '../modal-unlock-ads';
 
 const emptyImage = require('../../assets/icons/not_found.png');
+const adsIcon = require('../../assets/icons/ads_icon.png');
 
 function CardCategories({
   listData,
@@ -41,9 +37,8 @@ function CardCategories({
 }) {
   const [selectedCard, setSelectedCard] = useState(initialSelect);
   const [objCard, setObjCard] = useState(customSelected);
-
-  // console.log('Check selectedCard:', selectedCard);
-
+  const [showUnlockByAds, setUnlockByAds] = useState(false);
+  const [selectedCatory, setSelectedCategory] = useState(null);
   useEffect(() => {
     const initialItem = selectedCard;
     if (!isUserPremium()) {
@@ -54,11 +49,12 @@ function CardCategories({
     }
   }, []);
 
-  useEffect(() => {
-    if (initialSelect !== selectedCard && !onCustomSelectCategory) {
-      setSelectedCard(initialSelect);
-    }
-  }, [initialSelect]);
+  // useEffect(() => {
+  //   if (initialSelect !== selectedCard && !onCustomSelectCategory) {
+  //     console.log('RESET BY initialSelect:', initialSelect);
+  //     setSelectedCard(initialSelect);
+  //   }
+  // }, [initialSelect]);
 
   const updateFieldCategory = async updateData => {
     try {
@@ -99,21 +95,33 @@ function CardCategories({
 
   const onPressSelect = (value, objFull) => {
     const isSelected = isDataSelected(value);
+    const resObjCard = objCard || [];
     let mainData = [...selectedCard];
-    let objData = [...objCard];
+    let objData = [...resObjCard];
     if (isSelected) {
       mainData = selectedCard.filter(card => card !== value);
       objData = objCard.filter(card => card.id !== value);
       setSelectedCard(mainData);
     } else {
-      mainData.push(value);
       objData.push(objFull);
-      setSelectedCard(mainData);
+      if (isUserPremium()) {
+        mainData.push(value);
+        setSelectedCard(mainData);
+      } else {
+        const filterListContent =
+          value === 1 || value === 2
+            ? mainData
+            : mainData.filter(item => item === 1 || item === 2);
+        filterListContent.push(value);
+        mainData = filterListContent;
+        setSelectedCard(filterListContent);
+      }
     }
     setObjCard(objData);
-    onCustomSelectCategory(objData);
     if (!onCustomSelectCategory) {
       updateFieldCategory(mainData);
+    } else {
+      onCustomSelectCategory(objData);
     }
   };
 
@@ -122,30 +130,48 @@ function CardCategories({
       onPressSelect(card.id, card);
     }
     if (card.is_free === 0 && !isUserPremium()) {
-      handlePayment('in_app_paywall');
+      setSelectedCategory(card);
+      if (isDataSelected(card.id)) {
+        onPressSelect(card.id, card);
+      } else {
+        setUnlockByAds(true);
+      }
     }
   };
 
   function renderLogo(item, isGetSelect, isFreeGeneralCategory) {
-    if (item.is_free === 0 && !isUserPremium()) {
-      return (
-        <View style={styles.ctnIconItem}>
-          <IconLock width="100%" height="100%" />
-        </View>
-      );
-    }
     if (isGetSelect) {
       return (
-        <View style={styles.ctnIconItem}>
-          {isFreeGeneralCategory ? (
-            <IconChecklistWhite width="100%" height="100%" />
-          ) : (
-            <IconChecklist width="100%" height="100%" />
-          )}
+        <View style={[styles.ctnIcon, isFreeGeneralCategory && styles.grayBg]}>
+          <View style={styles.ctnIconItem}>
+            {isFreeGeneralCategory ? (
+              <IconChecklistWhite width="100%" height="100%" />
+            ) : (
+              <IconChecklist width="100%" height="100%" />
+            )}
+          </View>
         </View>
       );
     }
-    return null;
+    if (item.is_free === 0 && !isUserPremium()) {
+      return (
+        <View style={styles.ctnPremiumIcon}>
+          <View style={styles.ctnAdsIcon}>
+            <Image source={adsIcon} style={styles.iconAds} />
+            <Text style={styles.txtAds}>Free</Text>
+          </View>
+          <View
+            style={[styles.ctnIcon, isFreeGeneralCategory && styles.grayBg]}>
+            <View style={styles.ctnIconItem}>
+              <IconLock width="100%" height="100%" />
+            </View>
+          </View>
+        </View>
+      );
+    }
+    return (
+      <View style={[styles.ctnIcon, isFreeGeneralCategory && styles.grayBg]} />
+    );
   }
 
   function renderHeaderPopular() {
@@ -166,6 +192,7 @@ function CardCategories({
               const isFreeGeneralCategory = item.id === 1 && !isUserPremium();
               return (
                 <TouchableWithoutFeedback
+                  key={index}
                   disabled={item.id === 1 && !isUserPremium()}
                   onPress={() => {
                     handleOnpress(item);
@@ -186,11 +213,7 @@ function CardCategories({
                         <Text style={styles.txtItem} numberOfLines={2}>
                           {item.name}
                         </Text>
-                        <View
-                          style={[
-                            styles.ctnIcon,
-                            isFreeGeneralCategory && styles.grayBg,
-                          ]}>
+                        <View style={styles.lockWrapper}>
                           {renderLogo(
                             item,
                             isDataSelected(item.id),
@@ -215,63 +238,6 @@ function CardCategories({
           </View>
         </View>
       );
-      // return (
-      //   <FlatList
-      //     data={listData.popular}
-      //     numColumns={2}
-      //     scrollEnabled={false}
-      //     showsVerticalScrollIndicator={false}
-      //     ListHeaderComponent={renderHeaderPopular()}
-      //     renderItem={({item, index}) => {
-      //       const isFreeGeneralCategory = item.id === 1 && !isUserPremium();
-      //       return (
-      //         <TouchableWithoutFeedback
-      //           disabled={item.id === 1 && !isUserPremium()}
-      //           onPress={() => {
-      //             handleOnpress(item);
-      //           }}>
-      //           <View
-      //             style={[styles.ctnCard, index % 2 === 0 && styles.mgRight12]}>
-      //             <View style={styles.ctnRowCard}>
-      //               <View
-      //                 style={[
-      //                   styles.ctnItemCategories,
-      //                   (item.name || '').length > 13 && {
-      //                     marginRight: moderateScale(50),
-      //                   },
-      //                 ]}>
-      //                 <Text style={styles.txtItem} numberOfLines={2}>
-      //                   {item.name}
-      //                 </Text>
-      //                 <View
-      //                   style={[
-      //                     styles.ctnIcon,
-      //                     isFreeGeneralCategory && styles.grayBg,
-      //                   ]}>
-      //                   {renderLogo(
-      //                     item,
-      //                     isDataSelected(item.id),
-      //                     isFreeGeneralCategory,
-      //                   )}
-      //                 </View>
-      //               </View>
-      //               <View style={styles.ctnItemRigh}>
-      //                 <View style={styles.ctnImgItem}>
-      //                   <FastImage
-      //                     resizeMode="contain"
-      //                     style={styles.imgStyle}
-      //                     source={{uri: `${BACKEND_URL}${item.icon.url}`}}
-      //                   />
-      //                 </View>
-      //               </View>
-      //             </View>
-      //           </View>
-      //         </TouchableWithoutFeedback>
-      //       );
-      //     }}
-      //     keyExtractor={item => item.id}
-      //   />
-      // );
     }
     return null;
   }
@@ -282,20 +248,24 @@ function CardCategories({
     }
     if (index === 2 && !isUserPremium()) {
       return (
-        <View style={styles.ctnRelative}>
-          <View style={styles.ctnAdvert}>
-            <Text style={styles.ctnUnlockText}>Unlock all</Text>
-            <View style={styles.ctnImgAdv}>
-              <ImgGoPremium width="100%" height="100%" />
+        <View style={styles.shadowWrapper}>
+          <View style={[styles.ctnRelative, styles.ctnShadow]}>
+            <View style={styles.ctnAdvert}>
+              <View style={styles.ctnImgAdv}>
+                <ImgGoPremium width="100%" height="100%" />
+              </View>
             </View>
+            <Button
+              onPress={() => {
+                handlePayment('in_app_paywall');
+              }}
+              btnStyle={styles.btnGoPremiun}
+              label="Go Premium"
+            />
           </View>
-          <Button
-            onPress={() => {
-              handlePayment('in_app_paywall');
-            }}
-            btnStyle={styles.btnGoPremiun}
-            label="Go Premium"
-          />
+          <View style={styles.ctnUlockFree}>
+            <Text style={styles.txtUnlockFree}>Unlock all Categories</Text>
+          </View>
         </View>
       );
     }
@@ -318,7 +288,7 @@ function CardCategories({
 
   function renderContent(content, altIndex, hideTitle) {
     return (
-      <View style={styles.itemWrapper}>
+      <View style={styles.itemWrapper} key={altIndex}>
         {renderHeaderContent(content, altIndex, hideTitle)}
         <View style={styles.ctnRowMain}>
           {content.categories.map((item, index) => {
@@ -356,11 +326,7 @@ function CardCategories({
                       <Text style={styles.txtItem} numberOfLines={2}>
                         {item.name}
                       </Text>
-                      <View
-                        style={[
-                          styles.ctnIcon,
-                          isFreeGeneralCategory && styles.grayBg,
-                        ]}>
+                      <View style={styles.lockWrapper}>
                         {renderLogo(
                           item,
                           isDataSelected(item.id),
@@ -376,68 +342,6 @@ function CardCategories({
         </View>
       </View>
     );
-    // return (
-    //   <FlatList
-    //     data={content.categories}
-    //     numColumns={2}
-    //     scrollEnabled={false}
-    //     showsVerticalScrollIndicator={false}
-    //     ListHeaderComponent={renderHeaderContent(content, altIndex, hideTitle)}
-    //     renderItem={({item, index}) => {
-    //       const isFreeGeneralCategory = item.id === 1 && !isUserPremium();
-    //       return (
-    //         <TouchableWithoutFeedback
-    //           key={item.id}
-    //           disabled={isFreeGeneralCategory}
-    //           onPress={() => {
-    //             handleOnpress(item);
-    //           }}>
-    //           <View
-    //             style={[
-    //               styles.ctnCard,
-    //               index % 2 === 0 && styles.mgRight12,
-    //               hideTitle ? styles.mgTop20 : {},
-    //             ]}>
-    //             <View style={styles.ctnRowCard}>
-    //               <View style={styles.ctnItemRigh}>
-    //                 <View style={styles.ctnImgItem}>
-    //                   <FastImage
-    //                     style={styles.imgStyle}
-    //                     resizeMode="contain"
-    //                     source={{uri: `${BACKEND_URL}${item.icon.url}`}}
-    //                   />
-    //                 </View>
-    //               </View>
-    //               <View
-    //                 style={[
-    //                   styles.ctnItemCategories,
-    //                   (item.name || '').length > 13 && {
-    //                     marginRight: moderateScale(50),
-    //                   },
-    //                 ]}>
-    //                 <Text style={styles.txtItem} numberOfLines={2}>
-    //                   {item.name}
-    //                 </Text>
-    //                 <View
-    //                   style={[
-    //                     styles.ctnIcon,
-    //                     isFreeGeneralCategory && styles.grayBg,
-    //                   ]}>
-    //                   {renderLogo(
-    //                     item,
-    //                     isDataSelected(item.id),
-    //                     isFreeGeneralCategory,
-    //                   )}
-    //                 </View>
-    //               </View>
-    //             </View>
-    //           </View>
-    //         </TouchableWithoutFeedback>
-    //       );
-    //     }}
-    //     keyExtractor={item => item.id}
-    //   />
-    // );
   }
 
   function renderEmpty() {
@@ -476,31 +380,12 @@ function CardCategories({
         );
       }
       return renderEmpty();
-      // return (
-      //   <FlatList
-      //     scrollEnabled={false}
-      //     showsVerticalScrollIndicator={false}
-      //     data={listData.alternative}
-      //     ListHeaderComponent={renderEmpty()}
-      //     renderItem={({item, index}) => renderContent(item, index)}
-      //     keyExtractor={item => item.id}
-      //   />
-      // );
     }
     if (listData.category?.length > 0) {
       const parseCategory = !hidePopular
         ? listData.category.filter(item => item.id !== 1)
         : listData.category;
       return parseCategory.map((item, index) => renderContent(item, index));
-      // return (
-      //   <FlatList
-      //     scrollEnabled={false}
-      //     showsVerticalScrollIndicator={false}
-      //     data={parseCategory}
-      //     renderItem={({item, index}) => renderContent(item, index)}
-      //     keyExtractor={item => item.id}
-      //   />
-      // );
     }
     return null;
   }
@@ -511,15 +396,6 @@ function CardCategories({
       return parseCategory.map((item, index) =>
         renderContent(item, index, true),
       );
-      // return (
-      //   <FlatList
-      //     showsVerticalScrollIndicator={false}
-      //     data={parseCategory}
-      //     scrollEnabled={false}
-      //     renderItem={({item, index}) => renderContent(item, index, true)}
-      //     keyExtractor={item => item.id}
-      //   />
-      // );
     }
     return null;
   }
@@ -539,6 +415,18 @@ function CardCategories({
             handlePayment('in_app_paywall');
           }}
           label={buttonLabel || 'Unlock all'}
+        />
+      )}
+      {showUnlockByAds && (
+        <ModalUnlockCategory
+          visible={showUnlockByAds}
+          handleClose={() => {
+            setUnlockByAds(false);
+          }}
+          selectedCategory={selectedCatory}
+          handleUnlock={selectedCategory => {
+            onPressSelect(selectedCategory.id, selectedCategory);
+          }}
         />
       )}
     </View>

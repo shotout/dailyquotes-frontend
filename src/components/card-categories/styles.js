@@ -34,6 +34,21 @@ export default StyleSheet.create({
     position: 'relative',
     flex: 1,
   },
+  ctnShadow: {
+    backgroundColor: '#fff',
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+
+    elevation: 5,
+    paddingHorizontal: moderateScale(20),
+    borderRadius: moderateScale(12),
+    paddingTop: moderateScale(26)
+  },
   ctnRowCard: {
     flex: 1,
     flexDirection: 'row',
@@ -154,5 +169,50 @@ export default StyleSheet.create({
   ctnRowMain: {
     flexDirection: 'row',
     flexWrap: 'wrap'
-  }
+  },
+  ctnPremiumIcon:{
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  ctnAdsIcon:{
+    height: moderateScale(22),
+    borderRadius: moderateScale(22 / 2),
+    paddingHorizontal: moderateScale(6),
+    marginRight: moderateScale(6),
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+    backgroundColor: '#ED5267'
+  },
+  iconAds:{
+    width: moderateScale(12),
+    height: moderateScale(12),
+    resizeMode: 'contain',
+    marginRight: moderateScale(4)
+  },
+  txtAds:{
+    color: '#fff',
+    fontFamily: fonts.InterMedium,
+    fontSize: moderateScale(12)
+  },
+  shadowWrapper:{
+    position: 'relative',
+    paddingTop: moderateScale(20)
+  },
+  ctnUlockFree:{
+    backgroundColor: '#ED5267',
+    position: 'absolute',
+    top: moderateScale(8),
+    alignSelf: 'center',
+    height: moderateScale(24),
+    borderRadius: moderateScale(24 / 2),
+    paddingHorizontal: moderateScale(12),
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  txtUnlockFree:{
+    color: '#fff',
+    fontFamily: fonts.InterMedium,
+    fontSize: moderateScale(12)
+  },
 });

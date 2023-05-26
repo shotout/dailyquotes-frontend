@@ -96,4 +96,11 @@ export default StyleSheet.create({
   ctnStyle: {
     marginBottom: isIphoneXorAbove() ? moderateScale(120) : moderateScale(120),
   },
+  ctnBanner: {
+    paddingBottom: isIphoneXorAbove() ? 110 : 100,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    paddingTop: moderateScale(10),
+  },
 });

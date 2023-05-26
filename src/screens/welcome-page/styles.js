@@ -51,4 +51,9 @@ export default StyleSheet.create({
     lineHeight: moderateScale(26),
     marginBottom: moderateScale(20),
   },
+  absoluteContent: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+  },
 });

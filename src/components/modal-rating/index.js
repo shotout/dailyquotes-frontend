@@ -70,25 +70,22 @@ function ModalRating({handleClose, visible}) {
           <View style={styles.ctnIcon}>
             {Array.apply(null, Array(ratingSelected)).map((x, i) => (
               <TouchableOpacity
+                key={i.toString()}
                 onPress={() => {
                   setRatingSelected(i + 1);
                 }}>
-                <Image
-                  source={ratingIcon}
-                  style={styles.ratingImageStyle}
-                  key={i.toString()}
-                />
+                <Image source={ratingIcon} style={styles.ratingImageStyle} />
               </TouchableOpacity>
             ))}
             {Array.apply(null, Array(5 - ratingSelected)).map((x, i) => (
               <TouchableOpacity
+                key={i.toString()}
                 onPress={() => {
                   setRatingSelected(ratingSelected + i + 1);
                 }}>
                 <Image
                   source={unSelectRatingStar}
                   style={styles.ratingImageStyle}
-                  key={i.toString()}
                 />
               </TouchableOpacity>
             ))}

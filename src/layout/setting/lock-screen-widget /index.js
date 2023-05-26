@@ -72,6 +72,7 @@ function LockScreenWidget({isVisible, onClose}) {
             <View style={styles.dotWrapper}>
               {listTutorialLockscreenWidget.map((item, index) => (
                 <View
+                  key={index}
                   style={[
                     styles.ctnDot,
                     index === activeIndexTutorial && styles.blackDot,

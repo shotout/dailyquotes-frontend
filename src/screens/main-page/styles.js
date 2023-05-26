@@ -101,6 +101,9 @@ export default StyleSheet.create({
     bottom: 0,
     width: '100%',
   },
+  ctnPdAds:{
+    paddingBottom: isIphoneXorAbove() ? moderateScale(70) : moderateScale(60),
+  },
   ctnIcon: {
     flex: 1,
   },
@@ -223,7 +226,8 @@ export default StyleSheet.create({
   subBottomWrapper:{
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    marginBottom: moderateScale(12)
   },
   ctnIconCategories:{
     width: moderateScale(18),
@@ -232,5 +236,52 @@ export default StyleSheet.create({
   },
   txtCategory:{
     fontSize: moderateScale(13)
-  }
+  },
+  ctnBannerAds:{
+    position: 'absolute',
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    paddingBottom: isIphoneXorAbove() ? moderateScale(14) : 0,
+    bottom: 0
+  },
+  ctnSwipe: {
+    position: 'absolute',
+    width: '100%',
+    // backgroundColor: 'red',
+    bottom: isIphoneXorAbove() ? moderateScale(120) : moderateScale(110),
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  adjustBtmPremiumSwipe:{
+    bottom: moderateScale(70)
+  },
+  icnSwipe: {
+    width: moderateScale(22),
+    height: moderateScale(22),
+    resizeMode: 'contain',
+  },
+  txtSwipe: {
+    fontFamily: fonts.InterMedium,
+    color: '#B4B4B4',
+    fontSize: moderateScale(14),
+    marginBottom: moderateScale(6),
+  },
+  ctnSlideUp: {
+    position: 'absolute',
+    width: '100%',
+    // backgroundColor: 'red',
+    bottom: moderateScale(0),
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  ctnSlideDown: {
+    position: 'absolute',
+    width: '100%',
+    // backgroundColor: 'red',
+    bottom: moderateScale(0),
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });

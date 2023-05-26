@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
+  Image,
 } from 'react-native';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
@@ -23,6 +24,14 @@ import {
 import moment from 'moment';
 import RNFS from 'react-native-fs';
 
+import {
+  BannerAd,
+  BannerAdSize,
+  InterstitialAd,
+  RewardedAd,
+  RewardedAdEventType,
+} from 'react-native-google-mobile-ads';
+import {createAnimatableComponent} from 'react-native-animatable';
 import ButtonIcon from '../../components/button-icon';
 import ModalCategories from '../../layout/main-page/modal-categories';
 import ModalShare from '../../layout/main-page/modal-share';
@@ -48,11 +57,18 @@ import ThemeIcon from '../../assets/svg/theme_icon.svg';
 import Crown from '../../assets/svg/crown.svg';
 import QuotesContent from '../../components/quotes-content-fast-image';
 import {handleModalFirstPremium} from '../../shared/globalContent';
-import {getFutureDate, handlePayment, isUserPremium} from '../../helpers/user';
+import {
+  getFutureDate,
+  handlePayment,
+  isPremiumToday,
+  isUserPremium,
+  reformatDate,
+} from '../../helpers/user';
 import ContentSubscription from '../../layout/setting/content-subscription';
 import {
   changeQuoteLikeStatus,
-  handleEndQuote,
+  setAnimationSlideStatus,
+  setNewQuoteData,
   setQuoteRef,
 } from '../../store/defaultState/actions';
 import ModalRating from '../../components/modal-rating';
@@ -60,8 +76,38 @@ import {useBackgroundQuotes} from '../../shared/useBackgroundQuotes';
 import useLocalNotif from '../../shared/useLocalNotif';
 import {handleWidgetQuote} from '../../helpers/widgetHelper';
 import {changeStandardWidget} from '../../store/widgetState/actions';
+import {
+  getAdaptiveBannerID,
+  getRewardedInsterstialID,
+  getRewardedOutOfQuotesID,
+} from '../../shared/static/adsId';
+import ModalCountDown from '../../components/modal-countdown';
+import PageCountDown from '../../layout/main-page/page-countdown';
+import {isMoreThanThreeHoursSinceLastTime} from '../../helpers/timeHelpers';
+import {checkAdsTracking} from '../../helpers/adsTracking';
 
+const arrowBottom = require('../../assets/icons/arrow-bottom.png');
 const UnionImage = require('../../assets/images/union.png');
+
+const interval = null;
+const timeout = null;
+
+const adUnitId = getRewardedOutOfQuotesID();
+
+const rewarded = RewardedAd.createForAdRequest(adUnitId, {
+  requestNonPersonalizedAdsOnly: true,
+  keywords: ['fashion', 'clothing'],
+});
+
+const interstitial = InterstitialAd.createForAdRequest(
+  getRewardedInsterstialID(),
+  {
+    requestNonPersonalizedAdsOnly: true,
+    keywords: ['fashion', 'clothing'],
+  },
+);
+
+const AnimatableView = createAnimatableComponent(View);
 
 function MainPage({
   defaultData,
@@ -70,24 +116,36 @@ function MainPage({
   haveBeenAskRating,
   changeAskRatingParameter,
   route,
+  todayAdsLimit,
+  listBasicQuote,
+  runAnimationSlide,
+  finishInitialLoader,
+  paywallNotifcation,
+  animationCounter,
 }) {
+  const limitIndex = 6;
   const isFromOnboarding = route.params?.isFromOnboarding;
-  const paywallObj = route.params?.paywallObj;
+  const initialIndexContent = isUserPremium() ? 0 : limitIndex;
   const [showModalSubscribe, setShowModalSubscribe] = useState(false);
-  const [activeSlide, setActiveSlide] = useState(0);
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const [activeSlide, setActiveSlide] = useState(initialIndexContent);
+  const [currentSlide, setCurrentSlide] = useState(initialIndexContent);
   const [isEnableFreePremium, setEnableFreePremium] = useState(false);
   const [showModalLike, setShowModalLike] = useState(false);
-  const [showTutorial, setShowTutorial] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(isFromOnboarding || false);
   const [captureUri, setCaptureUri] = useState(null);
   const [showSharePopup, setShowSharePopup] = useState(false);
   const [isPremiumBefore, setPremiumBefore] = useState(isUserPremium());
   const [modalRatingVisible, setModalRating] = useState(false);
   const [quoteLikeStatus, setQuoteLikeStatus] = useState(false);
+  const [isUserHasScroll, setUserScrollQuotes] = useState(false);
+  const [isShowNextQuooteAnimation, setShowNextQuoteAnimation] =
+    useState(false);
+  const [isHasRunAnimation, setHasRunAnimation] = useState(false);
+  const [runQuoteAnimation, setRunQuoteAnimation] = useState(false);
   const [themeUser] = useBackgroundQuotes(userProfile.data.themes[0]);
   const [scheduleTime] = useLocalNotif(userProfile);
 
-  // console.log('Check themeUser:', themeUser);
+  const [showModalCountdown, setModalCountdown] = useState(false);
 
   const captureRef = useRef();
   const doubleTapRef = createRef();
@@ -98,9 +156,9 @@ function MainPage({
 
   const handleShowPopupShare = () => {
     setShowSharePopup(true);
-    // setTimeout(() => {
-    //   setShowSharePopup(false);
-    // }, 10000);
+    setTimeout(() => {
+      setShowSharePopup(false);
+    }, 10000);
   };
 
   const handleRatingModal = async () => {
@@ -112,12 +170,6 @@ function MainPage({
       const currentTotalOpenApps = Number(openAppsCounter);
       const skipCounterToNumber = skipCounter ? Number(skipCounter) : 0;
       const currentDate = moment().format('YYYY-MM-DD');
-      // console.log(
-      //   'Check status :',
-      //   currentTotalOpenApps,
-      //   skipCounterToNumber,
-      //   getFutureDate(haveBeenAskRating, 12),
-      // );
       if (currentTotalOpenApps % 3 === 0) {
         if (
           !skipCounterToNumber ||
@@ -143,34 +195,36 @@ function MainPage({
 
   const handleRatingStatus = async () => {
     const res = await getRatingStatus();
-    // console.log('RAting status:', res);
     if (res.data === false) {
       handleRatingModal();
     }
   };
-
   const handleShowPaywall = async () => {
     const res = await getSetting();
     setEnableFreePremium(res.data.value !== 'true');
     if (res.data.value === 'true' && !isUserPremium() && !isFromOnboarding) {
-      if (paywallObj) {
-        handlePayment(paywallObj?.placement);
+      // Paywall open apps
+      if (paywallNotifcation) {
+        handlePayment(paywallNotifcation?.placement, handleShowPopupShare);
       } else {
-        handlePayment('offer_no_purchase_after_onboarding_paywall');
+        const getCurrentOpenApps = await AsyncStorage.getItem('latestOpenApps');
+        const mainDate = reformatDate(parseFloat(getCurrentOpenApps));
+        const isMoreThan3Hours = isMoreThanThreeHoursSinceLastTime(mainDate);
+        const stringifyDate = Date.now().toString();
+        if (!getCurrentOpenApps || isMoreThan3Hours) {
+          const paywallType =
+            userProfile?.data?.notif_count && userProfile?.data?.notif_count > 2
+              ? 'offer_no_purchase_after_onboarding_paywall_2nd'
+              : 'offer_no_purchase_after_onboarding_paywall';
+          handlePayment(paywallType, handleShowPopupShare);
+          AsyncStorage.setItem('latestOpenApps', stringifyDate);
+        } else {
+          setAnimationSlideStatus(true);
+        }
       }
     } else {
       handleRatingStatus();
-      if (!isUserPremium()) {
-        handleShowPopupShare();
-      }
-
-      const checkTutorial = async () => {
-        const isFinishTutorial = await AsyncStorage.getItem('isFinishTutorial');
-        if (isFinishTutorial !== 'yes') {
-          setShowTutorial(true);
-        }
-      };
-      checkTutorial();
+      setAnimationSlideStatus(true);
     }
   };
 
@@ -179,6 +233,23 @@ function MainPage({
       handleWidgetQuote(themeUser, activeQuote);
     }
   };
+
+  useEffect(() => {
+    if (runAnimationSlide && !isUserHasScroll && !showTutorial) {
+      setTimeout(() => {
+        if (!isUserHasScroll) {
+          setShowNextQuoteAnimation(true);
+        }
+      }, 2000);
+      setTimeout(() => {
+        setRunQuoteAnimation(true);
+      }, 1800);
+
+      return () => {
+        clearInterval(interval);
+      };
+    }
+  }, [runAnimationSlide, isUserHasScroll, showTutorial]);
 
   useEffect(() => {
     if (themeUser.id !== 6) {
@@ -191,11 +262,14 @@ function MainPage({
   }, [themeUser]);
 
   useEffect(() => {
-    // refThemes.current.show();
-    // setSubcription({
-    //   subscription_type: 1,
-    // });
-    handleShowPaywall();
+    const checkTutorial = async () => {
+      const isFinishTutorial = await AsyncStorage.getItem('isFinishTutorial');
+      if (isFinishTutorial !== 'yes') {
+        setShowTutorial(true);
+      }
+    };
+    checkTutorial();
+
     setTimeout(() => {
       const activeQuote = getActiveQuote();
       if (activeQuote) {
@@ -203,7 +277,7 @@ function MainPage({
       }
     });
     // setSubcription({
-    //   subscription_type: 4,
+    //   subscription_type: 1,
     // });
     const backAction = () => {
       console.log('Back press');
@@ -215,8 +289,36 @@ function MainPage({
       backAction,
     );
 
-    return () => backHandler.remove();
+    // Handle interstial reward quote ads
+
+    const unsubscribeLoaded = rewarded.addAdEventListener(
+      RewardedAdEventType.LOADED,
+      () => {
+        console.log('LOAD ADS FROM MAIN PAGE REWARD');
+      },
+    );
+    const unsubscribeEarned = rewarded.addAdEventListener(
+      RewardedAdEventType.EARNED_REWARD,
+      reward => {
+        console.log('User earned reward of ', reward);
+      },
+    );
+    rewarded.load();
+    interstitial.load();
+    checkAdsTracking();
+    return () => {
+      backHandler.remove();
+      unsubscribeLoaded();
+      unsubscribeEarned();
+    };
   }, []);
+
+  useEffect(() => {
+    console.log('Check finishInitialLoader:', finishInitialLoader);
+    if (finishInitialLoader) {
+      handleShowPaywall();
+    }
+  }, [finishInitialLoader]);
 
   useEffect(() => {
     if (!isPremiumBefore && isUserPremium()) {
@@ -226,21 +328,29 @@ function MainPage({
   }, [userProfile, isPremiumBefore]);
 
   useEffect(() => {
+    setTimeout(() => {
+      rewarded.load();
+    }, 2000);
+  }, [todayAdsLimit]);
+
+  useEffect(() => {
     const handleAddPastQuotes = async currentSlideId => {
       try {
-        await addPastQuotes(quotes.listData[currentSlideId].id);
+        if (
+          quotes.listData[currentSlideId] &&
+          quotes.listData[currentSlideId]?.id
+        ) {
+          await addPastQuotes(quotes.listData[currentSlideId].id);
+        }
       } catch (err) {
         console.log('Error add past quotes:', err);
       }
     };
+    const activeQuote = getActiveQuote();
     if (activeSlide > currentSlide) {
       setCurrentSlide(activeSlide);
       handleAddPastQuotes(currentSlide);
-      if (!showSharePopup && !isUserPremium()) {
-        handleShowPopupShare();
-      }
     }
-    const activeQuote = getActiveQuote();
     let isLiked = false;
     if (activeQuote) {
       if (!activeQuote.like) {
@@ -259,6 +369,26 @@ function MainPage({
     if (activeSlide !== currentSlide) {
       if (activeQuote) {
         handleWidgetData(activeQuote);
+      }
+      if (!interstitial.loaded) {
+        interstitial.load();
+      }
+      if (!isUserPremium()) {
+        handleShowInterstialAds(activeQuote, activeSlide);
+      }
+    }
+    if (!isPremiumToday()) {
+      if (currentSlide === 16 || activeSlide === 16) {
+        if (
+          activeSlide === 0 ||
+          activeSlide === 3 ||
+          activeSlide === 7 ||
+          activeSlide === 10 ||
+          activeSlide === 13 ||
+          activeSlide === 16
+        ) {
+          setModalCountdown(true);
+        }
       }
     }
   }, [activeSlide]);
@@ -288,8 +418,10 @@ function MainPage({
   };
 
   const handleEndReach = () => {
-    if (quotes.listData?.length > 0 && quotes.listData?.length < 10) {
-      handleEndQuote();
+    if (!isPremiumToday() && listBasicQuote?.length > 5) {
+      const listOverallQuote = [...quotes.listData, ...listBasicQuote];
+      listOverallQuote.push({item_type: 'countdown_page'});
+      setNewQuoteData(listOverallQuote);
     }
   };
 
@@ -303,6 +435,11 @@ function MainPage({
       Math.max(Math.floor(e.nativeEvent.contentOffset.y / height + 0.5) + 1, 0),
       quotes.listData?.length || 0,
     );
+    if (pageNumber - 1 !== activeSlide && !isUserHasScroll) {
+      setUserScrollQuotes(true);
+      if (interval) clearInterval(interval);
+      if (timeout) clearTimeout(timeout);
+    }
     setActiveSlide(pageNumber - 1);
   };
 
@@ -330,6 +467,13 @@ function MainPage({
       return quotes.listData[activeSlide];
     }
     return null;
+  };
+
+  const isHideContent = () => {
+    if (getActiveQuote()?.item_type === 'countdown_page') {
+      return true;
+    }
+    return false;
   };
 
   const handleQuoteActive = () => {
@@ -374,8 +518,23 @@ function MainPage({
   };
 
   const onDoubleTap = event => {
+    if (!isUserHasScroll && event.nativeEvent.state === State.BEGAN) {
+      setUserScrollQuotes(true);
+    }
     if (event.nativeEvent.state === State.ACTIVE) {
       handleLike();
+    }
+  };
+
+  const handleShowInterstialAds = (activeQuote, activeIndex) => {
+    const showInterstialAds = () => {
+      interstitial.load();
+      if (interstitial.loaded) {
+        interstitial.show();
+      }
+    };
+    if (activeQuote.item_type === 'in_app_ads') {
+      showInterstialAds();
     }
   };
 
@@ -395,7 +554,55 @@ function MainPage({
     return null;
   }
 
+  function renderArrowSwipe() {
+    if (
+      runAnimationSlide &&
+      !isUserHasScroll &&
+      !showTutorial &&
+      isShowNextQuooteAnimation &&
+      animationCounter
+    ) {
+      return (
+        <AnimatableView
+          animation="fadeIn"
+          duration={1000}
+          style={[
+            styles.ctnSwipe,
+            isUserPremium() && styles.adjustBtmPremiumSwipe,
+          ]}>
+          <AnimatableView
+            animation="slideInUp"
+            duration={500}
+            style={styles.ctnSlideUp}>
+            <AnimatableView
+              animation="slideOutDown"
+              duration={1000}
+              delay={1500}
+              style={styles.ctnSlideDown}>
+              <AnimatableView
+                animation="fadeOut"
+                duration={200}
+                delay={1600}
+                onAnimationEnd={() => {
+                  setShowNextQuoteAnimation(false);
+                  setShowNextQuoteAnimation(true);
+                }}
+                style={styles.ctnSlideDown}>
+                <Text style={styles.txtSwipe}>Swipe to see next Quote</Text>
+                <Image source={arrowBottom} style={styles.icnSwipe} />
+              </AnimatableView>
+            </AnimatableView>
+          </AnimatableView>
+        </AnimatableView>
+      );
+    }
+    return null;
+  }
+
   function renderButton() {
+    if (isHideContent()) {
+      return null;
+    }
     const bgStyle = {
       backgroundColor:
         themeUser.id === 4 || themeUser.id === 2
@@ -403,7 +610,12 @@ function MainPage({
           : 'rgba(0, 0, 0, 0.7)',
     };
     return (
-      <View style={styles.btnWrapper}>
+      <View
+        style={[
+          styles.btnWrapper,
+          !isUserPremium() && !isHideContent() && styles.ctnPdAds,
+        ]}>
+        {renderArrowSwipe()}
         <View style={styles.subBottomWrapper}>
           <TouchableWithoutFeedback onPress={handleShare}>
             <View style={[styles.ctnRounded, bgStyle]}>
@@ -458,7 +670,7 @@ function MainPage({
   }
 
   function renderFreeBadge() {
-    if (showTutorial || isUserPremium()) {
+    if (showTutorial || isUserPremium() || isHideContent()) {
       return null;
     }
     return (
@@ -486,14 +698,31 @@ function MainPage({
     );
   }
 
-  // console.log('Main page user profile:', userProfile.data.themes);
-  function renderContent(item) {
+  function renderContent(item, index) {
     const getImageContent = themeUser.imgLocal;
-
+    if (item.item_type === 'countdown_page') {
+      return <PageCountDown />;
+    }
+    // if (item.item_type === 'in_app_ads') {
+    //   return (
+    //     <QuotesContentAds
+    //       isActive={activeSlide === index}
+    //       source={getImageContent}
+    //     />
+    //   );
+    // }
     return (
       <QuotesContent
         item={item}
         themeUser={themeUser}
+        isActive={activeSlide === index}
+        index={index}
+        isAnimationStart={
+          runAnimationSlide &&
+          !isUserHasScroll &&
+          !showTutorial &&
+          runQuoteAnimation
+        }
         source={getImageContent}
         // source={require(themeUser.urlLocal)}
       />
@@ -501,6 +730,7 @@ function MainPage({
   }
 
   function renderFlatlistContent() {
+    // console.log('Check quote:', userProfile);
     return (
       <PanGestureHandler
         onGestureEvent={handleGesture}
@@ -512,16 +742,25 @@ function MainPage({
           <FlatList
             ref={setQuoteRef}
             style={styles.ctnRoot}
+            initialScrollIndex={isUserPremium() ? 0 : limitIndex}
+            getItemLayout={(data, index) => ({
+              length: sizing.getDimensionHeight(1),
+              offset: sizing.getDimensionHeight(1) * index,
+              index,
+            })}
+            onScrollToIndexFailed={() => {
+              console.log('FAILED SCROLL TO INDEX', 5);
+            }}
             data={quotes?.listData || []}
-            extraData={quotes.listData}
+            extraData={isUserHasScroll}
             pagingEnabled
             onMomentumScrollEnd={onMomentoumScrollEnd}
             scrollsToTop={false}
             showsVerticalScrollIndicator={false}
-            onEndReached={handleEndReach}
+            // onEndReached={handleEndReach}
             onEndReachedThreshold={0.9}
             renderItem={({item, index}) => renderContent(item, index)}
-            keyExtractor={(item, index) => `${item.id} ${index}`}
+            keyExtractor={(item, index) => `${item?.id || ''} ${index}`}
           />
         </TapGestureHandler>
       </PanGestureHandler>
@@ -547,6 +786,23 @@ function MainPage({
     return null;
   }
 
+  function renderBottomAds() {
+    if (isUserPremium() || isHideContent()) {
+      return null;
+    }
+    return (
+      <View style={styles.ctnBannerAds}>
+        <BannerAd
+          unitId={getAdaptiveBannerID()}
+          size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+          requestOptions={{
+            requestNonPersonalizedAdsOnly: true,
+          }}
+        />
+      </View>
+    );
+  }
+
   function renderMainContent() {
     if (showTutorial) {
       return (
@@ -566,6 +822,7 @@ function MainPage({
         {renderScreenshot()}
         {renderFlatlistContent()}
         {renderButton()}
+        {renderBottomAds()}
       </View>
     );
   }
@@ -675,6 +932,12 @@ function MainPage({
           handleClose={() => {
             setModalRating(false);
             changeAskRatingParameter();
+          }}
+        />
+        <ModalCountDown
+          visible={showModalCountdown}
+          handleClose={() => {
+            setModalCountdown(false);
           }}
         />
       </View>

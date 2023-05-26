@@ -60,4 +60,12 @@ export default StyleSheet.create({
     paddingBottom: isIphoneXorAbove() ? moderateScale(80) : moderateScale(60),
     flexGrow: 1,
   },
+  ctnBanner: {
+    paddingBottom: isIphoneXorAbove() ? 80 : 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    backgroundColor: '#fff',
+    paddingTop: moderateScale(10),
+  },
 });

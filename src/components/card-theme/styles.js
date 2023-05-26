@@ -30,9 +30,8 @@ export default StyleSheet.create({
     width: moderateScale(25),
     alignItems: 'center',
     justifyContent: 'center',
-    position: 'absolute',
-    right: moderateScale(12),
-    top: moderateScale(5),
+    backgroundColor:'#fff',
+    borderRadius: moderateScale(25 / 2)
   },
   ctnIconItem: {
     height: moderateScale(15),
@@ -108,5 +107,33 @@ export default StyleSheet.create({
   },
   lastItem:{
     marginRight: moderateScale(20)
+  },
+  ctnAdsIcon:{
+    height: moderateScale(22),
+    borderRadius: moderateScale(22 / 2),
+    paddingHorizontal: moderateScale(6),
+    marginRight: moderateScale(6),
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+    backgroundColor: '#ED5267'
+  },
+  iconAds:{
+    width: moderateScale(12),
+    height: moderateScale(12),
+    resizeMode: 'contain',
+    marginRight: moderateScale(4)
+  },
+  txtAds:{
+    color: '#fff',
+    fontFamily: fonts.InterMedium,
+    fontSize: moderateScale(12)
+  },
+  ctnLock:{
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: moderateScale(6),
+    paddingLeft: moderateScale(4)
   }
 });

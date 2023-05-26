@@ -150,12 +150,12 @@
       "sha1": "8580dec824bbdb6ce24d04d3aaf360776339f0a7"
     },
     {
-      "path": "src/assets/fonts/Optima.ttf",
-      "sha1": "abab7b462f565a85d1cec0ab048031d05d9eb5e7"
+      "path": "src/assets/fonts/Optima-ExtraBlack.otf",
+      "sha1": "45632e34b56fd9e828ec221f6ee31cbd7cc75c0f"
     },
     {
-      "path": "src/assets/fonts/Palatino.ttf",
-      "sha1": "3f51e1f039bc048f43005583ae508092cdaa3280"
+      "path": "src/assets/fonts/Optima.ttf",
+      "sha1": "abab7b462f565a85d1cec0ab048031d05d9eb5e7"
     },
     {
       "path": "src/assets/fonts/PalatinoLTPro-Medium.ttf",

@@ -34,10 +34,43 @@ const INITIAL_STATE = {
     visible: false,
     counter: 0,
   },
+  todayAdsLimit: 12,
+  listBasicQuote: [],
+  restPassLength: 0,
+  runAnimationSlide: false,
+  finishInitialLoader: false,
+  paywallNotifcation: null,
+  animationCounter: true,
 };
 
 export default (state = INITIAL_STATE, action) => {
   switch (action.type) {
+    case types.SET_ANIMATION_COUNTER:
+      return {
+        ...state,
+        animationCounter: action.payload,
+      };
+    case types.SET_PAYWALL_NOTIFICATION:
+      return {
+        ...state,
+        paywallNotifcation: action.payload,
+      };
+    case types.SET_INITIAL_FINISH_LOADER:
+      return {
+        ...state,
+        finishInitialLoader: action.payload,
+      };
+    case types.SET_ANIMATION_SLIDE_DATA:
+      return {
+        ...state,
+        runAnimationSlide: action.payload,
+      };
+    case types.SET_TODAY_ADS_LIMIT:
+      return {
+        ...state,
+        todayAdsLimit: 12,
+        restPassLength: 0,
+      };
     case types.SHOW_LOADING_MODAL:
       return {
         ...state,
@@ -134,15 +167,29 @@ export default (state = INITIAL_STATE, action) => {
           isLoading: true,
         },
       };
-    case types.SUCCESS_FETCH_QUOTE:
+    case types.SET_NEW_QUOTE_DATA:
       return {
         ...state,
         quotes: {
-          listData: action.payload.data,
+          ...state.quotes,
+          listData: action.payload,
+        },
+      };
+    case types.SUCCESS_FETCH_QUOTE:
+      return {
+        ...state,
+        restPassLength: action.restPassLength,
+        todayAdsLimit:
+          action.isPassPremium || state.todayAdsLimit > 17
+            ? 99
+            : 12 + action.restPassLength,
+        quotes: {
+          listData: action.arrData,
           currentPage: 1,
           isLoading: false,
           totalQuotes: action.payload.total,
         },
+        listBasicQuote: action.listBasicQuote,
       };
     case types.ERROR_FETCH_QUOTES:
       return {

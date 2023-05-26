@@ -3,17 +3,20 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import PropTypes from 'prop-types';
 import notifee, {EventType} from '@notifee/react-native';
-import messaging from '@react-native-firebase/messaging';
 import TimeZone from 'react-native-timezone';
 
 // Redux
 import {connect} from 'react-redux';
-import {Alert, AppState, Linking} from 'react-native';
+import {AppState, Linking, View} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
 import Purchasely from 'react-native-purchasely';
+import {AppOpenAd, AdEventType} from 'react-native-google-mobile-ads';
+import SplashScreen from 'react-native-splash-screen';
 import states from './states';
 import dispatcher from './dispatcher';
+
+// ADS
 
 // Ref routing
 import {navigationRef} from '../../shared/navigationRef';
@@ -26,12 +29,7 @@ import MainPage from '../main-page';
 
 import {APP_VERSION} from '../../shared/static';
 import {handleModalFirstPremium} from '../../shared/globalContent';
-import {
-  getSetting,
-  getUserProfile,
-  selectTheme,
-  updateProfile,
-} from '../../shared/request';
+import {getSetting, selectTheme, updateProfile} from '../../shared/request';
 import {
   handlePayment,
   handleSubscriptionStatus,
@@ -43,11 +41,28 @@ import NotificationTester from '../notification-tester';
 import {navigationLinking} from '../../shared/navigationLinking';
 import {
   hideLoadingModal,
+  resetTodayAdsLimit,
+  setAnimationCounter,
+  setAnimationSlideStatus,
   setCounterNumber,
+  setInitialLoaderStatus,
+  setPaywallNotification,
   showLoadingModal,
 } from '../../store/defaultState/actions';
+import {getAppOpenID} from '../../shared/static/adsId';
+import AdsOverlay from '../ads-overlay';
+import store from '../../store/configure-store';
+
+const adUnitId = getAppOpenID();
+
+const appOpenAd = AppOpenAd.createForAdRequest(adUnitId, {
+  requestNonPersonalizedAdsOnly: true,
+  keywords: ['fashion', 'clothing'],
+});
 
 const Stack = createNativeStackNavigator();
+
+appOpenAd.load();
 
 function Routes({
   getInitialData,
@@ -62,8 +77,11 @@ function Routes({
   quotes,
 }) {
   const [isLoading, setLoading] = useState(true);
-  const [paywallObj, setPaywallObj] = useState(null);
+  const [isLoadingAds, setLoadingAds] = useState(true);
+  const [showAdsOverlay, setAdsOverlay] = useState(false);
   const appState = useRef(AppState.currentState);
+  const loadingRef = useRef(true);
+  const paywallStatus = useRef(null);
   const [appStateVisible, setAppStateVisible] = useState(appState.current);
 
   const handleSubmitPremiumStatusWeekly = async submitObj => {
@@ -199,15 +217,15 @@ function Routes({
         });
       }
     }
-    if (
-      (res.subscription.type === 1 && res.themes[0].id !== 6) ||
-      (userProfile.data.themes?.length === 0 && res.themes.length === 0)
-    ) {
-      await selectTheme({
-        _method: 'PATCH',
-        themes: [6],
-      });
-    }
+    // if (
+    //   (res.subscription.type === 1 && res.themes[0].id !== 6) ||
+    //   (userProfile.data.themes?.length === 0 && res.themes.length === 0)
+    // ) {
+    //   await selectTheme({
+    //     _method: 'PATCH',
+    //     themes: [6],
+    //   });
+    // }
   };
 
   const handleNotificationQuote = async (res, remoteMessage, getInitialURL) => {
@@ -234,31 +252,37 @@ function Routes({
     }
   };
 
-  const handleNotificationOpened = () => {
+  const handleNotificationOpened = resProfile => {
+    let isAbleToFetchQuote = true;
     notifee.onForegroundEvent(async ({type, detail}) => {
-      if (
-        (type === EventType.ACTION_PRESS || type === EventType.PRESS) &&
-        detail.notification.data?.id
-      ) {
-        handleDecrementBadgeCount();
+      if (type === EventType.ACTION_PRESS || type === EventType.PRESS) {
         if (detail.notification.data?.id) {
-          await fetchListQuote({
-            notif: detail.notification.data?.id || null,
-          });
-          scrollToTopQuote();
+          isAbleToFetchQuote = false;
+          handleDecrementBadgeCount();
+          if (detail.notification.data?.id) {
+            await fetchListQuote({
+              notif: detail.notification.data?.id || null,
+            });
+            scrollToTopQuote();
+          }
+        }
+
+        if (detail.notification.data?.type === 'paywall') {
+          if (loadingRef.current) {
+            setPaywallNotification(detail.notification.data);
+            loadingRef.current = false;
+          } else {
+            handlePayment(detail.notification.data?.placement);
+          }
         }
       }
     });
-    messaging().onNotificationOpenedApp(async remoteMessage => {
-      handleDecrementBadgeCount();
-      if (remoteMessage?.data?.id) {
-        await fetchListQuote({notif: remoteMessage?.data?.id || null});
-        scrollToTopQuote();
+    setTimeout(async () => {
+      if (isAbleToFetchQuote) {
+        const getInitialURL = await Linking.getInitialURL();
+        handleNotificationQuote(resProfile, null, getInitialURL);
       }
-      if (remoteMessage?.data?.type === 'paywall') {
-        handlePayment(remoteMessage?.data?.placement);
-      }
-    });
+    }, 2000);
   };
 
   const handleInitialData = async () => {
@@ -266,16 +290,35 @@ function Routes({
       await getInitialData(callbackError);
       setCounterNumber(99);
     } else {
-      getInitialData(callbackError);
+      await getInitialData(callbackError);
+      SplashScreen.hide();
     }
   };
 
-  const handleDidMount = () => {
+  const handleResetQuotePremium = async () => {
+    const quotePremiumDate = await AsyncStorage.getItem('quotePremiumDate');
+    const currentDate = moment().format('YYYY-MM-DD');
+    if (quotePremiumDate && quotePremiumDate !== currentDate) {
+      AsyncStorage.removeItem('quotePremiumDate');
+      resetTodayAdsLimit();
+    }
+  };
+
+  const handleDidMount = async () => {
     try {
+      setAnimationSlideStatus(false);
+      setAnimationCounter(true);
+      setPaywallNotification(null);
+      const quotePremiumDate = await AsyncStorage.getItem('quotePremiumDate');
+      const currentDate = moment().format('YYYY-MM-DD');
+      if (quotePremiumDate && quotePremiumDate !== currentDate) {
+        AsyncStorage.removeItem('quotePremiumDate');
+        resetTodayAdsLimit();
+      }
+      handleResetQuotePremium();
       showLoadingModal();
       Purchasely.isReadyToPurchase(true);
       resetNotificationBadge();
-      handleNotificationOpened();
       handleInitialData();
       if (activeVersion !== APP_VERSION) {
         handleAppVersion();
@@ -285,29 +328,27 @@ function Routes({
         }, 500);
       } else if (userProfile.token) {
         const fetchUserData = async () => {
-          const resProfile = await getUserProfile();
-          const res = resProfile.data;
-
-          const remoteMessage = await messaging().getInitialNotification();
-          if (remoteMessage?.data?.type === 'paywall') {
-            setPaywallObj(remoteMessage.data);
+          const setting = await getSetting();
+          if (setting.data.value !== 'true') {
+            handleShowFreePremiumWeekly();
+            handleShowFreePremiumDaily();
           }
+          const resProfile = await reloadUserProfile();
+          const res = resProfile;
+
+          handleNotificationOpened(resProfile);
+          SplashScreen.hide();
           await handleSelectTheme(res);
           setCounterNumber(99);
-          await reloadUserProfile();
-          const getInitialURL = await Linking.getInitialURL();
-          handleNotificationQuote(res, remoteMessage, getInitialURL);
           handleSubscriptionStatus(res.subscription);
           fetchCollection();
           fetchListLiked();
           fetchPastQuotes();
           setLoading(false);
           handleUpdateTimezone();
-          const setting = await getSetting();
-          if (setting.data.value !== 'true') {
-            handleShowFreePremiumWeekly();
-            handleShowFreePremiumDaily();
-          }
+          setTimeout(() => {
+            loadingRef.current = false;
+          }, 10000);
         };
         fetchUserData();
 
@@ -322,12 +363,19 @@ function Routes({
       console.log('Check err didmount:', err);
       callbackError();
       hideLoadingModal();
+      SplashScreen.hide();
     }
   };
 
   const purchaselyListener = () => {
     Purchasely.addEventListener(event => {
-      console.log('Res addEventListener:', event.name);
+      paywallStatus.current = event.name;
+      const animationStatus = store.getState().defaultState.runAnimationSlide;
+      if (event.name === 'PRESENTATION_CLOSED') {
+        if (animationStatus === false) {
+          setAnimationSlideStatus(true);
+        }
+      }
     });
 
     Purchasely.addPurchasedListener(res => {
@@ -336,26 +384,102 @@ function Routes({
     });
   };
 
+  const handleShowAds = async () => {
+    const isFinishTutorial = await AsyncStorage.getItem('isFinishTutorial');
+    appOpenAd.load();
+    if (isFinishTutorial === 'yes' && userProfile?.token) {
+      setTimeout(() => {
+        if (appOpenAd.loaded) {
+          appOpenAd.show();
+        } else {
+          setLoadingAds(false);
+          setInitialLoaderStatus(true);
+        }
+      }, 2000);
+    } else {
+      setLoadingAds(false);
+      setInitialLoaderStatus(true);
+    }
+  };
+
+  const handleLoadInAppAds = async () => {
+    const isFinishTutorial = await AsyncStorage.getItem('isFinishTutorial');
+    if (isFinishTutorial === 'yes') {
+      if (appOpenAd.loaded) {
+        setAdsOverlay(true);
+        appOpenAd.show();
+      } else {
+        setLoadingAds(false);
+      }
+    }
+  };
+
   useEffect(() => {
+    setInitialLoaderStatus(false);
+    if (userProfile.token) {
+      if (!isUserPremium()) {
+        handleShowAds();
+      } else {
+        setLoadingAds(false);
+      }
+    } else {
+      setLoadingAds(false);
+    }
     handleDidMount();
     purchaselyListener();
-    const subscription = AppState.addEventListener('change', nextAppState => {
-      if (
-        appState.current.match(/inactive|background/) &&
-        nextAppState === 'active'
-      ) {
-        resetNotificationBadge();
-        handleUpdateTimezone();
-      }
+    const subscription = AppState.addEventListener(
+      'change',
+      async nextAppState => {
+        if (
+          appState.current.match(/inactive|background/) &&
+          nextAppState === 'active'
+        ) {
+          resetNotificationBadge();
+          handleUpdateTimezone();
+        }
+        if (
+          appState.current.match(/inactive|background/) &&
+          nextAppState === 'active'
+        ) {
+          appOpenAd.load();
+          if (
+            paywallStatus &&
+            paywallStatus.current !== 'PRESENTATION_CLOSED'
+          ) {
+            handleLoadInAppAds();
+          } else {
+            appOpenAd.load();
+          }
+        } else {
+          paywallStatus.current = 'READY';
+          appOpenAd.load();
+        }
 
-      appState.current = nextAppState;
-      setAppStateVisible(appState.current);
-    });
+        appState.current = nextAppState;
+        setAppStateVisible(appState.current);
+      },
+    );
 
-    // throw new Error('My first Sentry error!');
+    const unsubscribeAppOpenAds = appOpenAd.addAdEventListener(
+      AdEventType.CLOSED,
+      () => {
+        setLoadingAds(false);
+        setAdsOverlay(false);
+      },
+    );
+
+    const listenerIAPAds = appOpenAd.addAdEventListener(
+      AdEventType.CLOSED,
+      () => {
+        setInitialLoaderStatus(true);
+      },
+    );
     return () => {
       subscription.remove();
       Purchasely.removeEventListener();
+      unsubscribeAppOpenAds();
+
+      listenerIAPAds();
     };
   }, []);
 
@@ -371,33 +495,34 @@ function Routes({
   }
   if (isLoading) return null;
   return (
-    <NavigationContainer ref={navigationRef} linking={navigationLinking}>
-      <Stack.Navigator initialRouteName={getInitialRoute()}>
-        <Stack.Screen
-          options={navigationData.noHeader.options}
-          name="WelcomePage"
-          component={WelcomePage}
-        />
-        <Stack.Screen
-          options={navigationData.noHeader.options}
-          name="Register"
-          component={Register}
-        />
-        <Stack.Screen
-          options={navigationData.noHeader.options}
-          name="MainPage"
-          component={MainPage}
-          initialParams={{
-            paywallObj,
-          }}
-        />
-        <Stack.Screen
-          options={navigationData.noHeader.options}
-          name="NotificationTester"
-          component={NotificationTester}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <View style={{flex: 1, position: 'relative'}}>
+      <NavigationContainer ref={navigationRef} linking={navigationLinking}>
+        <Stack.Navigator initialRouteName={getInitialRoute()}>
+          <Stack.Screen
+            options={navigationData.noHeader.options}
+            name="WelcomePage"
+            component={WelcomePage}
+          />
+          <Stack.Screen
+            options={navigationData.noHeader.options}
+            name="Register"
+            component={Register}
+          />
+          <Stack.Screen
+            options={navigationData.noHeader.options}
+            name="MainPage"
+            component={MainPage}
+          />
+          <Stack.Screen
+            options={navigationData.noHeader.options}
+            name="NotificationTester"
+            component={NotificationTester}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+      {isLoadingAds && <WelcomePage isLoading />}
+      {showAdsOverlay && <AdsOverlay />}
+    </View>
   );
 }
 

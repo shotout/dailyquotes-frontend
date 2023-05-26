@@ -4,4 +4,12 @@ export default states => ({
   userProfile: states.defaultState.userProfile,
   collections: states.defaultState.collections,
   haveBeenAskRating: states.defaultState.haveBeenAskRating,
+  todayAdsLimit: states.defaultState.todayAdsLimit,
+  restPassLength: states.defaultState.restPassLength,
+  listBasicQuote: states.defaultState.listBasicQuote,
+  runAnimationSlide: states.defaultState.runAnimationSlide,
+  listQuoteRef: states.defaultState.listQuoteRef,
+  finishInitialLoader: states.defaultState.finishInitialLoader,
+  paywallNotifcation: states.defaultState.paywallNotifcation,
+  animationCounter: states.defaultState.animationCounter,
 });

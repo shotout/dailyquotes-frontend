@@ -72,6 +72,13 @@ export const updateCategory = data =>
     data,
   });
 
+export const unlockByAdmob = (params = {}) =>
+  Wrap({
+    url: '/admob',
+    method: 'GET',
+    params,
+  });
+
 export const getListQuotes = (params = {}) =>
   Wrap({
     url: '/quote',

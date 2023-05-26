@@ -8,6 +8,7 @@ import {
   View,
 } from 'react-native';
 import SlidingUpPanel from 'rn-sliding-up-panel';
+import {BannerAd, BannerAdSize} from 'react-native-google-mobile-ads';
 import CardTheme from '../../../components/card-theme';
 import styles from './styles';
 import IconClose from '../../../assets/svg/icon_close.svg';
@@ -15,6 +16,8 @@ import {isIphoneXorAbove} from '../../../shared/devices';
 import {sizing} from '../../../shared/styling';
 import LineGestureSlide from '../../../components/line-gesture-slide';
 import {listTheme} from '../../../shared/useBackgroundQuotes';
+import {getAdaptiveBannerID} from '../../../shared/static/adsId';
+import {isUserPremium} from '../../../helpers/user';
 
 export default function ModalTheme(props) {
   const {contentRef, onClose, onCustomSelectTheme, customSelected} = props;
@@ -67,6 +70,17 @@ export default function ModalTheme(props) {
                 customSelected={customSelected}
               />
             </ScrollView>
+            {!isUserPremium() && (
+              <View style={styles.ctnBanner}>
+                <BannerAd
+                  unitId={getAdaptiveBannerID()}
+                  size={BannerAdSize.BANNER}
+                  requestOptions={{
+                    requestNonPersonalizedAdsOnly: true,
+                  }}
+                />
+              </View>
+            )}
           </View>
         </View>
       )}

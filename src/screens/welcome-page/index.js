@@ -11,7 +11,7 @@ import {setCounterNumber} from '../../store/defaultState/actions';
 
 const bgImage = require('../../assets/images/welcome_backround.png');
 
-function WelcomePage({defaultData}) {
+function WelcomePage({defaultData, isLoading}) {
   useEffect(() => {
     if (defaultData.feeling?.length > 0) {
       setCounterNumber(99);
@@ -19,7 +19,7 @@ function WelcomePage({defaultData}) {
   }, [defaultData]);
 
   return (
-    <View style={styles.ctnRoot}>
+    <View style={[styles.ctnRoot, isLoading && styles.absoluteContent]}>
       <ImageBackground source={bgImage} style={styles.ctnBackgroundImage}>
         <View style={styles.ctnIcon}>
           <View style={styles.ctnLogoIcon}>
@@ -34,17 +34,19 @@ function WelcomePage({defaultData}) {
             </Text>
           </View>
         </View>
-        <View style={styles.btnWrapper}>
-          <Button
-            label="Get started"
-            // onPress={handlePurchasely}
-            onPress={() => {
-              // handlePayment();
-              navigate('Register');
-              askTrackingPermission();
-            }}
-          />
-        </View>
+        {!isLoading && (
+          <View style={styles.btnWrapper}>
+            <Button
+              label="Get started"
+              // onPress={handlePurchasely}
+              onPress={() => {
+                // handlePayment();
+                navigate('Register');
+                askTrackingPermission();
+              }}
+            />
+          </View>
+        )}
       </ImageBackground>
     </View>
   );

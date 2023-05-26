@@ -5,7 +5,7 @@
   "scripts": {
     "android": "npx react-native run-android",
     "android-prod": "react-native run-android --variant=release",
-    "ios": "npx react-native run-ios --simulator \"iPhone 13 Pro\"",
+    "ios": "npx react-native run-ios --simulator \"iPhone 14\"",
     "ipad": "npx react-native run-ios --device \"iPad Gian\"",
     "link-font": "npx react-native-asset",
     "start": "npx react-native start",
@@ -18,20 +18,23 @@
     "reinstall": "rm -rf node_modules && yarn",
     "fixDebug": "rm -rf node_modules/react-native/Libraries/BatchedBridge/MessageQueue.js && cp -R __tests__/MessageQueue.js node_modules/react-native/Libraries/BatchedBridge/",
     "fixGif": "rm -rf node_modules/react-native-fast-image/RNFastImage.podspec && cp -R __tests__/RNFastImage.podspec node_modules/react-native-fast-image/",
-    "getHash": "keytool -exportcert -alias mootie-alias -keystore android/app/mootie.keystore | openssl sha1 -binary | openssl base64"
+    "getHash": "keytool -exportcert -alias mootie-alias -keystore android/app/mootie.keystore | openssl sha1 -binary | openssl base64",
+    "postinstall": "react-native setup-ios-permissions && pod-install"
   },
   "dependencies": {
+    "@brigad/react-native-skadnetwork": "^0.1.2",
     "@notifee/react-native": "^7.6.1",
     "@purchasely/react-native-purchasely-google": "^2.4.1",
     "@react-native-async-storage/async-storage": "^1.17.10",
     "@react-native-camera-roll/camera-roll": "^5.0.4",
     "@react-native-clipboard/clipboard": "^1.11.1",
-    "@react-native-firebase/analytics": "^16.5.0",
-    "@react-native-firebase/app": "^16.2.0",
-    "@react-native-firebase/messaging": "^16.2.0",
+    "@react-native-firebase/analytics": "^16.7.0",
+    "@react-native-firebase/app": "^16.7.0",
+    "@react-native-firebase/messaging": "^16.7.0",
     "@react-navigation/native": "^6.0.13",
     "@react-navigation/native-stack": "^6.9.0",
     "@sentry/react-native": "^5.3.0",
+    "add": "^2.0.6",
     "axios": "^1.0.0",
     "lodash": "^4.17.21",
     "lottie-react-native": "^5.1.4",
@@ -51,9 +54,11 @@
     "react-native-fs": "^2.20.0",
     "react-native-fullscreen-chz": "^4.0.13",
     "react-native-gesture-handler": "^2.7.0",
+    "react-native-google-mobile-ads": "^10.3.2",
     "react-native-in-app-review": "^4.2.1",
     "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-paper": "^4.12.5",
+    "react-native-permissions": "^3.8.0",
     "react-native-popover-view": "^5.1.7",
     "react-native-purchasely": "^2.4.1",
     "react-native-responsive-fontsize": "^0.5.1",
@@ -61,6 +66,7 @@
     "react-native-screens": "^3.17.0",
     "react-native-share": "^8.0.0",
     "react-native-size-matters": "^0.4.0",
+    "react-native-splash-screen": "^3.3.0",
     "react-native-svg": "^13.2.0",
     "react-native-swipe-list-view": "^3.2.9",
     "react-native-timezone": "^2.1.0",
@@ -72,7 +78,8 @@
     "redux-persist": "6.0.0",
     "redux-thunk": "2.4.1",
     "reselect": "^4.1.6",
-    "rn-sliding-up-panel": "^2.4.6"
+    "rn-sliding-up-panel": "^2.4.6",
+    "yarn": "^1.22.19"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
@@ -91,11 +98,15 @@
     "eslint-plugin-react-native": "^3.11.0",
     "jest": "^26.6.3",
     "metro-react-native-babel-preset": "^0.66.2",
+    "pod-install": "0.1.38",
     "prettier": "^2.5.0",
     "react-native-svg-transformer": "^1.0.0",
     "react-test-renderer": "17.0.2"
   },
   "jest": {
     "preset": "react-native"
-  }
+  },
+  "reactNativePermissionsIOS": [
+    "AppTrackingTransparency"
+  ]
 }

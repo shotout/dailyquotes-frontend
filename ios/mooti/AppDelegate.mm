@@ -1,6 +1,9 @@
 #import "AppDelegate.h"
+#import "RNSplashScreen.h"
 #import <Firebase.h>
 #import <React/RCTLinkingManager.h>
+#import <AppTrackingTransparency/AppTrackingTransparency.h>
+#import <AdSupport/ASIdentifierManager.h>
 
 #import <React/RCTBridge.h>
 #import <React/RCTBundleURLProvider.h>
@@ -36,6 +39,7 @@ static NSString *const kRNConcurrentRoot = @"concurrentRoot";
 {
   [FIRApp configure];
   RCTAppSetupPrepareApp(application);
+  
 
   RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
   
@@ -62,6 +66,30 @@ static NSString *const kRNConcurrentRoot = @"concurrentRoot";
   rootViewController.view = rootView;
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
+
+  [RNSplashScreen show];
+  
+  if (@available(iOS 14, *)) {
+      [ATTrackingManager requestTrackingAuthorizationWithCompletionHandler:^(ATTrackingManagerAuthorizationStatus status) {
+        // status mengandung status permintaan pelacakan IDFA
+        // Anda dapat menambahkan logika yang sesuai berdasarkan status yang diberikan
+        switch (status) {
+          case ATTrackingManagerAuthorizationStatusAuthorized:
+            // Lakukan tindakan yang diperlukan ketika IDFA tracking diizinkan
+            break;
+          case ATTrackingManagerAuthorizationStatusDenied:
+            // Lakukan tindakan yang diperlukan ketika IDFA tracking ditolak
+            break;
+          case ATTrackingManagerAuthorizationStatusRestricted:
+            // Lakukan tindakan yang diperlukan ketika IDFA tracking terbatas
+            break;
+          case ATTrackingManagerAuthorizationStatusNotDetermined:
+            // Lakukan tindakan yang diperlukan ketika IDFA tracking belum ditentukan
+            break;
+        }
+      }];
+    }
+  
   return YES;
 }
 

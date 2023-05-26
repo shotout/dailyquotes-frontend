@@ -12,6 +12,7 @@ import {
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import SlidingUpPanel from 'rn-sliding-up-panel';
+import {BannerAd, BannerAdSize} from 'react-native-google-mobile-ads';
 import styles from './styles';
 import IconClose from '../../../assets/svg/icon_close.svg';
 import ListContent from '../../../components/list-content';
@@ -38,12 +39,14 @@ import AccountPreference from '../../setting/account-preference';
 import {
   handlePayment,
   isUserPremium,
+  openPrivacyPolicy,
   openTermsofUse,
 } from '../../../helpers/user';
 import {sizing} from '../../../shared/styling';
 import LineGestureSlide from '../../../components/line-gesture-slide';
 import HomeWidget from '../../setting/home-widget';
 import LockScreenWidget from '../../setting/lock-screen-widget ';
+import {getAdaptiveBannerID} from '../../../shared/static/adsId';
 
 function ModalSetting({contentRef, onClose, collections}) {
   const [showModalSubscribe, setShowModalSubscribe] = useState(false);
@@ -97,7 +100,7 @@ function ModalSetting({contentRef, onClose, collections}) {
           }}>
           <View style={styles.ctnRow}>
             <View style={styles.ctnRowLeft}>
-              <Text style={styles.titleStyle}>Try it for free</Text>
+              <Text style={styles.titleStyle}>Go Premium</Text>
               <Text style={styles.subTitleStyle}>
                 Access unlimited categories, quotes, themes and remove ads!
               </Text>
@@ -130,7 +133,7 @@ function ModalSetting({contentRef, onClose, collections}) {
               setShowModalReminder(true);
             }}
           />
-          {Platform.OS === 'ios' && (
+          {/* {Platform.OS === 'ios' && (
             <ListContent
               title="Home Screen Widgets"
               icon={<WidgetIcon width="90%" height="90%" />}
@@ -147,7 +150,7 @@ function ModalSetting({contentRef, onClose, collections}) {
                 setModalLockScreenWidget(true);
               }}
             />
-          )}
+          )} */}
         </View>
         <View style={styles.separator} />
       </View>
@@ -220,6 +223,11 @@ function ModalSetting({contentRef, onClose, collections}) {
           <View style={styles.ctnFooter}>
             {/* <ListContent title="Imprint" styleList={styles.styleList} /> */}
             <ListContent
+              title="Privacy Policy"
+              styleList={styles.styleList}
+              onPress={openPrivacyPolicy}
+            />
+            <ListContent
               title="Terms & Conditions"
               styleList={styles.styleList}
               onPress={openTermsofUse}
@@ -236,7 +244,10 @@ function ModalSetting({contentRef, onClose, collections}) {
         <ScrollView
           showsVerticalScrollIndicator={false}
           nestedScrollEnabled
-          contentContainerStyle={styles.ctnScroll}>
+          contentContainerStyle={[
+            styles.ctnScroll,
+            !isUserPremium() && styles.ctnScrollFreeUser,
+          ]}>
           <View style={styles.titleWrap}>
             <Text style={styles.ctnTittle}>Settings</Text>
           </View>
@@ -244,6 +255,18 @@ function ModalSetting({contentRef, onClose, collections}) {
           {renderQuote()}
           {renderFollow()}
         </ScrollView>
+
+        {!isUserPremium() && (
+          <View style={styles.ctnBanner}>
+            <BannerAd
+              unitId={getAdaptiveBannerID()}
+              size={BannerAdSize.BANNER}
+              requestOptions={{
+                requestNonPersonalizedAdsOnly: true,
+              }}
+            />
+          </View>
+        )}
       </View>
     );
   }

@@ -101,4 +101,17 @@ export default StyleSheet.create({
   mg20: {
     marginTop: moderateScale(20),
   },
+  ctnBanner: {
+    paddingBottom: isIphoneXorAbove() ? 158 : 116,
+    justifyContent: 'center',
+    position: 'absolute',
+    bottom: 0,
+    alignItems: 'center',
+    width: '100%',
+    backgroundColor: '#fff',
+    paddingTop: moderateScale(10),
+  },
+  ctnScrollFreeUser: {
+    paddingBottom: isIphoneXorAbove() ? moderateScale(210) : moderateScale(170),
+  },
 });

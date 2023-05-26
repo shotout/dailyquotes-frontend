@@ -1,4 +1,8 @@
 {
   "name": "mooti",
-  "displayName": "mooti"
+  "displayName": "mooti",
+  "react-native-google-mobile-ads": {
+    "android_app_id": "ca-app-pub-1891825795064804~9754619757",
+    "ios_app_id": "ca-app-pub-1891825795064804~4947648658"
+  }
 }

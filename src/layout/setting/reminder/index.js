@@ -35,7 +35,7 @@ function Reminder({isVisible, onClose, userProfile}) {
     end_at: moment(new Date(2018, 11, 24, 21, 0, 30, 0)).format(
       'YYYY-MM-DD HH:mm',
     ),
-    often: 10,
+    often: 15,
   });
 
   const handleSaveReminder = async () => {
