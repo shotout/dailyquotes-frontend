@@ -1,6 +1,7 @@
 import moment from 'moment';
 import {Linking, Platform} from 'react-native';
 import Purchasely, {ProductResult} from 'react-native-purchasely';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getUserProfile, setSubcription} from '../shared/request';
 import store from '../store/configure-store';
 import {fetchCollection, handleSetProfile} from '../store/defaultState/actions';
@@ -13,6 +14,7 @@ import {
   SHOW_PAYWALL,
   SUBSCRIPTION_STARTED,
 } from './eventTracking';
+import {reset} from '../shared/navigationRef';
 
 export const dateToUnix = date => moment(date).unix();
 export const getFutureDate = (defaultDate, day) =>
@@ -53,15 +55,14 @@ export const isUserPremium = () => {
 };
 
 export const isPremiumToday = () => {
-  const todayLimit = store.getState().defaultState.todayAdsLimit;
-  const {restPassLength} = store.getState().defaultState;
+  const {freeUserPremium} = store.getState().defaultState;
   if (isUserPremium()) {
     return true;
   }
-  if (12 + (restPassLength || 0) === todayLimit) {
-    return false;
+  if (freeUserPremium) {
+    return true;
   }
-  return true;
+  return false;
 };
 
 export const isCompletedOnboarding = () => {
@@ -74,58 +75,72 @@ export const isCompletedOnboarding = () => {
 };
 
 export const reloadUserProfile = async () =>
-  new Promise(async resolve => {
-    const res = await getUserProfile();
-    const currentUserProfile = store.getState().defaultState.userProfile;
-    store.dispatch(
-      handleSetProfile({
-        ...currentUserProfile,
-        ...res,
-      }),
-    );
-    if (res.data.subscription.type !== 5) {
-      if (currentUserProfile.data) {
-        if (currentUserProfile.data.subscription.type !== 1) {
-          if (res.data.subscription.type === 1) {
-            eventTracking(CANCEL_SUBSCRIBE_AFTER_TRIAL);
-          }
-          if (
-            currentUserProfile.data.subscription.type !==
-            res.data.subscription.type
-          ) {
-            if (res.data.subscription.type !== 1) {
-              eventTracking(SUBSCRIPTION_STARTED);
-              const objPurchase = JSON.parse(
-                res.data.subscription.purchasely_data,
-              );
-              if (objPurchase) {
-                revenueTracking(
-                  objPurchase.plan_price_in_customer_currency,
-                  objPurchase.customer_currency,
+  new Promise(async (resolve, reject) => {
+    try {
+      const res = await getUserProfile();
+      const currentUserProfile = store.getState().defaultState.userProfile;
+      store.dispatch(
+        handleSetProfile({
+          ...currentUserProfile,
+          ...res,
+        }),
+      );
+      if (res.data.subscription.type !== 5) {
+        if (currentUserProfile.data) {
+          if (currentUserProfile.data.subscription.type !== 1) {
+            if (res.data.subscription.type === 1) {
+              eventTracking(CANCEL_SUBSCRIBE_AFTER_TRIAL);
+            }
+            if (
+              currentUserProfile.data.subscription.type !==
+              res.data.subscription.type
+            ) {
+              if (res.data.subscription.type !== 1) {
+                eventTracking(SUBSCRIPTION_STARTED);
+                const objPurchase = JSON.parse(
+                  res.data.subscription.purchasely_data,
                 );
+                if (objPurchase) {
+                  revenueTracking(
+                    objPurchase.plan_price_in_customer_currency,
+                    objPurchase.customer_currency,
+                  );
+                }
               }
             }
           }
         }
       }
+      resolve(res.data);
+    } catch (err) {
+      reset('WelcomePage');
+      reject('error get profile');
     }
-    resolve(res.data);
   });
 
 export const handlePayment = async (vendorId, cb) =>
   new Promise(async (resolve, reject) => {
     try {
       eventTracking(SHOW_PAYWALL);
-
+      let stringVendor = vendorId;
       const purchaseId = await Purchasely.getAnonymousUserId();
       if (vendorId === 'onboarding') {
         await setSubcription({
           subscription_type: 5,
           purchasely_id: purchaseId,
         });
+      } else if (!stringVendor) {
+        const currentDate = moment().format('YYYY-MM-DD');
+        const getInstallDate = await AsyncStorage.getItem('firstInstall');
+        if (getInstallDate === currentDate) {
+          stringVendor = 'offer_no_purchase_after_onboarding_paywall';
+        } else {
+          stringVendor = 'offer_no_purchase_after_onboarding_paywall_2nd';
+        }
       }
       const res = await Purchasely.presentPresentationForPlacement({
-        placementVendorId: vendorId || 'onboarding',
+        placementVendorId:
+          stringVendor || 'offer_no_purchase_after_onboarding_paywall',
         isFullscreen: true,
       });
       const user = store.getState().defaultState.userProfile;
@@ -277,4 +292,18 @@ export const reformatDate = valueDate => {
     );
   }
   return new Date();
+};
+
+export const handleBasicPaywall = async cbPaywall => {
+  const profile = store.getState().defaultState.userProfile;
+  const paywallType =
+    profile?.data?.notif_count && profile?.data?.notif_count > 2
+      ? 'offer_no_purchase_after_onboarding_paywall_2nd'
+      : 'offer_no_purchase_after_onboarding_paywall';
+  console.log(
+    'CHECK BASIC PAYWALL paywallType:',
+    profile?.data?.notif_count,
+    paywallType,
+  );
+  await handlePayment(paywallType, cbPaywall);
 };

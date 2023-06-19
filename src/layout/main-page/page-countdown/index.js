@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {ImageBackground, View, Text, Image, ScrollView} from 'react-native';
 import {RewardedAd, RewardedAdEventType} from 'react-native-google-mobile-ads';
 import styles from './styles';
-import {handlePayment} from '../../../helpers/user';
+import {handleBasicPaywall, handlePayment} from '../../../helpers/user';
 import Button from '../../../components/button';
 import {getRewardedOutOfQuotesID} from '../../../shared/static/adsId';
 import {setTodayAdsLimit} from '../../../store/defaultState/actions';
@@ -128,9 +128,7 @@ const PageCountDown = () => {
                   <Image source={crownIcon} style={styles.btnImgStyle} />
                 </View>
               }
-              onPress={() => {
-                handlePayment('in_app_paywall');
-              }}
+              onPress={handleBasicPaywall}
               label="Go Premium!"
             />
           </View>

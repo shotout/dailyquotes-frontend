@@ -14,7 +14,7 @@ function NotificationTester({userProfile}) {
       await notifee.requestPermission();
 
       // Create a channel (required for Android)
-      const channelId = await notifee.createChannel({
+      await notifee.createChannel({
         id: 'quote',
         name: 'Quote Channel',
         sound: 'circle.mp3',
@@ -24,16 +24,7 @@ function NotificationTester({userProfile}) {
       await notifee.displayNotification({
         title: 'Notification Title',
         body: 'Main body content of the notification',
-        data: {id: '27'},
-        android: {
-          channelId,
-          smallIcon: 'ic_small_notif', // optional, defaults to 'ic_launcher'.
-          // pressAction is needed if you want the notification to open the app when pressed
-          pressAction: {
-            id: 'default',
-          },
-          sound: 'circle.mp3',
-        },
+        data: {type: 'paywall', placement: 'in_app_paywall'},
       });
     } catch (err) {
       console.log('Err display:', err);

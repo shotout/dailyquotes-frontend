@@ -31,7 +31,6 @@ function QuotesContent({
   }, [isActive, isAnimationStart]);
 
   const runAnimation = () => {
-    console.log('Check counter.current:', counter.current);
     Animated.timing(translateX, {
       toValue: 0,
       duration: 300,
@@ -48,17 +47,19 @@ function QuotesContent({
             counter.current !== 0 && counter.current % 2 === 0;
           if (isStopAnimation) {
             setAnimationCounter(false);
-            Animated.timing(translateX, {
-              toValue: 0,
-              duration: 300,
-              useNativeDriver: true,
-            }).start(() => {
-              setTimeout(() => {
+            setTimeout(() => {
+              Animated.timing(translateX, {
+                toValue: 0,
+                duration: 300,
+                useNativeDriver: true,
+              }).start(() => {
                 setTimeout(() => {
-                  setAnimationCounter(true);
-                }, 100);
-                runAnimation();
-              }, 3500);
+                  setTimeout(() => {
+                    setAnimationCounter(true);
+                  }, 100);
+                  runAnimation();
+                }, 3500);
+              });
             });
           } else {
             runAnimation();
@@ -89,10 +90,12 @@ function QuotesContent({
 
   return (
     <View style={styles.ctnWrapper}>
-      <Image
-        source={source}
-        style={[styles.ctnBackgroundImage, styles.ctnAbsolute]}
-      />
+      {isActive && (
+        <Image
+          source={source}
+          style={[styles.ctnBackgroundImage, styles.ctnAbsolute]}
+        />
+      )}
       <Animated.View
         style={{
           width: '100%',

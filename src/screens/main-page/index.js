@@ -16,6 +16,7 @@ import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ViewShot from 'react-native-view-shot';
+import notifee from '@notifee/react-native';
 import {
   PanGestureHandler,
   State,
@@ -25,6 +26,7 @@ import moment from 'moment';
 import RNFS from 'react-native-fs';
 
 import {
+  AdEventType,
   BannerAd,
   BannerAdSize,
   InterstitialAd,
@@ -59,6 +61,7 @@ import QuotesContent from '../../components/quotes-content-fast-image';
 import {handleModalFirstPremium} from '../../shared/globalContent';
 import {
   getFutureDate,
+  handleBasicPaywall,
   handlePayment,
   isPremiumToday,
   isUserPremium,
@@ -68,6 +71,7 @@ import ContentSubscription from '../../layout/setting/content-subscription';
 import {
   changeQuoteLikeStatus,
   setAnimationSlideStatus,
+  setInitialLoaderStatus,
   setNewQuoteData,
   setQuoteRef,
 } from '../../store/defaultState/actions';
@@ -85,6 +89,8 @@ import ModalCountDown from '../../components/modal-countdown';
 import PageCountDown from '../../layout/main-page/page-countdown';
 import {isMoreThanThreeHoursSinceLastTime} from '../../helpers/timeHelpers';
 import {checkAdsTracking} from '../../helpers/adsTracking';
+import {loadInterstialAds} from '../../helpers/loadReward';
+import LoadingFullScreen from '../../components/loading-fullscreen';
 
 const arrowBottom = require('../../assets/icons/arrow-bottom.png');
 const UnionImage = require('../../assets/images/union.png');
@@ -99,7 +105,7 @@ const rewarded = RewardedAd.createForAdRequest(adUnitId, {
   keywords: ['fashion', 'clothing'],
 });
 
-const interstitial = InterstitialAd.createForAdRequest(
+const interstialAds = InterstitialAd.createForAdRequest(
   getRewardedInsterstialID(),
   {
     requestNonPersonalizedAdsOnly: true,
@@ -122,6 +128,7 @@ function MainPage({
   finishInitialLoader,
   paywallNotifcation,
   animationCounter,
+  fetchListQuote,
 }) {
   const limitIndex = 6;
   const isFromOnboarding = route.params?.isFromOnboarding;
@@ -140,11 +147,11 @@ function MainPage({
   const [isUserHasScroll, setUserScrollQuotes] = useState(false);
   const [isShowNextQuooteAnimation, setShowNextQuoteAnimation] =
     useState(false);
-  const [isHasRunAnimation, setHasRunAnimation] = useState(false);
+  const [isLoadingInterstial, setLoadingInterstial] = useState(false);
   const [runQuoteAnimation, setRunQuoteAnimation] = useState(false);
   const [themeUser] = useBackgroundQuotes(userProfile.data.themes[0]);
   const [scheduleTime] = useLocalNotif(userProfile);
-
+  const [statusbarStatus, setStatusBar] = useState(false);
   const [showModalCountdown, setModalCountdown] = useState(false);
 
   const captureRef = useRef();
@@ -201,27 +208,32 @@ function MainPage({
   };
   const handleShowPaywall = async () => {
     const res = await getSetting();
+    const initNotification = await notifee.getInitialNotification();
+    const getInitialPlacement =
+      initNotification?.notification?.data || paywallNotifcation;
     setEnableFreePremium(res.data.value !== 'true');
     if (res.data.value === 'true' && !isUserPremium() && !isFromOnboarding) {
       // Paywall open apps
-      if (paywallNotifcation) {
-        handlePayment(paywallNotifcation?.placement, handleShowPopupShare);
+      if (getInitialPlacement) {
+        const paywallNotifCb = () => {
+          setInitialLoaderStatus(false);
+          handleShowPopupShare();
+        };
+        handlePayment(getInitialPlacement?.placement, paywallNotifCb);
       } else {
         const getCurrentOpenApps = await AsyncStorage.getItem('latestOpenApps');
         const mainDate = reformatDate(parseFloat(getCurrentOpenApps));
         const isMoreThan3Hours = isMoreThanThreeHoursSinceLastTime(mainDate);
         const stringifyDate = Date.now().toString();
         if (!getCurrentOpenApps || isMoreThan3Hours) {
-          const paywallType =
-            userProfile?.data?.notif_count && userProfile?.data?.notif_count > 2
-              ? 'offer_no_purchase_after_onboarding_paywall_2nd'
-              : 'offer_no_purchase_after_onboarding_paywall';
-          handlePayment(paywallType, handleShowPopupShare);
+          handleBasicPaywall(handleShowPopupShare);
           AsyncStorage.setItem('latestOpenApps', stringifyDate);
         } else {
           setAnimationSlideStatus(true);
         }
       }
+
+      handleRatingStatus();
     } else {
       handleRatingStatus();
       setAnimationSlideStatus(true);
@@ -264,8 +276,13 @@ function MainPage({
   useEffect(() => {
     const checkTutorial = async () => {
       const isFinishTutorial = await AsyncStorage.getItem('isFinishTutorial');
+      const getFirstInstall = await AsyncStorage.getItem('firstInstall');
       if (isFinishTutorial !== 'yes') {
         setShowTutorial(true);
+      }
+      if (!getFirstInstall) {
+        const currentDate = moment().format('YYYY-MM-DD');
+        AsyncStorage.setItem('firstInstall', currentDate);
       }
     };
     checkTutorial();
@@ -303,18 +320,33 @@ function MainPage({
         console.log('User earned reward of ', reward);
       },
     );
+
+    const rewardedOpen = rewarded.addAdEventListener(AdEventType.OPENED, () => {
+      setStatusBar(true);
+      console.log('LOAD ADS MODAL COUNTDOWN');
+    });
+    const rewardedClose = rewarded.addAdEventListener(
+      AdEventType.CLOSED,
+      () => {
+        setStatusBar(false);
+        console.log('LOAD ADS MODAL COUNTDOWN');
+      },
+    );
     rewarded.load();
-    interstitial.load();
-    checkAdsTracking();
+    interstialAds.load();
+    if (Platform.OS === 'ios') {
+      checkAdsTracking();
+    }
     return () => {
       backHandler.remove();
       unsubscribeLoaded();
       unsubscribeEarned();
+      rewardedOpen();
+      rewardedClose();
     };
   }, []);
 
   useEffect(() => {
-    console.log('Check finishInitialLoader:', finishInitialLoader);
     if (finishInitialLoader) {
       handleShowPaywall();
     }
@@ -324,6 +356,7 @@ function MainPage({
     if (!isPremiumBefore && isUserPremium()) {
       setPremiumBefore(true);
       setShowModalSubscribe(true);
+      fetchListQuote();
     }
   }, [userProfile, isPremiumBefore]);
 
@@ -370,11 +403,11 @@ function MainPage({
       if (activeQuote) {
         handleWidgetData(activeQuote);
       }
-      if (!interstitial.loaded) {
-        interstitial.load();
-      }
       if (!isUserPremium()) {
         handleShowInterstialAds(activeQuote, activeSlide);
+      }
+      if (!interstialAds.loaded) {
+        interstialAds.load();
       }
     }
     if (!isPremiumToday()) {
@@ -526,15 +559,18 @@ function MainPage({
     }
   };
 
-  const handleShowInterstialAds = (activeQuote, activeIndex) => {
-    const showInterstialAds = () => {
-      interstitial.load();
-      if (interstitial.loaded) {
-        interstitial.show();
+  const handleShowInterstialAds = async activeQuote => {
+    if (activeQuote?.item_type === 'in_app_ads') {
+      if (interstialAds.loaded) {
+        interstialAds.show();
+      } else {
+        const cbFinish = () => {
+          setLoadingInterstial(false);
+        };
+        setLoadingInterstial(true);
+        await loadInterstialAds(interstialAds, cbFinish);
+        cbFinish();
       }
-    };
-    if (activeQuote.item_type === 'in_app_ads') {
-      showInterstialAds();
     }
   };
 
@@ -676,9 +712,7 @@ function MainPage({
     return (
       <TouchableOpacity
         style={styles.ctnFreeBadge}
-        onPress={() => {
-          handlePayment('in_app_paywall');
-        }}>
+        onPress={handleBasicPaywall}>
         <View style={styles.ctnIconCrown}>
           <Crown width="100%" height="100%" />
         </View>
@@ -700,17 +734,9 @@ function MainPage({
 
   function renderContent(item, index) {
     const getImageContent = themeUser.imgLocal;
-    if (item.item_type === 'countdown_page') {
+    if (item?.item_type === 'countdown_page') {
       return <PageCountDown />;
     }
-    // if (item.item_type === 'in_app_ads') {
-    //   return (
-    //     <QuotesContentAds
-    //       isActive={activeSlide === index}
-    //       source={getImageContent}
-    //     />
-    //   );
-    // }
     return (
       <QuotesContent
         item={item}
@@ -730,7 +756,6 @@ function MainPage({
   }
 
   function renderFlatlistContent() {
-    // console.log('Check quote:', userProfile);
     return (
       <PanGestureHandler
         onGestureEvent={handleGesture}
@@ -852,17 +877,21 @@ function MainPage({
     return null;
   }
 
-  const isDarkTheme = userProfile.data?.themes[0]?.id === 4;
+  const isDarkTheme =
+    userProfile.data?.themes[0]?.id === 4 ||
+    userProfile.data?.themes[0]?.id === 6;
 
   return (
     <>
       <StatusBar
         barStyle={isDarkTheme ? 'light-content' : 'dark-content'}
         backgroundColor={isDarkTheme ? '#000' : '#fff'}
+        hidden={statusbarStatus}
       />
       <View style={styles.ctnRoot}>
         {renderMainContent()}
         {renderFreeBadge()}
+
         <ModalCategories
           refPanel={refCategory}
           contentRef={c => {
@@ -935,11 +964,20 @@ function MainPage({
           }}
         />
         <ModalCountDown
+          adsRef={rewarded}
+          hideStatusbar={() => {
+            setStatusBar(true);
+          }}
+          showStatusBar={() => {
+            setStatusBar(false);
+          }}
           visible={showModalCountdown}
           handleClose={() => {
             setModalCountdown(false);
           }}
         />
+
+        <LoadingFullScreen isLoading={isLoadingInterstial} />
       </View>
     </>
   );

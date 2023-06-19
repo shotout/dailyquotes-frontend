@@ -28,6 +28,7 @@ const commonPersistConfig = {
     'registerData',
     'todayAdsLimit',
     'restPassLength',
+    'freeUserPremium',
   ],
   blacklist: [
     'showModalPremium',

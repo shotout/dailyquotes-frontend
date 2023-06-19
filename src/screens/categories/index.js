@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import React, {useState} from 'react';
 import {ScrollView, Text, TouchableOpacity, View} from 'react-native';
-import { handlePayment } from '../../helpers/user';
+import { handleBasicPaywall, handlePayment } from '../../helpers/user';
 import styles from './styles';
 
 export default function Categories({onSelect}) {
@@ -11,9 +11,7 @@ export default function Categories({onSelect}) {
     return (
       <View style={styles.rowHeaderText}>
         <Text style={styles.boldHeader}>Categories</Text>
-        <TouchableOpacity onPress={() => {
-              handlePayment('in_app_paywall');
-            }}>
+        <TouchableOpacity onPress={handleBasicPaywall}>
           <Text>Unlock all</Text>
         </TouchableOpacity>
       </View>

@@ -37,6 +37,7 @@ import PastQuotes from '../../your-quotes/past-quotes';
 import LikeQuotes from '../../your-quotes/liked-quotes';
 import AccountPreference from '../../setting/account-preference';
 import {
+  handleBasicPaywall,
   handlePayment,
   isUserPremium,
   openPrivacyPolicy,
@@ -94,10 +95,7 @@ function ModalSetting({contentRef, onClose, collections}) {
     }
     return (
       <View style={styles.ctnBgWrap}>
-        <TouchableWithoutFeedback
-          onPress={() => {
-            handlePayment('in_app_paywall');
-          }}>
+        <TouchableWithoutFeedback onPress={handleBasicPaywall}>
           <View style={styles.ctnRow}>
             <View style={styles.ctnRowLeft}>
               <Text style={styles.titleStyle}>Go Premium</Text>

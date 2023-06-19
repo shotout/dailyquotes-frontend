@@ -1,4 +1,4 @@
-sudo keytool -genkey -v -keystore mootie.keystore -alias mootie-alias -keyalg RSA -keysize 2048 -validity 10000
+sudo keytool -genkey -v -keystore mcsmart.keystore -alias mootie-alias -keyalg RSA -keysize 2048 -validity 10000
 
 What is your first and last name?
   [Unknown]:  Gian Rhamadhan

@@ -62,6 +62,7 @@ import {
   showLoadingModal,
   storeRegistrationData,
 } from '../../store/defaultState/actions';
+import {sizing} from '../../shared/styling';
 
 const registerBackground = require('../../assets/images/background_register.png');
 const Convetti = require('../../assets/lottie/hello.json');
@@ -786,7 +787,8 @@ function Register({
           contentContainerStyle={styles.ctnScroll}
           scrollEnabled={
             (!isIphoneXorAbove() && registerStep === 8) ||
-            (!isIphoneXorAbove() && registerStep !== 1)
+            (!isIphoneXorAbove() && registerStep !== 1) ||
+            (sizing.getWindowHeight(1) < 844 && registerStep === 8)
           }>
           {renderHeader()}
           {renderContent()}

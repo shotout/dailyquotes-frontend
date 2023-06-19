@@ -39,7 +39,11 @@ import {dislikeQuotes} from '../../../shared/request';
 import ModalCollection from '../modal-collection';
 import states from './states';
 import ModalAddCollection from '../modal-add-collection';
-import {handlePayment, isUserPremium} from '../../../helpers/user';
+import {
+  handleBasicPaywall,
+  handlePayment,
+  isUserPremium,
+} from '../../../helpers/user';
 import {eventTracking, QUOTE_SHARED} from '../../../helpers/eventTracking';
 import {downloadText} from '../../../shared/static';
 import LineGestureSlide from '../../../components/line-gesture-slide';
@@ -87,7 +91,7 @@ function ModalShare(props) {
       if (premiumStatus) {
         const objStatus = JSON.parse(premiumStatus);
         if (objStatus.activeStatus === 3) {
-          await handlePayment('one_month_free');
+          await handleBasicPaywall();
           if (typeof onPremium === 'function') onPremium();
           onClose();
           const submitObj = {

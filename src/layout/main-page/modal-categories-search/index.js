@@ -8,7 +8,11 @@ import styles from './styles';
 import CardCategories from '../../../components/card-categories';
 import {getListGroup} from '../../../shared/request';
 import useDebounce from '../../../helpers/useDebounce';
-import {handlePayment, isUserPremium} from '../../../helpers/user';
+import {
+  handleBasicPaywall,
+  handlePayment,
+  isUserPremium,
+} from '../../../helpers/user';
 import LoadingIndicator from '../../../components/loading-indicator';
 import states from './states';
 
@@ -83,9 +87,7 @@ function ModalCategoriesSearch({isVisible, onClose, userProfile}) {
           {!isUserPremium() && (
             <TouchableOpacity
               style={styles.ctnJustifyEnd}
-              onPress={() => {
-                handlePayment('in_app_paywall');
-              }}>
+              onPress={handleBasicPaywall}>
               <Text style={styles.txtHeaderBtn}>Unlock all</Text>
             </TouchableOpacity>
           )}

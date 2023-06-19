@@ -30,7 +30,11 @@ import dispatcher from './dispatcher';
 import IconLove from '../../../assets/svg/icon_love_tap.svg';
 import PopupDelete from '../../../components/popup-delete';
 import LoadingIndicator from '../../../components/loading-indicator';
-import {handlePayment, isUserPremium} from '../../../helpers/user';
+import {
+  handleBasicPaywall,
+  handlePayment,
+  isUserPremium,
+} from '../../../helpers/user';
 import {downloadText} from '../../../shared/static';
 
 function PastQuotes({isVisible, onClose, userProfile, fetchPastQuotes}) {
@@ -169,9 +173,7 @@ function PastQuotes({isVisible, onClose, userProfile, fetchPastQuotes}) {
         onPress={onClose}
         rightText={!isUserPremium()}
         labelRight="View all"
-        onRightText={() => {
-          handlePayment('in_app_paywall');
-        }}
+        onRightText={handleBasicPaywall}
       />
     );
   }
@@ -292,9 +294,7 @@ function PastQuotes({isVisible, onClose, userProfile, fetchPastQuotes}) {
         <Button
           label="See older quotes"
           btnStyle={styles.btnMoreStyle}
-          onPress={() => {
-            handlePayment('in_app_paywall');
-          }}
+          onPress={handleBasicPaywall}
         />
       );
     }

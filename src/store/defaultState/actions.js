@@ -17,7 +17,7 @@ import {
 import {APP_VERSION, BACKEND_URL} from '../../shared/static';
 import store from '../configure-store';
 import * as types from './types';
-import {isPremiumToday, isUserPremium} from '../../helpers/user';
+import {getFutureDate, isPremiumToday, isUserPremium} from '../../helpers/user';
 import dummyPastQuotes from '../../shared/static/dummyPastQuotes';
 
 export const setModalFirstPremium = payload => ({
@@ -43,9 +43,19 @@ export const handleSetProfile = payload => ({
 export const fetchListQuote = (params, isPassPremium) => async dispatch =>
   new Promise(async (resolve, reject) => {
     try {
+      const {freeUserPremium} = store.getState().defaultState;
+      let isFreeUserPremium = isPremiumToday();
+      const todayDate = moment().format('YYYY-MM-DD');
+      if (
+        isPremiumToday() &&
+        !isUserPremium() &&
+        todayDate !== freeUserPremium
+      ) {
+        isFreeUserPremium = false;
+      }
       dispatch({type: types.START_FETCH_QUOTES});
       const quote = await getListQuotes({
-        length: isPremiumToday() || isPassPremium ? 1000 : 10,
+        length: isFreeUserPremium || isPassPremium ? 1000 : 10,
         page: 1,
         ...params,
       });
@@ -57,13 +67,14 @@ export const fetchListQuote = (params, isPassPremium) => async dispatch =>
           : pastQuote?.data?.data || dummyPastQuotes;
       }
       if (quote.data?.data?.length > 0) {
-        let overallData = [
-          ...[{item_type: 'countdown_page'}],
-          ...restPas,
-          ...quote.data.data,
-          ...[{item_type: 'countdown_page'}],
-        ];
-        if (!isPremiumToday() && !isPassPremium) {
+        let overallData = [...restPas, ...quote.data.data];
+        if (!isFreeUserPremium && !isPassPremium) {
+          overallData = [
+            ...[{item_type: 'countdown_page'}],
+            ...restPas,
+            ...quote.data.data,
+            ...[{item_type: 'countdown_page'}],
+          ];
           overallData = overallData.map((ctn, itemIndex) => {
             if (
               itemIndex === 2 ||
@@ -79,7 +90,7 @@ export const fetchListQuote = (params, isPassPremium) => async dispatch =>
             return ctn;
           });
         } else if (!isUserPremium()) {
-          overallData.map((ctn, itemIndex) => {
+          overallData = overallData.map((ctn, itemIndex) => {
             if (
               itemIndex === 2 ||
               itemIndex === 5 ||
@@ -94,9 +105,17 @@ export const fetchListQuote = (params, isPassPremium) => async dispatch =>
             }
             if (itemIndex > 16) {
               if (itemIndex % 4 === 0) {
-                overallData.splice(itemIndex + 1, 0, {item_type: 'in_app_ads'});
+                return {
+                  ...ctn,
+                  item_type: 'in_app_ads',
+                };
               }
             }
+
+            return {
+              ...ctn,
+              item_type: 'normal_quote',
+            };
           });
         }
         dispatch({
@@ -104,16 +123,12 @@ export const fetchListQuote = (params, isPassPremium) => async dispatch =>
           payload: quote.data,
           arrData: overallData,
           listBasicQuote:
-            isPremiumToday() || isPassPremium ? [] : quote.data.data,
+            isFreeUserPremium || isPassPremium ? [] : quote.data.data,
           restPassLength: restPas?.length,
           isPassPremium,
+          isFreeUserPremium:
+            isFreeUserPremium || isPassPremium ? todayDate : null,
         });
-      }
-      if (isPassPremium) {
-        AsyncStorage.setItem(
-          'quotePremiumDate:',
-          moment().format('YYYY-MM-DD'),
-        );
       }
       resolve(quote);
     } catch (err) {
@@ -212,13 +227,10 @@ export const getInitialData = callbackError => async dispatch =>
   });
 
 export const handleAppVersion = () => async dispatch => {
-  const {activeVersion} = store.getState().defaultState;
-  if (activeVersion !== APP_VERSION) {
-    dispatch({
-      type: types.SET_APP_VERSION,
-      payload: APP_VERSION,
-    });
-  }
+  dispatch({
+    type: types.SET_APP_VERSION,
+    payload: APP_VERSION,
+  });
 };
 
 export const handleEndQuote = () => {

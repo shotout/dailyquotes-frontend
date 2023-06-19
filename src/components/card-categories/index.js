@@ -14,7 +14,11 @@ import IconChecklistWhite from '../../assets/svg/checklist_white.svg';
 import states from './states';
 import dispatcher from './dispatcher';
 import {updateCategory} from '../../shared/request';
-import {handlePayment, isUserPremium} from '../../helpers/user';
+import {
+  handleBasicPaywall,
+  handlePayment,
+  isUserPremium,
+} from '../../helpers/user';
 import {scrollToTopQuote} from '../../store/defaultState/selector';
 import ModalUnlockCategory from '../modal-unlock-ads';
 
@@ -256,9 +260,7 @@ function CardCategories({
               </View>
             </View>
             <Button
-              onPress={() => {
-                handlePayment('in_app_paywall');
-              }}
+              onPress={handleBasicPaywall}
               btnStyle={styles.btnGoPremiun}
               label="Go Premium"
             />
@@ -411,9 +413,7 @@ function CardCategories({
       {!isUserPremium() && (
         <Button
           btnStyle={styles.btnGoPremiun}
-          onPress={() => {
-            handlePayment('in_app_paywall');
-          }}
+          onPress={handleBasicPaywall}
           label={buttonLabel || 'Unlock all'}
         />
       )}

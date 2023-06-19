@@ -48,7 +48,9 @@ export default function HeaderButton({
           </View>
         </TouchableOpacity>
         <View style={styles.titleWrap}>
-          <Text style={styles.ctnTitle}>{title}</Text>
+          <Text style={styles.ctnTitle} numberOfLines={1} ellipsizeMode="tail">
+            {title}
+          </Text>
         </View>
       </View>
       {renderRightMenu()}

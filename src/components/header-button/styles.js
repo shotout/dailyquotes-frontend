@@ -18,6 +18,7 @@ export default StyleSheet.create({
   titleWrap: {
     position: 'relative',
     paddingLeft: moderateScale(10),
+    flex: 1,
   },
   ctnTitle: {
     fontFamily: fonts.InterExtraBold,
@@ -27,6 +28,7 @@ export default StyleSheet.create({
   rowWrap: {
     flexDirection: 'row',
     alignItems: 'center',
+    flex: 1,
   },
   iconRight: {
     width: moderateScale(18),

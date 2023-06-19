@@ -7,6 +7,7 @@
     "android-prod": "react-native run-android --variant=release",
     "ios": "npx react-native run-ios --simulator \"iPhone 14\"",
     "ipad": "npx react-native run-ios --device \"iPad Gian\"",
+    "iphone": "npx react-native run-ios --device \"iPhone Gian\"",
     "link-font": "npx react-native-asset",
     "start": "npx react-native start",
     "test": "jest",
@@ -19,7 +20,7 @@
     "fixDebug": "rm -rf node_modules/react-native/Libraries/BatchedBridge/MessageQueue.js && cp -R __tests__/MessageQueue.js node_modules/react-native/Libraries/BatchedBridge/",
     "fixGif": "rm -rf node_modules/react-native-fast-image/RNFastImage.podspec && cp -R __tests__/RNFastImage.podspec node_modules/react-native-fast-image/",
     "getHash": "keytool -exportcert -alias mootie-alias -keystore android/app/mootie.keystore | openssl sha1 -binary | openssl base64",
-    "postinstall": "react-native setup-ios-permissions && pod-install"
+    "postinstall": "react-native setup-ios-permissions && pod-install && npx patch-package"
   },
   "dependencies": {
     "@brigad/react-native-skadnetwork": "^0.1.2",

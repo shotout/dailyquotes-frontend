@@ -20,7 +20,11 @@ import styles from './styles';
 import CardCategories from '../../../components/card-categories';
 import states from './states';
 import ModalCategoriesSearch from '../modal-categories-search';
-import {handlePayment, isUserPremium} from '../../../helpers/user';
+import {
+  handleBasicPaywall,
+  handlePayment,
+  isUserPremium,
+} from '../../../helpers/user';
 import {sizing} from '../../../shared/styling';
 import Button from '../../../components/button';
 import {getAdaptiveBannerID} from '../../../shared/static/adsId';
@@ -136,9 +140,7 @@ function ModalCategories({
             <Text style={[styles.txtHeaderBtn, styles.txtBlack]}>Done</Text>
           </TouchableOpacity> */}
             <TouchableOpacity
-              onPress={() => {
-                handlePayment('in_app_paywall');
-              }}
+              onPress={handleBasicPaywall}
               style={styles.ctnJustifyEnd}>
               <Text style={styles.txtHeaderBtn}>Unlock all</Text>
             </TouchableOpacity>

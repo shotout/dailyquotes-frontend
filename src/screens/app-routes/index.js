@@ -7,7 +7,7 @@ import TimeZone from 'react-native-timezone';
 
 // Redux
 import {connect} from 'react-redux';
-import {AppState, Linking, View} from 'react-native';
+import {AppState, Linking, Platform, View} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
 import Purchasely from 'react-native-purchasely';
@@ -19,7 +19,7 @@ import dispatcher from './dispatcher';
 // ADS
 
 // Ref routing
-import {navigationRef} from '../../shared/navigationRef';
+import {navigationRef, reset} from '../../shared/navigationRef';
 import navigationData from '../../shared/navigationData';
 
 // Screen
@@ -41,7 +41,6 @@ import NotificationTester from '../notification-tester';
 import {navigationLinking} from '../../shared/navigationLinking';
 import {
   hideLoadingModal,
-  resetTodayAdsLimit,
   setAnimationCounter,
   setAnimationSlideStatus,
   setCounterNumber,
@@ -52,6 +51,7 @@ import {
 import {getAppOpenID} from '../../shared/static/adsId';
 import AdsOverlay from '../ads-overlay';
 import store from '../../store/configure-store';
+import {loadOpenAddsReward} from '../../helpers/loadReward';
 
 const adUnitId = getAppOpenID();
 
@@ -77,11 +77,11 @@ function Routes({
   quotes,
 }) {
   const [isLoading, setLoading] = useState(true);
-  const [isLoadingAds, setLoadingAds] = useState(true);
   const [showAdsOverlay, setAdsOverlay] = useState(false);
   const appState = useRef(AppState.currentState);
   const loadingRef = useRef(true);
   const paywallStatus = useRef(null);
+  const openAdsOpened = useRef(false);
   const [appStateVisible, setAppStateVisible] = useState(appState.current);
 
   const handleSubmitPremiumStatusWeekly = async submitObj => {
@@ -266,13 +266,15 @@ function Routes({
             scrollToTopQuote();
           }
         }
-
         if (detail.notification.data?.type === 'paywall') {
+          console.log('Check paywall data:', detail.notification.data);
           if (loadingRef.current) {
             setPaywallNotification(detail.notification.data);
             loadingRef.current = false;
           } else {
-            handlePayment(detail.notification.data?.placement);
+            setTimeout(() => {
+              handlePayment(detail.notification.data?.placement);
+            }, 1000);
           }
         }
       }
@@ -291,53 +293,37 @@ function Routes({
       setCounterNumber(99);
     } else {
       await getInitialData(callbackError);
-      SplashScreen.hide();
     }
   };
 
-  const handleResetQuotePremium = async () => {
-    const quotePremiumDate = await AsyncStorage.getItem('quotePremiumDate');
-    const currentDate = moment().format('YYYY-MM-DD');
-    if (quotePremiumDate && quotePremiumDate !== currentDate) {
-      AsyncStorage.removeItem('quotePremiumDate');
-      resetTodayAdsLimit();
-    }
-  };
-
-  const handleDidMount = async () => {
+  const handleDidMount = async resProfile => {
     try {
       setAnimationSlideStatus(false);
       setAnimationCounter(true);
       setPaywallNotification(null);
-      const quotePremiumDate = await AsyncStorage.getItem('quotePremiumDate');
-      const currentDate = moment().format('YYYY-MM-DD');
-      if (quotePremiumDate && quotePremiumDate !== currentDate) {
-        AsyncStorage.removeItem('quotePremiumDate');
-        resetTodayAdsLimit();
-      }
-      handleResetQuotePremium();
       showLoadingModal();
       Purchasely.isReadyToPurchase(true);
       resetNotificationBadge();
       handleInitialData();
       if (activeVersion !== APP_VERSION) {
         handleAppVersion();
-
         setTimeout(() => {
           setLoading(false);
-        }, 500);
+          SplashScreen.hide();
+        }, 2000);
       } else if (userProfile.token) {
         const fetchUserData = async () => {
+          if (!isUserPremium()) {
+            handleShowAds();
+          }
           const setting = await getSetting();
           if (setting.data.value !== 'true') {
             handleShowFreePremiumWeekly();
             handleShowFreePremiumDaily();
           }
-          const resProfile = await reloadUserProfile();
           const res = resProfile;
 
           handleNotificationOpened(resProfile);
-          SplashScreen.hide();
           await handleSelectTheme(res);
           setCounterNumber(99);
           handleSubscriptionStatus(res.subscription);
@@ -346,6 +332,9 @@ function Routes({
           fetchPastQuotes();
           setLoading(false);
           handleUpdateTimezone();
+          if (isUserPremium()) {
+            SplashScreen.hide();
+          }
           setTimeout(() => {
             loadingRef.current = false;
           }, 10000);
@@ -388,16 +377,21 @@ function Routes({
     const isFinishTutorial = await AsyncStorage.getItem('isFinishTutorial');
     appOpenAd.load();
     if (isFinishTutorial === 'yes' && userProfile?.token) {
-      setTimeout(() => {
-        if (appOpenAd.loaded) {
-          appOpenAd.show();
-        } else {
-          setLoadingAds(false);
+      if (appOpenAd.loaded) {
+        appOpenAd.show();
+      } else {
+        const cbFinishOpenAds = () => {
+          SplashScreen.hide();
           setInitialLoaderStatus(true);
-        }
-      }, 2000);
+          setAdsOverlay(false);
+          console.log('CALLBACK FINISH CALLED');
+        };
+        console.log('LOAD IN APP ADS VIA FORCE LOAD');
+        // cbFinishOpenAds();
+        loadOpenAddsReward(appOpenAd, cbFinishOpenAds);
+      }
     } else {
-      setLoadingAds(false);
+      SplashScreen.hide();
       setInitialLoaderStatus(true);
     }
   };
@@ -408,24 +402,38 @@ function Routes({
       if (appOpenAd.loaded) {
         setAdsOverlay(true);
         appOpenAd.show();
-      } else {
-        setLoadingAds(false);
       }
     }
   };
 
-  useEffect(() => {
-    setInitialLoaderStatus(false);
-    if (userProfile.token) {
-      if (!isUserPremium()) {
-        handleShowAds();
+  const getUserdata = async () => {
+    const goToFirstPage = () => {
+      handleAppVersion();
+      setTimeout(() => {
+        setLoading(false);
+        SplashScreen.hide();
+        handleDidMount();
+      }, 2000);
+    };
+    try {
+      if (userProfile?.token) {
+        const resProfile = await reloadUserProfile();
+        handleDidMount(resProfile);
       } else {
-        setLoadingAds(false);
+        goToFirstPage();
       }
-    } else {
-      setLoadingAds(false);
+    } catch (err) {
+      console.log('Err fetch profile:', err);
+      goToFirstPage();
     }
-    handleDidMount();
+  };
+
+  useEffect(() => {
+    if (!userProfile?.token) {
+      SplashScreen.hide();
+    }
+    setInitialLoaderStatus(false);
+    getUserdata();
     purchaselyListener();
     const subscription = AppState.addEventListener(
       'change',
@@ -437,16 +445,15 @@ function Routes({
           resetNotificationBadge();
           handleUpdateTimezone();
         }
-        if (
-          appState.current.match(/inactive|background/) &&
-          nextAppState === 'active'
-        ) {
+        if (appState.current.match('background') && nextAppState === 'active') {
           appOpenAd.load();
           if (
             paywallStatus &&
             paywallStatus.current !== 'PRESENTATION_CLOSED'
           ) {
-            handleLoadInAppAds();
+            if (Platform.OS === 'ios') {
+              handleLoadInAppAds();
+            }
           } else {
             appOpenAd.load();
           }
@@ -463,22 +470,35 @@ function Routes({
     const unsubscribeAppOpenAds = appOpenAd.addAdEventListener(
       AdEventType.CLOSED,
       () => {
-        setLoadingAds(false);
         setAdsOverlay(false);
+      },
+    );
+
+    const listenerOpenApps = appOpenAd.addAdEventListener(
+      AdEventType.OPENED,
+      () => {
+        console.log('OPEN ADS OPENED');
+        SplashScreen.hide();
+        setAdsOverlay(true);
+        openAdsOpened.current = true;
       },
     );
 
     const listenerIAPAds = appOpenAd.addAdEventListener(
       AdEventType.CLOSED,
       () => {
+        openAdsOpened.current = false;
         setInitialLoaderStatus(true);
+        if (loadingRef.current) {
+          loadingRef.current = false;
+        }
       },
     );
     return () => {
       subscription.remove();
       Purchasely.removeEventListener();
       unsubscribeAppOpenAds();
-
+      listenerOpenApps();
       listenerIAPAds();
     };
   }, []);
@@ -520,7 +540,6 @@ function Routes({
           />
         </Stack.Navigator>
       </NavigationContainer>
-      {isLoadingAds && <WelcomePage isLoading />}
       {showAdsOverlay && <AdsOverlay />}
     </View>
   );

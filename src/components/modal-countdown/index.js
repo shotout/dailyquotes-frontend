@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 import {Modal, Portal} from 'react-native-paper';
-import {RewardedAd, RewardedAdEventType} from 'react-native-google-mobile-ads';
+import {AdEventType, RewardedAdEventType} from 'react-native-google-mobile-ads';
 import styles from './styles';
 import useCountdown from './useCountdown';
 import {getRewardedOutOfQuotesID} from '../../shared/static/adsId';
@@ -17,14 +17,7 @@ import {setTodayAdsLimit} from '../../store/defaultState/actions';
 const bgTimer = require('../../assets/icons/timer_bg.png');
 const iconClose = require('../../assets/icons/close.png');
 
-const adUnitId = getRewardedOutOfQuotesID();
-
-const rewarded = RewardedAd.createForAdRequest(adUnitId, {
-  requestNonPersonalizedAdsOnly: true,
-  keywords: ['fashion', 'clothing'],
-});
-
-const ModalCountDown = ({visible, handleClose}) => {
+const ModalCountDown = ({visible, handleClose, adsRef}) => {
   const count = useCountdown(visible);
 
   const [timeLeft, setTimeLeft] = useState({
@@ -54,33 +47,17 @@ const ModalCountDown = ({visible, handleClose}) => {
 
     // Handle interstial reward quote ads
 
-    const unsubscribeLoaded = rewarded.addAdEventListener(
-      RewardedAdEventType.LOADED,
-      () => {
-        console.log('LOAD ADS MODAL COUNTDOWN');
-      },
-    );
-    const unsubscribeEarned = rewarded.addAdEventListener(
-      RewardedAdEventType.EARNED_REWARD,
-      reward => {
-        console.log('User earned modal countdown ', reward);
-        setTodayAdsLimit();
-        handleClose();
-      },
-    );
-    rewarded.load();
+    adsRef.load();
     return () => {
       clearInterval(interval);
-      unsubscribeLoaded();
-      unsubscribeEarned();
     };
   }, []);
 
   useEffect(() => {
     if (count === 0 && visible) {
       console.log('SHOW COUNTDOWN ADS');
-      if (rewarded.loaded) {
-        rewarded.show();
+      if (adsRef.loaded) {
+        adsRef.show();
       }
     }
   }, [count, visible]);

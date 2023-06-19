@@ -41,6 +41,7 @@ const INITIAL_STATE = {
   finishInitialLoader: false,
   paywallNotifcation: null,
   animationCounter: true,
+  freeUserPremium: false,
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -70,6 +71,7 @@ export default (state = INITIAL_STATE, action) => {
         ...state,
         todayAdsLimit: 12,
         restPassLength: 0,
+        freeUserPremium: false,
       };
     case types.SHOW_LOADING_MODAL:
       return {
@@ -129,6 +131,7 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         userProfile: {},
+        registerData: null,
         listLikedQuote: {
           listDataLike: [],
         },
@@ -178,6 +181,7 @@ export default (state = INITIAL_STATE, action) => {
     case types.SUCCESS_FETCH_QUOTE:
       return {
         ...state,
+        freeUserPremium: action.isFreeUserPremium,
         restPassLength: action.restPassLength,
         todayAdsLimit:
           action.isPassPremium || state.todayAdsLimit > 17

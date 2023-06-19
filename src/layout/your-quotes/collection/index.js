@@ -137,7 +137,12 @@ function QuoteCollections({isVisible, onClose, collections}) {
         }}>
         <View style={styles.rowContentWrap}>
           <View style={styles.rightWrap}>
-            <Text style={styles.ctnTitle}>{item.name}</Text>
+            <Text
+              style={styles.ctnTitle}
+              numberOfLines={1}
+              ellipsizeMode="tail">
+              {item.name}
+            </Text>
             <Text style={styles.stnsubTittle}>{item.quotes_count} quotes</Text>
           </View>
           <View style={styles.ctnIcon}>

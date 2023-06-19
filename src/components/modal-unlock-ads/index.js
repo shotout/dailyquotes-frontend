@@ -11,7 +11,7 @@ import {Modal, Portal} from 'react-native-paper';
 import {RewardedAd, RewardedAdEventType} from 'react-native-google-mobile-ads';
 import styles from './styles';
 import Button from '../button';
-import {handlePayment} from '../../helpers/user';
+import {handleBasicPaywall, handlePayment} from '../../helpers/user';
 import {getRewardedCategoryID} from '../../shared/static/adsId';
 
 const categoryImg = require('../../assets/icons/unlock_category.png');
@@ -109,9 +109,7 @@ const ModalUnlockCategory = ({
                   <Image source={crownIcon} style={styles.btnImgStyle} />
                 </View>
               }
-              onPress={() => {
-                handlePayment('in_app_paywall');
-              }}
+              onPress={handleBasicPaywall}
               label="Go Premium!"
             />
             <View style={styles.ctnWatch}>
