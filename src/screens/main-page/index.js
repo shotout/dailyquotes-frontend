@@ -281,7 +281,7 @@ function MainPage({
         setShowTutorial(true);
       }
       if (!getFirstInstall) {
-        const currentDate = moment().format('YYYY-MM-DD');
+        const currentDate = moment().format('YYYY-MM-DD HH:mm:ss');
         AsyncStorage.setItem('firstInstall', currentDate);
       }
     };
