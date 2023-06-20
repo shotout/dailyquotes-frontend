@@ -242,6 +242,7 @@ export default (state = INITIAL_STATE, action) => {
         },
       };
     case types.SET_PROFILE_DATA:
+      console.log('masuk set', action.payload);
       return {
         ...state,
         userProfile: action.payload,

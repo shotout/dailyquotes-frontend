@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   Image,
   Text,
@@ -10,7 +10,14 @@ import {
 import moment from 'moment';
 import Lottie from 'lottie-react-native';
 import {createAnimatableComponent} from 'react-native-animatable';
+import DeviceInfo from 'react-native-device-info';
+import {connect} from 'react-redux';
+import PropTypes from 'prop-types';
 import styles from './styles';
+import {checkDeviceRegister} from '../../../shared/request';
+import {handleSubscriptionStatus} from '../../../helpers/user';
+import dispatcher from './dispatcher';
+import states from './states';
 
 const ViewAnimation = createAnimatableComponent(View);
 
@@ -34,10 +41,44 @@ const checkLottie = require('../../../assets/lottie/checklist.json');
 let intervalSec = null;
 let currentSec = null;
 
-export default function Contract({values, substep, onLongPress, listCategory}) {
+function Contract({
+  values,
+  substep,
+  onLongPress,
+  listCategory,
+  handleSetProfile,
+}) {
   const [isAnimateHasStarted, setAnimatedStart] = useState(false);
   const contractAnimation = useRef(new Animated.Value(0.07)).current;
   const placeholderAnimation = useRef(new Animated.Value(0.07)).current;
+  const [device_id, setDeviceId] = useState(null);
+
+  useEffect(() => {
+    DeviceInfo.getUniqueId().then(async uniqueId => {
+      try {
+        setDeviceId(uniqueId);
+        // eslint-disable-next-line no-use-before-define
+      } catch (err) {
+        console.log('Err get device info:', err);
+      }
+    });
+  });
+
+  useEffect(() => {
+    getDeviceID(device_id);
+  }, [device_id]);
+  const getDeviceID = async id => {
+    try {
+      const res = await checkDeviceRegister({
+        device_id: id,
+      });
+      handleSetProfile(res);
+      handleSubscriptionStatus(res.data.subscription);
+      console.log(res);
+    } catch (err) {
+      console.log('Device id not register');
+    }
+  };
 
   const handlePress = async () => {
     // onLongPress()
@@ -298,3 +339,7 @@ export default function Contract({values, substep, onLongPress, listCategory}) {
     </View>
   );
 }
+Contract.propTypes = {
+  handleSetProfile: PropTypes.func.isRequired,
+};
+export default connect(states, dispatcher)(Contract);
