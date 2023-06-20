@@ -16,7 +16,7 @@ target 'mooti' do
   pod 'FirebaseCore', :modular_headers => true
   pod 'GoogleUtilities', :modular_headers => true
   $RNFirebaseAsStaticFramework = true
-
+  use_flipper!({'Flipper' => '0.175.0'})
   use_react_native!(
     :path => config[:reactNativePath],
     # to enable hermes on iOS, change `false` to `true` and then install pods
@@ -25,6 +25,7 @@ target 'mooti' do
     :fabric_enabled => flags[:fabric_enabled],
     # :flipper_configuration => FlipperConfiguration.enabled,
     # An absolute path to your application root.
+    # :flipper_configuration => FlipperConfiguration.enabled(debugs, { 'Flipper' => '0.175.0' }),
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
@@ -36,5 +37,28 @@ target 'mooti' do
   post_install do |installer|
     react_native_post_install(installer)
     __apply_Xcode_12_5_M1_post_install_workaround(installer)
+    apply_flipper_fix(installer)
+  end
+  def apply_flipper_fix(installer)
+    installer.pods_project.targets.each do |target|
+      if target.name == 'React-Core'
+        target.build_configurations.each do |config|
+          if config.debug?
+            puts "Enabling Flipper for build configuration '#{config.name}'"
+            # For 0.68.2. Note that main branch now uses GCC_PREPROCESSOR_DEFINITIONS:
+            # https://github.com/cipolleschi/react-native/blob/f3db6cc52792e3006a16408df4ae40f3aee19a86/scripts/cocoapods/flipper.rb#L87
+            config.build_settings['OTHER_CFLAGS'] = "$(inherited) -DFB_SONARKIT_ENABLED=1"
+          end
+        end
+      end
+
+      # Enable Flipper for simulators only
+      # comment this if want to run ios Debug and DebugInfra
+      # if target.name.start_with?('Flipper')
+      #   target.build_configurations.each do |config|
+      #     config.build_settings['VALID_ARCHS'] = 'arm64 arm64e'
+      #   end
+      # end
+    end
   end
 end

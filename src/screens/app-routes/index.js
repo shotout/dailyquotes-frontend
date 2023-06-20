@@ -504,6 +504,7 @@ function Routes({
   }, []);
 
   function getInitialRoute() {
+    console.log(userProfile);
     if (userProfile.token) {
       return 'MainPage';
       // return 'NotificationTester';
