@@ -23,6 +23,7 @@ const request = options => {
     'Content-type': 'application/json',
     Accept: 'application/json',
     'cache-control': 'no-cache',
+    'Accept-Encoding': 'gzip',
   };
 
   /*
