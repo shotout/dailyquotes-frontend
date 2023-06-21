@@ -88,6 +88,11 @@ function QuotesContent({
     }
   };
 
+  const percent80 = num => {
+    const count = (num * 80) / 100;
+    return count;
+  };
+
   return (
     <View style={styles.ctnWrapper}>
       {isActive && (
@@ -116,11 +121,17 @@ function QuotesContent({
                       fontSize: themeUser.font_size
                         ? moderateScale(Number(themeUser.font_size))
                         : moderateScale(18),
-                      backgroundColor: themeUser.background_color || undefined,
-                      color: themeUser.text_color || colors.white,
+                      backgroundColor: themeUser.background_color
+                        ? themeUser.background_color
+                        : undefined,
+                      color: themeUser.text_color
+                        ? themeUser.text_color
+                        : colors.white,
                       fontFamily: themeUser.font_family,
                       // fontFamily: 'Iceberg-Regular',
-                      textShadowColor: themeUser.text_shadow,
+                      textShadowColor: themeUser.text_shadow
+                        ? themeUser.text_shadow
+                        : undefined,
                       textShadowOffset: themeUser.text_shadow_offset
                         ? JSON.parse(themeUser.text_shadow_offset)
                         : undefined,
@@ -138,12 +149,24 @@ function QuotesContent({
                     style={[
                       styles.ctnQuotes,
                       {
-                        backgroundColor:
-                          themeUser.background_color || undefined,
-                        color: themeUser.text_color || colors.white,
-                        fontFamily: themeUser.font_family,
+                        fontSize: themeUser.font_size
+                          ? percent80(themeUser.font_size) < 19
+                            ? moderateScale(percent80(themeUser.font_size))
+                            : moderateScale(Number(themeUser.font_size))
+                          : moderateScale(18),
+                        backgroundColor: themeUser.background_color
+                          ? themeUser.background_color
+                          : undefined,
+                        color: themeUser.text_color
+                          ? themeUser.text_color
+                          : colors.white,
+                        fontFamily: themeUser.font_family
+                          ? themeUser.font_family
+                          : undefined,
                         // fontFamily: 'Iceberg-Regular',
-                        textShadowColor: themeUser.text_shadow,
+                        textShadowColor: themeUser.text_shadow
+                          ? themeUser.text_shadow
+                          : undefined,
                         textShadowOffset: themeUser.text_shadow_offset
                           ? JSON.parse(themeUser.text_shadow_offset)
                           : undefined,
