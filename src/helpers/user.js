@@ -120,6 +120,11 @@ export const reloadUserProfile = async () =>
 
 export const handlePayment = async (vendorId, cb) =>
   new Promise(async (resolve, reject) => {
+    const currentDate = moment().format('YYYY-MM-DD HH:mm:ss');
+    const getInstallDate = await AsyncStorage.getItem('firstInstall');
+    const endDate = moment(getInstallDate)
+      .add(1, 'days')
+      .format('YYYY-MM-DD HH:mm:ss');
     try {
       eventTracking(SHOW_PAYWALL);
       let stringVendor = vendorId;
@@ -130,9 +135,7 @@ export const handlePayment = async (vendorId, cb) =>
           purchasely_id: purchaseId,
         });
       } else if (!stringVendor) {
-        const currentDate = moment().format('YYYY-MM-DD');
-        const getInstallDate = await AsyncStorage.getItem('firstInstall');
-        if (getInstallDate === currentDate) {
+        if (currentDate <= endDate) {
           stringVendor = 'offer_no_purchase_after_onboarding_paywall';
         } else {
           stringVendor = 'offer_no_purchase_after_onboarding_paywall_2nd';
@@ -140,7 +143,9 @@ export const handlePayment = async (vendorId, cb) =>
       }
       const res = await Purchasely.presentPresentationForPlacement({
         placementVendorId:
-          stringVendor || 'offer_no_purchase_after_onboarding_paywall',
+          currentDate <= endDate
+            ? 'offer_no_purchase_after_onboarding_paywall'
+            : 'offer_no_purchase_after_onboarding_paywall_2nd',
         isFullscreen: true,
       });
       const user = store.getState().defaultState.userProfile;
@@ -295,15 +300,12 @@ export const reformatDate = valueDate => {
 };
 
 export const handleBasicPaywall = async cbPaywall => {
-  const profile = store.getState().defaultState.userProfile;
+  const currentDate = moment().format('YYYY-MM-DD HH:mm:ss');
+  const getInstallDate = await AsyncStorage.getItem('firstInstall');
+  const endDate = moment(getInstallDate)
+    .add(1, 'days')
+    .format('YYYY-MM-DD HH:mm:ss');
   const paywallType =
-    profile?.data?.notif_count && profile?.data?.notif_count > 2
-      ? 'offer_no_purchase_after_onboarding_paywall_2nd'
-      : 'offer_no_purchase_after_onboarding_paywall';
-  console.log(
-    'CHECK BASIC PAYWALL paywallType:',
-    profile?.data?.notif_count,
-    paywallType,
-  );
+    currentDate > endDate ? 'in_app_paywall' : 'in_app_paywall_2nd';
   await handlePayment(paywallType, cbPaywall);
 };

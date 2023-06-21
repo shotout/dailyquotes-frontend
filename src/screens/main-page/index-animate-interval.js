@@ -201,6 +201,11 @@ function MainPage({
     }
   };
   const handleShowPaywall = async () => {
+    const currentDate = moment().format('YYYY-MM-DD HH:mm:ss');
+    const getInstallDate = await AsyncStorage.getItem('firstInstall');
+    const endDate = moment(getInstallDate)
+      .add(1, 'days')
+      .format('YYYY-MM-DD HH:mm:ss');
     const res = await getSetting();
     setEnableFreePremium(res.data.value !== 'true');
     if (res.data.value === 'true' && !isUserPremium() && !isFromOnboarding) {
@@ -214,9 +219,9 @@ function MainPage({
         const stringifyDate = Date.now().toString();
         if (!getCurrentOpenApps || isMoreThan3Hours) {
           const paywallType =
-            userProfile?.data?.notif_count && userProfile?.data?.notif_count > 2
-              ? 'offer_no_purchase_after_onboarding_paywall_2nd'
-              : 'offer_no_purchase_after_onboarding_paywall';
+            currentDate <= endDate
+              ? 'offer_no_purchase_after_onboarding_paywall'
+              : 'offer_no_purchase_after_onboarding_paywall_2nd';
           handlePayment(paywallType, handleShowPopupShare);
           AsyncStorage.setItem('latestOpenApps', stringifyDate);
         } else {
