@@ -86,6 +86,7 @@ const theme77 = require('../assets/images/theme/77-luxury.png');
 const theme78 = require('../assets/images/theme/78-luxury.png');
 const theme79 = require('../assets/images/theme/79-seasonal.png');
 const theme80 = require('../assets/images/theme/80-textures.png');
+const theme90 = require('../assets/images/theme/90-textures.png');
 
 export const listTheme = [
   {
@@ -2299,6 +2300,35 @@ export const listTheme = [
       name: '80.png',
       url: '/assets/images/theme/bg/80.png',
       created_at: '2023-05-12T02:02:41.000000Z',
+      updated_at: null,
+    },
+  },
+  {
+    id: 90,
+    entry_id: null,
+    imgLocal: theme90,
+    group_id: 15,
+    name: 'Theme 90',
+    flag: null,
+    is_free: 0,
+    font_family: 'FjallaOne-Regular',
+    font_size: 24,
+    line_height: 34,
+    text_color: '#000000',
+    text_shadow: null,
+    text_shadow_offset: null,
+    background_color: null,
+    bg_image_color: null,
+    status: 1,
+    created_at: '2023-06-09T01:14:28.000000Z',
+    updated_at: null,
+    background: {
+      id: 140,
+      owner_id: 90,
+      type: 'theme',
+      name: '90.png',
+      url: '/assets/images/theme/bg/90.png',
+      created_at: '2023-06-09T01:14:28.000000Z',
       updated_at: null,
     },
   },
