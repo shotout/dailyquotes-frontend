@@ -62,9 +62,20 @@ export const fetchListQuote = (params, isPassPremium) => async dispatch =>
       let restPas = [];
       if (!isUserPremium()) {
         const pastQuote = await getListPastQuotes({length: 5, page: 1});
-        restPas = isArray(pastQuote?.data)
-          ? pastQuote?.data
-          : pastQuote?.data?.data || dummyPastQuotes;
+        if (pastQuote.data.data.length > 0) {
+          restPas = isArray(pastQuote?.data)
+            ? pastQuote?.data
+            : pastQuote?.data?.data || dummyPastQuotes;
+        } else {
+          const resp = await getListQuotes({
+            length: 15,
+            page: 1,
+            ...params,
+          });
+          restPas = isArray(resp?.data)
+            ? resp?.data
+            : resp?.data?.data || dummyPastQuotes;
+        }
       }
       if (quote.data?.data?.length > 0) {
         let overallData = [...restPas, ...quote.data.data];
@@ -160,6 +171,21 @@ export const fetchPastQuotes = () => async dispatch =>
     try {
       dispatch({type: types.START_PAST_QUOTES});
       const pastQuote = await getListPastQuotes();
+      if (pastQuote.data.data.length > 0) {
+        dispatch({
+          type: types.SUCCESS_PAST_QUOTES,
+          payload: pastQuote.data,
+        });
+      } else {
+        const resp = await getListQuotes({
+          length: 15,
+          page: 1,
+        });
+        dispatch({
+          type: types.SUCCESS_PAST_QUOTES,
+          payload: resp.data,
+        });
+      }
       dispatch({
         type: types.SUCCESS_PAST_QUOTES,
         payload: pastQuote.data,
