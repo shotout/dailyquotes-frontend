@@ -504,7 +504,7 @@ function Routes({
   }, []);
 
   function getInitialRoute() {
-    console.log(userProfile);
+    console.log('data register new', JSON.stringify(registerData));
     if (userProfile.token) {
       return 'MainPage';
       // return 'NotificationTester';

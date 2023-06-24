@@ -141,6 +141,7 @@ function Register({
       }
       await AsyncStorage.removeItem('isFinishTutorial');
     };
+
     DeviceInfo.getUniqueId().then(async uniqueId => {
       try {
         console.log('Device info running', uniqueId);
@@ -231,6 +232,7 @@ function Register({
 
   useEffect(() => {
     if (!isInitial) {
+      console.log(isInitial);
       storeRegistrationData({
         substep,
         registerStep,
@@ -247,6 +249,7 @@ function Register({
     values,
     isHasRegister,
     notificationStep,
+    isInitial,
   ]);
 
   const handleSubmit = async showPaywall => {
@@ -440,6 +443,12 @@ function Register({
       }, 300);
     }
   };
+
+  // useEffect(() => {
+  //   if (registerData) {
+  //     setRegisterStep(registerData?.registerStep);
+  //   }
+  // }, [registerData]);
 
   const handleSkipBtn = async () => {
     if (registerStep === 1) {
@@ -815,6 +824,7 @@ Register.propTypes = {
   fetchListQuote: PropTypes.func.isRequired,
   fetchCollection: PropTypes.func.isRequired,
   defaultData: PropTypes.object,
+  handleSetRegister: PropTypes.func.isRequired,
 };
 
 Register.defaultProps = {

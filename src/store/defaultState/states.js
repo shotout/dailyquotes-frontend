@@ -98,6 +98,7 @@ export default (state = INITIAL_STATE, action) => {
         },
       };
     case types.SET_REGISTER_STEP: {
+      console.log('SET REGISTER', JSON.stringify(action.payload));
       return {
         ...state,
         registerData: {
@@ -131,7 +132,6 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         userProfile: {},
-        registerData: null,
         listLikedQuote: {
           listDataLike: [],
         },
@@ -242,7 +242,6 @@ export default (state = INITIAL_STATE, action) => {
         },
       };
     case types.SET_PROFILE_DATA:
-      console.log('masuk set', action.payload);
       return {
         ...state,
         userProfile: action.payload,
