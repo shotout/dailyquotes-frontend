@@ -232,7 +232,6 @@ function Register({
 
   useEffect(() => {
     if (!isInitial) {
-      console.log(isInitial);
       storeRegistrationData({
         substep,
         registerStep,
