@@ -2367,6 +2367,7 @@ export const useBackgroundQuotes = userThemes => {
   const getListTheme = () => {
     if (themeUser && themeUser.id) {
       const findTheme = listTheme.find(item => item.id === themeUser.id);
+      console.log('masukk sini', findTheme);
       if (findTheme) {
         return [findTheme];
       }
