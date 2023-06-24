@@ -233,7 +233,6 @@ export const getInitialData = callbackError => async dispatch =>
         themes: theme.data,
         // link: link.data,
       });
-      console.log('data thema', theme);
       const preloadTheme = [];
       if (category.data?.category?.length > 0) {
         category.data.category.forEach(item => {
