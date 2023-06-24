@@ -2,7 +2,10 @@ import moment from 'moment';
 import {Linking, Platform} from 'react-native';
 import Purchasely, {ProductResult} from 'react-native-purchasely';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {getUserProfile, setSubcription} from '../shared/request';
+import DeviceInfo from 'react-native-device-info';
+import messaging from '@react-native-firebase/messaging';
+import TimeZone from 'react-native-timezone';
+import {getUserProfile, setSubcription, updateProfile} from '../shared/request';
 import store from '../store/configure-store';
 import {fetchCollection, handleSetProfile} from '../store/defaultState/actions';
 import {SUCCESS_FETCH_COLLECTION} from '../store/defaultState/types';
@@ -74,45 +77,89 @@ export const isCompletedOnboarding = () => {
   return false;
 };
 
-export const reloadUserProfile = async () =>
-  new Promise(async (resolve, reject) => {
-    try {
-      const res = await getUserProfile();
-      const currentUserProfile = store.getState().defaultState.userProfile;
-      store.dispatch(
-        handleSetProfile({
-          ...currentUserProfile,
-          ...res,
-        }),
-      );
-      if (res.data.subscription.type !== 5) {
-        if (currentUserProfile.data) {
-          if (currentUserProfile.data.subscription.type !== 1) {
-            if (res.data.subscription.type === 1) {
-              eventTracking(CANCEL_SUBSCRIBE_AFTER_TRIAL);
-            }
-            if (
-              currentUserProfile.data.subscription.type !==
-              res.data.subscription.type
-            ) {
-              if (res.data.subscription.type !== 1) {
-                eventTracking(SUBSCRIPTION_STARTED);
-                const objPurchase = JSON.parse(
-                  res.data.subscription.purchasely_data,
-                );
-                if (objPurchase) {
-                  revenueTracking(
-                    objPurchase.plan_price_in_customer_currency,
-                    objPurchase.customer_currency,
-                  );
-                }
-              }
+async function fetchGetUserProfile() {
+  const res = await getUserProfile();
+  const currentUserProfile = store.getState().defaultState.userProfile;
+  store.dispatch(
+    handleSetProfile({
+      ...currentUserProfile,
+      ...res,
+    }),
+  );
+  if (res.data.subscription.type !== 5) {
+    if (currentUserProfile.data) {
+      if (currentUserProfile.data.subscription.type !== 1) {
+        if (res.data.subscription.type === 1) {
+          eventTracking(CANCEL_SUBSCRIBE_AFTER_TRIAL);
+        }
+        if (
+          currentUserProfile.data.subscription.type !==
+          res.data.subscription.type
+        ) {
+          if (res.data.subscription.type !== 1) {
+            eventTracking(SUBSCRIPTION_STARTED);
+            const objPurchase = JSON.parse(
+              res.data.subscription.purchasely_data,
+            );
+            if (objPurchase) {
+              revenueTracking(
+                objPurchase.plan_price_in_customer_currency,
+                objPurchase.customer_currency,
+              );
             }
           }
         }
       }
+    }
+  }
+  return res;
+}
+
+export const reloadUserProfile = async () =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const res = await fetchGetUserProfile();
       resolve(res.data);
     } catch (err) {
+      let MutateForm = {};
+      DeviceInfo.getUniqueId().then(async uniqueId => {
+        try {
+          console.log('Device info running', uniqueId);
+          const fcmToken = await messaging().getToken();
+          const isSetBefore = await AsyncStorage.getItem('customIcon');
+          const id = await Purchasely.getAnonymousUserId();
+          MutateForm = {
+            notif_count: 0,
+            fcm_token: fcmToken,
+            device_id: uniqueId,
+            style: iconNameToId(isSetBefore),
+            purchasely_id: id,
+          };
+        } catch (err) {
+          console.log('Err get device info:', err);
+        }
+      });
+      const timeZone = await TimeZone.getTimeZone();
+      const payload = {
+        ...MutateForm,
+        name: 'User',
+        anytime: null,
+        often: 15,
+        start: '08:00',
+        end: '20:00',
+        gender: '',
+        feel: 6,
+        ways: [6],
+        areas: [1, 2, 3, 4, 5, 6, 7, 8],
+        timezone: timeZone,
+      };
+      await updateProfile({
+        ...payload,
+        _method: 'PATCH',
+      });
+      setTimeout(async() => {
+        await fetchGetUserProfile();
+      }, 2000);
       reset('WelcomePage');
       reject('error get profile');
     }
