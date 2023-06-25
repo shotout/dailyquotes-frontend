@@ -50,7 +50,7 @@ function CardTheme({
   const [selectedTheme, setSelectedCategory] = useState(null);
 
   useEffect(() => {
-    if (userProfile.data.themes?.length) {
+    if (userProfile?.data?.themes?.length) {
       const listTheme = userProfile.data.themes.map(item => item.id);
       setSelectedCard(listTheme);
     }

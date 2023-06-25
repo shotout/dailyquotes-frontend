@@ -50,11 +50,11 @@ function ModalCategoriesSearch({isVisible, onClose, userProfile}) {
   }, [debounceSearch]);
 
   const getInitialCategory = useCallback(() => {
-    if (userProfile.data.categories?.length > 0) {
+    if (userProfile?.data?.categories?.length > 0) {
       return userProfile.data.categories.map(item => item.id);
     }
     return [];
-  }, [userProfile.data.categories]);
+  }, [userProfile?.data?.categories]);
 
   const handleClose = () => {
     setAutoFocus(false);

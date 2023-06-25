@@ -11,9 +11,9 @@ import {getNotifQuotes} from './request';
 
 function useLocalNotif(userProfile) {
   const scheduleTime = userProfile.data?.schedule?.timer_local || [];
-  const scheduleObj = userProfile.data.schedule;
+  const scheduleObj = userProfile?.data?.schedule;
   const [listTimer, setTimer] = useState(scheduleTime);
-  const [currentTimezone, setTimezone] = useState(scheduleObj.timezone);
+  const [currentTimezone, setTimezone] = useState(scheduleObj?.timezone);
 
   const cancelAllNotification = () => {
     notifee.getTriggerNotificationIds().then(async ids => {
@@ -119,12 +119,12 @@ function useLocalNotif(userProfile) {
           const currentDate = getFutureDate(new Date(), 0);
           const compareItem =
             (listTimer || '').toString() !==
-            (userProfile.data?.schedule?.timer_local || []).toString();
+            (userProfile?.data?.schedule?.timer_local || []).toString();
           const isTimezoneChange =
-            userProfile.data.schedule.timezone !== currentTimezone;
+            userProfile?.data?.schedule?.timezone !== currentTimezone;
           if (compareItem || settedDate !== currentDate || isTimezoneChange) {
             if (isTimezoneChange) {
-              setTimezone(userProfile.data.schedule.timezone);
+              setTimezone(userProfile?.data?.schedule?.timezone);
             }
             AsyncStorage.setItem('lastLocalNotifSet', currentDate);
             console.log('NOTIF SETTED');
@@ -137,7 +137,7 @@ function useLocalNotif(userProfile) {
       };
       handleLocalNotification();
     }
-  }, [userProfile.data.schedule]);
+  }, [userProfile?.data?.schedule]);
   return [scheduleTime];
 }
 

@@ -6,13 +6,19 @@ import DeviceInfo from 'react-native-device-info';
 import messaging from '@react-native-firebase/messaging';
 import TimeZone from 'react-native-timezone';
 import {
+  checkDeviceRegister,
   getUserProfile,
   postRegister,
   selectTheme,
   setSubcription,
+  updateProfile,
 } from '../shared/request';
 import store from '../store/configure-store';
-import {fetchCollection, handleSetProfile} from '../store/defaultState/actions';
+import {
+  fetchCollection,
+  fetchListQuote,
+  handleSetProfile,
+} from '../store/defaultState/actions';
 import {SUCCESS_FETCH_COLLECTION} from '../store/defaultState/types';
 import {
   CANCEL_SUBSCRIBE_AFTER_TRIAL,
@@ -22,7 +28,7 @@ import {
   SHOW_PAYWALL,
   SUBSCRIPTION_STARTED,
 } from './eventTracking';
-import {reset} from '../shared/navigationRef';
+import {navigate, reset} from '../shared/navigationRef';
 
 export const dateToUnix = date => moment(date).unix();
 export const getFutureDate = (defaultDate, day) =>
@@ -55,9 +61,12 @@ export const iconNameToId = name => {
 
 export const isUserPremium = () => {
   const profile = store.getState().defaultState.userProfile;
-  const {type} = profile.data?.subscription;
-  if (type === 1 || type === 5) {
-    return false;
+  if (profile?.data != undefined) {
+    const {type} = profile?.data?.subscription;
+    if (type === 1 || type === 5) {
+      return false;
+    }
+    return true;
   }
   return true;
 };
@@ -75,9 +84,12 @@ export const isPremiumToday = () => {
 
 export const isCompletedOnboarding = () => {
   const profile = store.getState().defaultState.userProfile;
-  const {type} = profile.data.subscription;
-  if (type !== 5) {
-    return true;
+  if (profile?.data != undefined) {
+    const {type} = profile.data.subscription;
+    if (type !== 5) {
+      return true;
+    }
+    return false;
   }
   return false;
 };
@@ -159,22 +171,34 @@ export const reloadUserProfile = async () =>
           timezone: timeZone,
         };
         try {
-          const res = await postRegister(payload);
+          const value = await postRegister(payload);
+          const res = await checkDeviceRegister({
+            device_id: mutateForm.device_id,
+          });
+
           store.dispatch(
             handleSetProfile({
               ...currentUserProfile,
               ...res,
             }),
           );
-          await AsyncStorage.setItem('isAutoRegister', 'yes');
           if (res.data.subscription.type === 1 && res.data.themes[0].id !== 6) {
             await selectTheme({
               _method: 'PATCH',
               themes: [6],
             });
           }
+          await updateProfile({
+            ...payload,
+            _method: 'PATCH',
+          });
+          fetchListQuote();
+          fetchCollection();
+          navigate('MainPage', {isFromOnboarding: true});
+
+          await AsyncStorage.setItem('isAutoRegister', 'yes');
           await AsyncStorage.setItem('isFinishTutorial', 'yes');
-          reset('MainPage', {isFromOnboarding: false});
+
           resolve(res);
         } catch (err) {
           reset('WelcomePage');
@@ -308,7 +332,6 @@ export const createUniqueID = () =>
 
 export const handleSubscriptionStatus = async (subscription = {}) => {
   const purchaseId = await Purchasely.getAnonymousUserId();
-  console.log('disiiini', JSON.stringify(subscription));
   if (subscription.type === 2 || subscription.type === 3) {
     const trialDay = subscription.type === 2 ? 3 : 30;
     const dateEndFreeTrial = getFutureDate(subscription.started, trialDay);

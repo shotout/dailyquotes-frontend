@@ -121,7 +121,7 @@ function ModalCategories({
     if (customSelected && customSelected.length > 0) {
       return customSelected.map(item => item.id);
     }
-    if (userProfile.data.categories?.length > 0) {
+    if (userProfile?.data?.categories?.length > 0) {
       return userProfile.data.categories.map(item => item.id);
     }
     return [];

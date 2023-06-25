@@ -2637,7 +2637,7 @@ export const useBackgroundQuotes = userThemes => {
   // console.log('User userThemes :', userThemes);
 
   const getListTheme = () => {
-    if (themeUser && themeUser.id) {
+    if (themeUser && themeUser?.id) {
       const findTheme = listTheme.find(item => item.id === themeUser.id);
       if (findTheme) {
         return [findTheme];

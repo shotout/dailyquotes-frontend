@@ -74,6 +74,7 @@ import {
   setInitialLoaderStatus,
   setNewQuoteData,
   setQuoteRef,
+  storeRegistrationData,
 } from '../../store/defaultState/actions';
 import ModalRating from '../../components/modal-rating';
 import {useBackgroundQuotes} from '../../shared/useBackgroundQuotes';
@@ -149,7 +150,7 @@ function MainPage({
     useState(false);
   const [isLoadingInterstial, setLoadingInterstial] = useState(false);
   const [runQuoteAnimation, setRunQuoteAnimation] = useState(false);
-  const [themeUser] = useBackgroundQuotes(userProfile.data.themes[0]);
+  const [themeUser] = useBackgroundQuotes(userProfile?.data?.themes[0]);
   const [scheduleTime] = useLocalNotif(userProfile);
   const [statusbarStatus, setStatusBar] = useState(false);
   const [showModalCountdown, setModalCountdown] = useState(false);
@@ -160,7 +161,6 @@ function MainPage({
   const refThemes = createRef();
   const refShare = createRef();
   const refSetting = createRef();
-
   const handleShowPopupShare = () => {
     setShowSharePopup(true);
     setTimeout(() => {
@@ -262,9 +262,8 @@ function MainPage({
       };
     }
   }, [runAnimationSlide, isUserHasScroll, showTutorial]);
-
   useEffect(() => {
-    if (themeUser.id !== 6) {
+    if (themeUser?.id !== 6) {
       changeStandardWidget(themeUser);
       const activeQuote = getActiveQuote();
       if (activeQuote) {
@@ -641,7 +640,7 @@ function MainPage({
     }
     const bgStyle = {
       backgroundColor:
-        themeUser.id === 4 || themeUser.id === 2
+        themeUser?.id === 4 || themeUser?.id === 2
           ? 'rgba(255, 255, 255, 0.2)'
           : 'rgba(0, 0, 0, 0.7)',
     };
@@ -878,8 +877,8 @@ function MainPage({
   }
 
   const isDarkTheme =
-    userProfile.data?.themes[0]?.id === 4 ||
-    userProfile.data?.themes[0]?.id === 6;
+    userProfile?.data?.themes[0]?.id === 4 ||
+    userProfile?.data?.themes[0]?.id === 6;
 
   return (
     <>

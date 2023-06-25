@@ -19,7 +19,7 @@ import dispatcher from './dispatcher';
 // ADS
 
 // Ref routing
-import {navigationRef, reset} from '../../shared/navigationRef';
+import {navigate, navigationRef, reset} from '../../shared/navigationRef';
 import navigationData from '../../shared/navigationData';
 
 // Screen
@@ -29,7 +29,12 @@ import MainPage from '../main-page';
 
 import {APP_VERSION} from '../../shared/static';
 import {handleModalFirstPremium} from '../../shared/globalContent';
-import {getSetting, selectTheme, updateProfile} from '../../shared/request';
+import {
+  getSetting,
+  getUserProfile,
+  selectTheme,
+  updateProfile,
+} from '../../shared/request';
 import {
   handlePayment,
   handleSubscriptionStatus,
@@ -206,10 +211,9 @@ function Routes({
   };
 
   const handleSelectTheme = async res => {
-    console.log('disini select theme ya', JSON.stringify(res));
     if (userProfile.data.themes?.length > 0) {
       if (
-        res?.themes?.length === 0 ||
+        res?.themes?.length === 1 ||
         userProfile.data.themes[0].id !== res?.themes[0]?.id
       ) {
         selectTheme({
@@ -222,7 +226,7 @@ function Routes({
     //   (res.subscription.type === 1 && res.themes[0].id !== 6) ||
     //   (userProfile.data.themes?.length === 0 && res.themes.length === 0)
     // ) {
-    //   await selectTheme({
+    //   selectTheme({
     //     _method: 'PATCH',
     //     themes: [6],
     //   });
@@ -325,7 +329,6 @@ function Routes({
           const res = resProfile;
 
           handleNotificationOpened(resProfile);
-          console.log('disini ya');
           await handleSelectTheme(res);
           setCounterNumber(99);
           handleSubscriptionStatus(res.subscription);
@@ -434,6 +437,7 @@ function Routes({
     if (!userProfile?.token) {
       SplashScreen.hide();
     }
+
     setInitialLoaderStatus(false);
     getUserdata();
     purchaselyListener();
@@ -506,9 +510,8 @@ function Routes({
   }, []);
 
   function getInitialRoute() {
-    if (userProfile.token || registerData?.registerStep === 8) {
+    if (userProfile?.token || registerData?.registerStep === 8) {
       return 'MainPage';
-      // return 'NotificationTester';
     }
     if (registerData) {
       return 'Register';

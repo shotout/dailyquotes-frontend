@@ -371,6 +371,7 @@ function Register({
       setTimeout(() => {
         reloadUserProfile();
       }, 2000);
+      storeRegistrationData(null);
     } catch (err) {
       console.log('Error register:', err);
     }
