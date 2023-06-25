@@ -166,13 +166,16 @@ export const reloadUserProfile = async () =>
               ...res,
             }),
           );
+          await AsyncStorage.setItem('isAutoRegister', 'yes');
           if (res.data.subscription.type === 1 && res.data.themes[0].id !== 6) {
             await selectTheme({
               _method: 'PATCH',
               themes: [6],
             });
           }
+          await AsyncStorage.setItem('isFinishTutorial', 'yes');
           reset('MainPage', {isFromOnboarding: false});
+          resolve(res);
         } catch (err) {
           reset('WelcomePage');
         }

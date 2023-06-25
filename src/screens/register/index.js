@@ -139,7 +139,10 @@ function Register({
       ) {
         nextStepAnimate();
       }
-      await AsyncStorage.removeItem('isFinishTutorial');
+      const isAutoRegister = await AsyncStorage.getItem('isAutoRegister');
+      if (isAutoRegister !== 'yes') {
+        await AsyncStorage.removeItem('isFinishTutorial');
+      }
     };
 
     DeviceInfo.getUniqueId().then(async uniqueId => {
@@ -280,6 +283,7 @@ function Register({
       if (showPaywall) {
         await handlePayment('onboarding');
       }
+      await AsyncStorage.removeItem('isAutoRegister');
       setHasRegister(true);
       handleAfterRegister();
       setTimeout(() => {
