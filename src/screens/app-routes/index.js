@@ -533,7 +533,7 @@ function Routes({
             setTimeout(() => {
               reloadUserProfile();
             }, 2000);
-            await AsyncStorage.setItem('isFinishTutorial', 'no');
+            await AsyncStorage.setItem('isFinishTutorial', 'yes');
           } catch (err) {
             console.log('Error register:', err);
           }
