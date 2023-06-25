@@ -13,6 +13,8 @@ import moment from 'moment';
 import Purchasely from 'react-native-purchasely';
 import {AppOpenAd, AdEventType} from 'react-native-google-mobile-ads';
 import SplashScreen from 'react-native-splash-screen';
+import messaging from '@react-native-firebase/messaging';
+import DeviceInfo from 'react-native-device-info';
 import states from './states';
 import dispatcher from './dispatcher';
 
@@ -21,7 +23,6 @@ import dispatcher from './dispatcher';
 // Ref routing
 import {navigate, navigationRef, reset} from '../../shared/navigationRef';
 import navigationData from '../../shared/navigationData';
-
 // Screen
 import WelcomePage from '../welcome-page';
 import Register from '../register';
@@ -30,21 +31,25 @@ import MainPage from '../main-page';
 import {APP_VERSION} from '../../shared/static';
 import {handleModalFirstPremium} from '../../shared/globalContent';
 import {
+  checkDeviceRegister,
   getSetting,
-  getUserProfile,
   selectTheme,
   updateProfile,
+  postRegister,
 } from '../../shared/request';
 import {
   handlePayment,
+  handlePaymentTwo,
   handleSubscriptionStatus,
   isUserPremium,
+  iconNameToId,
   reloadUserProfile,
 } from '../../helpers/user';
 import {scrollToTopQuote} from '../../store/defaultState/selector';
 import NotificationTester from '../notification-tester';
 import {navigationLinking} from '../../shared/navigationLinking';
 import {
+  handleSetProfile,
   hideLoadingModal,
   setAnimationCounter,
   setAnimationSlideStatus,
@@ -88,6 +93,12 @@ function Routes({
   const paywallStatus = useRef(null);
   const openAdsOpened = useRef(false);
   const [appStateVisible, setAppStateVisible] = useState(appState.current);
+  const [mutateForm, setMutateForm] = useState({
+    style: 1,
+    fcm_token: null,
+    purchasely_id: null,
+    device_id: null,
+  });
 
   const handleSubmitPremiumStatusWeekly = async submitObj => {
     handleModalFirstPremium(true);
@@ -411,6 +422,44 @@ function Routes({
     }
   };
 
+  const handleSubmitRegist = async () => {
+    try {
+      const timeZone = await TimeZone.getTimeZone();
+      const payload = {
+        ...mutateForm,
+        name: 'User',
+        anytime: null,
+        often: 15,
+        start: '08:00',
+        end: '20:00',
+        gender: '',
+        feel: 6,
+        ways: [6],
+        areas: [1, 2, 3, 4, 5, 6, 7, 8],
+        timezone: timeZone,
+      };
+      const res = await postRegister(payload);
+      handleSetProfile(res);
+      if (res.data.subscription.type === 1 && res.data.themes[0].id !== 6) {
+        await selectTheme({
+          _method: 'PATCH',
+          themes: [6],
+        });
+      }
+
+      await handlePaymentTwo('onboarding');
+
+      await AsyncStorage.setItem('isFinishTutorial', 'no');
+      await fetchListQuote();
+      await fetchCollection();
+      setTimeout(() => {
+        reloadUserProfile();
+      }, 2000);
+    } catch (err) {
+      console.log('Error register:', err);
+    }
+  };
+
   const getUserdata = async () => {
     const goToFirstPage = () => {
       handleAppVersion();
@@ -428,7 +477,138 @@ function Routes({
         goToFirstPage();
       }
     } catch (err) {
-      console.log('Err fetch profile:', err);
+      DeviceInfo.getUniqueId().then(async uniqueId => {
+        try {
+          console.log('Device info running', uniqueId);
+          const fcmToken = await messaging().getToken();
+          const isSetBefore = await AsyncStorage.getItem('customIcon');
+          const id = await Purchasely.getAnonymousUserId();
+
+          try {
+            const timeZone = await TimeZone.getTimeZone();
+            const payload = {
+              name: 'User',
+              anytime: null,
+              often: 15,
+              start: '08:00',
+              end: '20:00',
+              gender: '',
+              feel: 6,
+              ways: [6],
+              areas: [1, 2, 3, 4, 5, 6, 7, 8],
+              timezone: timeZone,
+              fcm_token: fcmToken,
+              device_id: uniqueId,
+              style: iconNameToId(isSetBefore),
+              purchasely_id: id,
+            };
+            const res = await postRegister(payload);
+
+            const resp = await checkDeviceRegister({
+              device_id: uniqueId,
+            });
+
+            const currentUserProfile =
+              store.getState().defaultState.userProfile;
+            store.dispatch(
+              handleSetProfile({
+                ...currentUserProfile,
+                ...resp,
+              }),
+            );
+            handleSubscriptionStatus(resp.data.subscription);
+            handlePaymentTwo('onboarding');
+            if (
+              resp.data.subscription.type === 1 &&
+              resp.data.themes[0].id !== 6
+            ) {
+              await selectTheme({
+                _method: 'PATCH',
+                themes: [6],
+              });
+            }
+            await updateProfile({
+              ...payload,
+              _method: 'PATCH',
+            });
+            setTimeout(() => {
+              reloadUserProfile();
+            }, 2000);
+            handleSetProfile(resp);
+            if (
+              resp.data.subscription.type === 1 &&
+              resp.data.themes[0].id !== 6
+            ) {
+              await selectTheme({
+                _method: 'PATCH',
+                themes: [6],
+              });
+            }
+
+            await handlePaymentTwo('onboarding');
+
+            await AsyncStorage.setItem('isFinishTutorial', 'no');
+            await fetchListQuote();
+            await fetchCollection();
+            setTimeout(() => {
+              reloadUserProfile();
+            }, 2000);
+          } catch (err) {
+            console.log('Error register:', err);
+          }
+        } catch (err) {
+          console.log('Err get device info:', err);
+        }
+      });
+
+      // DeviceInfo.getUniqueId().then(async uniqueId => {
+      //   const timeZone = await TimeZone.getTimeZone();
+      //   const payload = {
+      //     ...mutateForm,
+      //     name: 'User',
+      //     anytime: null,
+      //     often: 15,
+      //     start: '08:00',
+      //     end: '20:00',
+      //     gender: '',
+      //     feel: 6,
+      //     ways: [6],
+      //     areas: [1, 2, 3, 4, 5, 6, 7, 8],
+      //     timezone: timeZone,
+      //   };
+      //   const fcmToken = await messaging().getToken();
+      //   const isSetBefore = await AsyncStorage.getItem('customIcon');
+      //   const id = await Purchasely.getAnonymousUserId();
+      //   setMutateForm({
+      //     ...mutateForm,
+      //     fcm_token: fcmToken,
+      //     device_id: uniqueId,
+      //     // device_id: Date.now().toString(),
+      //     purchasely_id: id,
+      //   });
+      //   console.log('Err fetch profile:', err);
+      //   const res = await checkDeviceRegister({
+      //     device_id: uniqueId,
+      //   });
+
+      //   handleSetProfile(res);
+      //   handleSubscriptionStatus(res.data.subscription);
+
+      //   handlePaymentTwo('onboarding');
+      //   if (res.data.subscription.type === 1 && res.data.themes[0].id !== 6) {
+      //     await selectTheme({
+      //       _method: 'PATCH',
+      //       themes: [6],
+      //     });
+      //   }
+      //   await updateProfile({
+      //     ...payload,
+      //     _method: 'PATCH',
+      //   });
+      //   setTimeout(() => {
+      //     reloadUserProfile();
+      //   }, 2000);
+      // });
       goToFirstPage();
     }
   };

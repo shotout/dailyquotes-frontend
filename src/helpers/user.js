@@ -132,7 +132,6 @@ export const reloadUserProfile = async () =>
       }
       resolve(res.data);
     } catch (err) {
-      reset('WelcomePage');
       reject('error get profile');
     }
   });
