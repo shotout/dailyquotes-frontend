@@ -117,7 +117,7 @@ function Register({
     await fetchListQuote();
     await fetchCollection();
     eventTracking(ONBOARDING_COMPLETE);
-    reset('MainPage', {isFromOnboarding: true});
+    reset('MainPage', {isFromOnboarding: false});
     setLoading(false);
     setCounterNumber(99);
   };
@@ -139,10 +139,7 @@ function Register({
       ) {
         nextStepAnimate();
       }
-      const isAutoRegister = await AsyncStorage.getItem('isAutoRegister');
-      if (isAutoRegister !== 'yes') {
-        await AsyncStorage.removeItem('isFinishTutorial');
-      }
+      await AsyncStorage.removeItem('isFinishTutorial');
     };
 
     DeviceInfo.getUniqueId().then(async uniqueId => {
@@ -308,15 +305,15 @@ function Register({
       const timeZone = await TimeZone.getTimeZone();
       const payload = {
         ...mutateForm,
-        name: values.name,
-        anytime: values.isAnytime,
-        often: values.often,
-        start: moment(values.start_at).format('HH:mm'),
-        end: moment(values.end_at).format('HH:mm'),
-        gender: values.gender,
-        feel: values.selectedFeeling.length ? values.selectedFeeling[0] : null,
-        ways: values.causeFeeling,
-        areas: values.selectedCategory,
+        name: 'User',
+        anytime: null,
+        often: 15,
+        start: '08:00',
+        end: '20:00',
+        gender: '',
+        feel: 6,
+        ways: [6],
+        areas: [1, 2, 3, 4, 5, 6, 7, 8],
         timezone: timeZone,
       };
       const res = await postRegister(payload);
@@ -330,8 +327,8 @@ function Register({
       if (showPaywall) {
         await handlePayment('onboarding');
       }
-      await AsyncStorage.removeItem('isAutoRegister');
       setHasRegister(true);
+      await AsyncStorage.setItem('isFinishTutorial', 'yes');
       handleAfterRegister();
       setTimeout(() => {
         reloadUserProfile();
@@ -367,7 +364,6 @@ function Register({
           themes: [6],
         });
       }
-      await AsyncStorage.removeItem('isAutoRegister');
       setTimeout(() => {
         reloadUserProfile();
       }, 2000);

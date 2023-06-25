@@ -171,7 +171,6 @@ export const fetchPastQuotes = () => async dispatch =>
     try {
       dispatch({type: types.START_PAST_QUOTES});
       const pastQuote = await getListPastQuotes();
-      alert(pastQuote.data.data.length);
       if (pastQuote.data.data.length > 0) {
         dispatch({
           type: types.SUCCESS_PAST_QUOTES,

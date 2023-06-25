@@ -81,12 +81,11 @@ export const isCompletedOnboarding = () => {
   }
   return false;
 };
-
 export const reloadUserProfile = async () =>
   new Promise(async (resolve, reject) => {
-    const currentUserProfile = store.getState().defaultState.userProfile;
     try {
       const res = await getUserProfile();
+      const currentUserProfile = store.getState().defaultState.userProfile;
       store.dispatch(
         handleSetProfile({
           ...currentUserProfile,
@@ -95,7 +94,7 @@ export const reloadUserProfile = async () =>
       );
       if (res.data.subscription.type !== 5) {
         if (currentUserProfile.data) {
-          if (currentUserProfile.data?.subscription.type !== 1) {
+          if (currentUserProfile.data.subscription.type !== 1) {
             if (res.data.subscription.type === 1) {
               eventTracking(CANCEL_SUBSCRIBE_AFTER_TRIAL);
             }
@@ -121,67 +120,7 @@ export const reloadUserProfile = async () =>
       }
       resolve(res.data);
     } catch (err) {
-      if (err.status === 401) {
-        let mutateForm = {
-          fcm_token: '',
-          device_id: '',
-          style: '',
-          purchasely_id: '',
-        };
-        await DeviceInfo.getUniqueId().then(async uniqueId => {
-          try {
-            console.log('Device info running', uniqueId);
-            const fcmToken = await messaging().getToken();
-            const isSetBefore = await AsyncStorage.getItem('customIcon');
-            const id = await Purchasely.getAnonymousUserId();
-            mutateForm = {
-              fcm_token: fcmToken,
-              device_id: uniqueId,
-              style: iconNameToId(isSetBefore),
-              purchasely_id: id,
-            };
-          } catch (err) {
-            console.log('Err get device info:', err);
-          }
-        });
-        const timeZone = await TimeZone.getTimeZone();
-        const payload = {
-          ...mutateForm,
-          name: 'User',
-          anytime: null,
-          often: 15,
-          start: '08:00',
-          end: '20:00',
-          gender: '',
-          feel: 6,
-          ways: [6],
-          areas: [1, 2, 3, 4, 5, 6, 7, 8],
-          timezone: timeZone,
-        };
-        try {
-          const res = await postRegister(payload);
-          store.dispatch(
-            handleSetProfile({
-              ...currentUserProfile,
-              ...res,
-            }),
-          );
-          await AsyncStorage.setItem('isAutoRegister', 'yes');
-          if (res.data.subscription.type === 1 && res.data.themes[0].id !== 6) {
-            await selectTheme({
-              _method: 'PATCH',
-              themes: [6],
-            });
-          }
-          await AsyncStorage.setItem('isFinishTutorial', 'yes');
-          reset('MainPage', {isFromOnboarding: false});
-          resolve(res);
-        } catch (err) {
-          reset('WelcomePage');
-        }
-      } else {
-        reset('WelcomePage');
-      }
+      reset('WelcomePage');
       reject('error get profile');
     }
   });
