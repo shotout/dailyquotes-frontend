@@ -5,7 +5,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import DeviceInfo from 'react-native-device-info';
 import messaging from '@react-native-firebase/messaging';
 import TimeZone from 'react-native-timezone';
-import {getUserProfile, setSubcription, updateProfile} from '../shared/request';
+import {
+  getUserProfile,
+  postRegister,
+  selectTheme,
+  setSubcription,
+} from '../shared/request';
 import store from '../store/configure-store';
 import {fetchCollection, handleSetProfile} from '../store/defaultState/actions';
 import {SUCCESS_FETCH_COLLECTION} from '../store/defaultState/types';
@@ -50,7 +55,7 @@ export const iconNameToId = name => {
 
 export const isUserPremium = () => {
   const profile = store.getState().defaultState.userProfile;
-  const {type} = profile.data.subscription;
+  const {type} = profile.data?.subscription;
   if (type === 1 || type === 5) {
     return false;
   }
@@ -77,90 +82,103 @@ export const isCompletedOnboarding = () => {
   return false;
 };
 
-async function fetchGetUserProfile() {
-  const res = await getUserProfile();
-  const currentUserProfile = store.getState().defaultState.userProfile;
-  store.dispatch(
-    handleSetProfile({
-      ...currentUserProfile,
-      ...res,
-    }),
-  );
-  if (res.data.subscription.type !== 5) {
-    if (currentUserProfile.data) {
-      if (currentUserProfile.data.subscription.type !== 1) {
-        if (res.data.subscription.type === 1) {
-          eventTracking(CANCEL_SUBSCRIBE_AFTER_TRIAL);
-        }
-        if (
-          currentUserProfile.data.subscription.type !==
-          res.data.subscription.type
-        ) {
-          if (res.data.subscription.type !== 1) {
-            eventTracking(SUBSCRIPTION_STARTED);
-            const objPurchase = JSON.parse(
-              res.data.subscription.purchasely_data,
-            );
-            if (objPurchase) {
-              revenueTracking(
-                objPurchase.plan_price_in_customer_currency,
-                objPurchase.customer_currency,
-              );
+export const reloadUserProfile = async () =>
+  new Promise(async (resolve, reject) => {
+    const currentUserProfile = store.getState().defaultState.userProfile;
+    try {
+      const res = await getUserProfile();
+      store.dispatch(
+        handleSetProfile({
+          ...currentUserProfile,
+          ...res,
+        }),
+      );
+      if (res.data.subscription.type !== 5) {
+        if (currentUserProfile.data) {
+          if (currentUserProfile.data?.subscription.type !== 1) {
+            if (res.data.subscription.type === 1) {
+              eventTracking(CANCEL_SUBSCRIBE_AFTER_TRIAL);
+            }
+            if (
+              currentUserProfile.data.subscription.type !==
+              res.data.subscription.type
+            ) {
+              if (res.data.subscription.type !== 1) {
+                eventTracking(SUBSCRIPTION_STARTED);
+                const objPurchase = JSON.parse(
+                  res.data.subscription.purchasely_data,
+                );
+                if (objPurchase) {
+                  revenueTracking(
+                    objPurchase.plan_price_in_customer_currency,
+                    objPurchase.customer_currency,
+                  );
+                }
+              }
             }
           }
         }
       }
-    }
-  }
-  return res;
-}
-
-export const reloadUserProfile = async () =>
-  new Promise(async (resolve, reject) => {
-    try {
-      const res = await fetchGetUserProfile();
       resolve(res.data);
     } catch (err) {
-      let MutateForm = {};
-      DeviceInfo.getUniqueId().then(async uniqueId => {
+      if (err.status === 401) {
+        let mutateForm = {
+          fcm_token: '',
+          device_id: '',
+          style: '',
+          purchasely_id: '',
+        };
+        await DeviceInfo.getUniqueId().then(async uniqueId => {
+          try {
+            console.log('Device info running', uniqueId);
+            const fcmToken = await messaging().getToken();
+            const isSetBefore = await AsyncStorage.getItem('customIcon');
+            const id = await Purchasely.getAnonymousUserId();
+            mutateForm = {
+              fcm_token: fcmToken,
+              device_id: uniqueId,
+              style: iconNameToId(isSetBefore),
+              purchasely_id: id,
+            };
+          } catch (err) {
+            console.log('Err get device info:', err);
+          }
+        });
+        const timeZone = await TimeZone.getTimeZone();
+        const payload = {
+          ...mutateForm,
+          name: 'User',
+          anytime: null,
+          often: 15,
+          start: '08:00',
+          end: '20:00',
+          gender: '',
+          feel: 6,
+          ways: [6],
+          areas: [1, 2, 3, 4, 5, 6, 7, 8],
+          timezone: timeZone,
+        };
         try {
-          console.log('Device info running', uniqueId);
-          const fcmToken = await messaging().getToken();
-          const isSetBefore = await AsyncStorage.getItem('customIcon');
-          const id = await Purchasely.getAnonymousUserId();
-          MutateForm = {
-            notif_count: 0,
-            fcm_token: fcmToken,
-            device_id: uniqueId,
-            style: iconNameToId(isSetBefore),
-            purchasely_id: id,
-          };
+          const res = await postRegister(payload);
+          store.dispatch(
+            handleSetProfile({
+              ...currentUserProfile,
+              ...res,
+            }),
+          );
+          if (res.data.subscription.type === 1 && res.data.themes[0].id !== 6) {
+            await selectTheme({
+              _method: 'PATCH',
+              themes: [6],
+            });
+          }
+          reset('MainPage', {isFromOnboarding: false});
         } catch (err) {
-          console.log('Err get device info:', err);
+          reset('WelcomePage');
         }
-      });
-      const timeZone = await TimeZone.getTimeZone();
-      const payload = {
-        ...MutateForm,
-        name: 'User',
-        anytime: null,
-        often: 15,
-        start: '08:00',
-        end: '20:00',
-        gender: '',
-        feel: 6,
-        ways: [6],
-        areas: [1, 2, 3, 4, 5, 6, 7, 8],
-        timezone: timeZone,
-      };
-      await updateProfile({
-        ...payload,
-        _method: 'PATCH',
-      });
-      setTimeout(async() => {
-        await fetchGetUserProfile();
-      }, 2000);
-      reset('WelcomePage');
+      } else {
+        reset('WelcomePage');
+      }
       reject('error get profile');
     }
   });
