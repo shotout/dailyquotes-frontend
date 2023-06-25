@@ -216,77 +216,18 @@ export const handlePayment = async (vendorId, cb) =>
   });
 export const handlePaymentTwo = async (vendorId, cb) =>
   new Promise(async (resolve, reject) => {
-    const currentDate = moment().format('YYYY-MM-DD HH:mm:ss');
-    const getInstallDate = await AsyncStorage.getItem('firstInstall');
-    const endDate = moment(getInstallDate)
-      .add(1, 'days')
-      .format('YYYY-MM-DD HH:mm:ss');
     try {
-      let stringVendor = vendorId;
       const purchaseId = await Purchasely.getAnonymousUserId();
       if (vendorId === 'onboarding') {
         await setSubcription({
           subscription_type: 5,
           purchasely_id: purchaseId,
         });
-      } else if (!stringVendor) {
-        if (currentDate <= endDate) {
-          stringVendor = 'offer_no_purchase_after_onboarding_paywall';
-        } else {
-          stringVendor = 'offer_no_purchase_after_onboarding_paywall_2nd';
-        }
       }
-      const res = await Purchasely.presentPresentationForPlacement({
-        placementVendorId:
-          currentDate <= endDate
-            ? 'offer_no_purchase_after_onboarding_paywall'
-            : 'offer_no_purchase_after_onboarding_paywall_2nd',
-        isFullscreen: true,
-      });
       const user = store.getState().defaultState.userProfile;
-      switch (res.result) {
-        case ProductResult.PRODUCT_RESULT_PURCHASED:
-          if (user.token) {
-            await setSubcription({
-              subscription_type: vendorId === 'one_month_free' ? 3 : 2,
-              subscription_data: res,
-              purchasely_id: purchaseId,
-            });
-            await reloadUserProfile();
-          }
-          eventTracking(FREE_TRIAL);
-          break;
-        case ProductResult.PRODUCT_RESULT_RESTORED:
-          console.log('Payment restored');
-          // let message = null;
-          // if (res.plan != null) {
-          //   console.log(`User purchased ${res.plan.name}`);
-          //   message = res.plan.name;
-          // }
-
-          // eventTracking(RESTORE_PURCHASED, message);
-          break;
-        case ProductResult.PRODUCT_RESULT_CANCELLED:
-          console.log('Payment cancel');
-          if (Platform.OS === 'android') {
-            if (
-              !vendorId ||
-              vendorId === 'onboarding' ||
-              vendorId === 'offer_no_purchase_after_onboarding_paywall'
-            ) {
-              // handlePayment(vendorId);
-            }
-          }
-          // await setSubcription({
-          //   subscription_type: 1,
-          //   purchasely_id: purchaseId,
-          // });
-          break;
-        default:
-          break;
+      if (user.token) {
+        await reloadUserProfile();
       }
-      if (typeof cb === 'function') cb();
-      resolve(res);
     } catch (err) {
       console.log('error payment:', err);
     }
