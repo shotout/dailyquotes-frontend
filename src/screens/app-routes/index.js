@@ -503,7 +503,6 @@ function Routes({
               purchasely_id: id,
             };
             const res = await postRegister(payload);
-
             const resp = await checkDeviceRegister({
               device_id: uniqueId,
             });
@@ -534,25 +533,7 @@ function Routes({
             setTimeout(() => {
               reloadUserProfile();
             }, 2000);
-            handleSetProfile(resp);
-            if (
-              resp.data.subscription.type === 1 &&
-              resp.data.themes[0].id !== 6
-            ) {
-              await selectTheme({
-                _method: 'PATCH',
-                themes: [6],
-              });
-            }
-
-            await handlePaymentTwo('onboarding');
-
             await AsyncStorage.setItem('isFinishTutorial', 'no');
-            await fetchListQuote();
-            await fetchCollection();
-            setTimeout(() => {
-              reloadUserProfile();
-            }, 2000);
           } catch (err) {
             console.log('Error register:', err);
           }
