@@ -40,6 +40,7 @@ import {
   checkDeviceRegister,
   postRegister,
   selectTheme,
+  setSubcription,
   updateProfile,
 } from '../../shared/request';
 import {reset} from '../../shared/navigationRef';
@@ -50,6 +51,7 @@ import {
   openPrivacyPolicy,
   openTermsofUse,
   reloadUserProfile,
+  handlePaymentTwo,
 } from '../../helpers/user';
 import LoadingIndicator from '../../components/loading-indicator';
 import {eventTracking, ONBOARDING_COMPLETE} from '../../helpers/eventTracking';
@@ -117,7 +119,7 @@ function Register({
     await fetchListQuote();
     await fetchCollection();
     eventTracking(ONBOARDING_COMPLETE);
-    reset('MainPage', {isFromOnboarding: true});
+    reset('MainPage', {isFromOnboarding: false});
     setLoading(false);
     setCounterNumber(99);
   };
@@ -139,10 +141,7 @@ function Register({
       ) {
         nextStepAnimate();
       }
-      const isAutoRegister = await AsyncStorage.getItem('isAutoRegister');
-      if (isAutoRegister !== 'yes') {
-        await AsyncStorage.removeItem('isFinishTutorial');
-      }
+      await AsyncStorage.removeItem('isFinishTutorial');
     };
 
     DeviceInfo.getUniqueId().then(async uniqueId => {
@@ -178,7 +177,54 @@ function Register({
   }, []);
 
   useEffect(() => {
-    if (registerStep === 9) {
+    if (registerStep === 8) {
+      const getDeviceID = async () => {
+        try {
+          const timeZone = await TimeZone.getTimeZone();
+          const payload = {
+            ...mutateForm,
+            name: values.name,
+            anytime: values.isAnytime,
+            often: values.often,
+            start: moment(values.start_at).format('HH:mm'),
+            end: moment(values.end_at).format('HH:mm'),
+            gender: values.gender,
+            feel: values.selectedFeeling.length
+              ? values.selectedFeeling[0]
+              : null,
+            ways: values.causeFeeling,
+            areas: values.selectedCategory,
+            timezone: timeZone,
+          };
+          const res = await checkDeviceRegister({
+            device_id: mutateForm.device_id,
+          });
+          setHasRegister(true);
+          handleSetProfile(res);
+          handleSubscriptionStatus(res.data.subscription);
+          fetchListQuote();
+          fetchCollection();
+          handlePaymentTwo('onboarding');
+          if (res.data.subscription.type === 1 && res.data.themes[0].id !== 6) {
+            await selectTheme({
+              _method: 'PATCH',
+              themes: [6],
+            });
+          }
+          await updateProfile({
+            ...payload,
+            _method: 'PATCH',
+          });
+          setTimeout(() => {
+            reloadUserProfile();
+          }, 2000);
+        } catch (err) {
+          console.log('Device id not register new');
+          handleSubmitRegist(true);
+        }
+      };
+      getDeviceID();
+    } else if (registerStep === 9) {
       const getDeviceID = async () => {
         try {
           const timeZone = await TimeZone.getTimeZone();
@@ -211,52 +257,6 @@ function Register({
               reset('MainPage', {isFromOnboarding: true});
             });
           }, 200);
-          if (res.data.subscription.type === 1 && res.data.themes[0].id !== 6) {
-            await selectTheme({
-              _method: 'PATCH',
-              themes: [6],
-            });
-          }
-          await updateProfile({
-            ...payload,
-            _method: 'PATCH',
-          });
-          setTimeout(() => {
-            reloadUserProfile();
-          }, 2000);
-        } catch (err) {
-          console.log('Device id not register');
-          handleSubmit(true);
-        }
-      };
-      getDeviceID();
-    } else if (registerStep === 8) {
-      const getDeviceID = async () => {
-        try {
-          const timeZone = await TimeZone.getTimeZone();
-          const payload = {
-            ...mutateForm,
-            name: values.name,
-            anytime: values.isAnytime,
-            often: values.often,
-            start: moment(values.start_at).format('HH:mm'),
-            end: moment(values.end_at).format('HH:mm'),
-            gender: values.gender,
-            feel: values.selectedFeeling.length
-              ? values.selectedFeeling[0]
-              : null,
-            ways: values.causeFeeling,
-            areas: values.selectedCategory,
-            timezone: timeZone,
-          };
-          const res = await checkDeviceRegister({
-            device_id: mutateForm.device_id,
-          });
-          setHasRegister(true);
-          handleSetProfile(res);
-          handleSubscriptionStatus(res.data.subscription);
-          fetchListQuote();
-          fetchCollection();
 
           if (res.data.subscription.type === 1 && res.data.themes[0].id !== 6) {
             await selectTheme({
@@ -273,7 +273,7 @@ function Register({
           }, 2000);
         } catch (err) {
           console.log('Device id not register');
-          handleSubmitRegist();
+          handleSubmit(true);
         }
       };
       getDeviceID();
@@ -308,15 +308,15 @@ function Register({
       const timeZone = await TimeZone.getTimeZone();
       const payload = {
         ...mutateForm,
-        name: values.name,
-        anytime: values.isAnytime,
-        often: values.often,
-        start: moment(values.start_at).format('HH:mm'),
-        end: moment(values.end_at).format('HH:mm'),
-        gender: values.gender,
-        feel: values.selectedFeeling.length ? values.selectedFeeling[0] : null,
-        ways: values.causeFeeling,
-        areas: values.selectedCategory,
+        name: 'User',
+        anytime: null,
+        often: 15,
+        start: '08:00',
+        end: '20:00',
+        gender: '',
+        feel: 6,
+        ways: [6],
+        areas: [1, 2, 3, 4, 5, 6, 7, 8],
         timezone: timeZone,
       };
       const res = await postRegister(payload);
@@ -330,8 +330,8 @@ function Register({
       if (showPaywall) {
         await handlePayment('onboarding');
       }
-      await AsyncStorage.removeItem('isAutoRegister');
       setHasRegister(true);
+      await AsyncStorage.setItem('isFinishTutorial', 'yes');
       handleAfterRegister();
       setTimeout(() => {
         reloadUserProfile();
@@ -343,20 +343,20 @@ function Register({
     }
   };
 
-  const handleSubmitRegist = async () => {
+  const handleSubmitRegist = async showPaywall => {
     try {
       const timeZone = await TimeZone.getTimeZone();
       const payload = {
         ...mutateForm,
-        name: values.name,
-        anytime: values.isAnytime,
-        often: values.often,
-        start: moment(values.start_at).format('HH:mm'),
-        end: moment(values.end_at).format('HH:mm'),
-        gender: values.gender,
-        feel: values.selectedFeeling.length ? values.selectedFeeling[0] : null,
-        ways: values.causeFeeling,
-        areas: values.selectedCategory,
+        name: 'User',
+        anytime: null,
+        often: 15,
+        start: '08:00',
+        end: '20:00',
+        gender: '',
+        feel: 6,
+        ways: [6],
+        areas: [1, 2, 3, 4, 5, 6, 7, 8],
         timezone: timeZone,
       };
       const res = await postRegister(payload);
@@ -367,11 +367,16 @@ function Register({
           themes: [6],
         });
       }
-      await AsyncStorage.removeItem('isAutoRegister');
+      if (showPaywall) {
+        await handlePaymentTwo('onboarding');
+      }
+      setHasRegister(true);
+      await AsyncStorage.setItem('isFinishTutorial', 'no');
+      await fetchListQuote();
+      await fetchCollection();
       setTimeout(() => {
         reloadUserProfile();
       }, 2000);
-      storeRegistrationData(null);
     } catch (err) {
       console.log('Error register:', err);
     }

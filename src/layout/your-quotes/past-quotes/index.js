@@ -57,7 +57,6 @@ function PastQuotes({isVisible, onClose, userProfile, fetchPastQuotes}) {
   const getListDataPast = async () => {
     setListDataPast({...listDataPast, isLoading: true});
     const res = await getListPastQuotes({length: 10, page: 1});
-    alert(res.data.data.length);
     if (res.data.data.length > 0) {
       if (Array.isArray(res.data)) {
         setListDataPast({
@@ -149,7 +148,6 @@ function PastQuotes({isVisible, onClose, userProfile, fetchPastQuotes}) {
       await removePastCollection({idQuote});
       setTimeout(async () => {
         const res = await getListPastQuotes({length: 10, page: 1});
-        alert(res.data.data.length);
         if (res.data.data.length > 0) {
           if (Array.isArray(res.data)) {
             setListDataPast({
@@ -202,7 +200,6 @@ function PastQuotes({isVisible, onClose, userProfile, fetchPastQuotes}) {
             length: 10,
             page: listDataPast.page + 1,
           });
-          alert(listPastDb.data.data.length);
           if (listPastDb.data.data.length > 0) {
             setListDataPast({
               ...listDataPast,

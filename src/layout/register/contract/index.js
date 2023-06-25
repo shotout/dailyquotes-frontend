@@ -54,31 +54,24 @@ function Contract({
   const [device_id, setDeviceId] = useState(null);
 
   useEffect(() => {
-    DeviceInfo.getUniqueId().then(async uniqueId => {
-      try {
-        setDeviceId(uniqueId);
-        // eslint-disable-next-line no-use-before-define
-      } catch (err) {
-        console.log('Err get device info:', err);
-      }
-    });
-  });
+    handlePress();
+  }, []);
 
-  useEffect(() => {
-    getDeviceID(device_id);
-  }, [device_id]);
-  const getDeviceID = async id => {
-    try {
-      const res = await checkDeviceRegister({
-        device_id: id,
-      });
-      handleSetProfile(res);
-      handleSubscriptionStatus(res.data.subscription);
-      console.log(res);
-    } catch (err) {
-      console.log('Device id not register');
-    }
-  };
+  // useEffect(() => {
+  //   getDeviceID(device_id);
+  // }, [device_id]);
+  // const getDeviceID = async id => {
+  //   try {
+  //     const res = await checkDeviceRegister({
+  //       device_id: id,
+  //     });
+  //     handleSetProfile(res);
+  //     handleSubscriptionStatus(res.data.subscription);
+  //     console.log(res);
+  //   } catch (err) {
+  //     console.log('Device id not register');
+  //   }
+  // };
 
   const handlePress = async () => {
     // onLongPress()
