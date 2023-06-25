@@ -308,6 +308,7 @@ export const createUniqueID = () =>
 
 export const handleSubscriptionStatus = async (subscription = {}) => {
   const purchaseId = await Purchasely.getAnonymousUserId();
+  console.log('disiiini', JSON.stringify(subscription));
   if (subscription.type === 2 || subscription.type === 3) {
     const trialDay = subscription.type === 2 ? 3 : 30;
     const dateEndFreeTrial = getFutureDate(subscription.started, trialDay);

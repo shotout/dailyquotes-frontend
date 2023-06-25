@@ -230,6 +230,53 @@ function Register({
         }
       };
       getDeviceID();
+    } else if (registerStep === 8) {
+      const getDeviceID = async () => {
+        try {
+          const timeZone = await TimeZone.getTimeZone();
+          const payload = {
+            ...mutateForm,
+            name: values.name,
+            anytime: values.isAnytime,
+            often: values.often,
+            start: moment(values.start_at).format('HH:mm'),
+            end: moment(values.end_at).format('HH:mm'),
+            gender: values.gender,
+            feel: values.selectedFeeling.length
+              ? values.selectedFeeling[0]
+              : null,
+            ways: values.causeFeeling,
+            areas: values.selectedCategory,
+            timezone: timeZone,
+          };
+          const res = await checkDeviceRegister({
+            device_id: mutateForm.device_id,
+          });
+          setHasRegister(true);
+          handleSetProfile(res);
+          handleSubscriptionStatus(res.data.subscription);
+          fetchListQuote();
+          fetchCollection();
+
+          if (res.data.subscription.type === 1 && res.data.themes[0].id !== 6) {
+            await selectTheme({
+              _method: 'PATCH',
+              themes: [6],
+            });
+          }
+          await updateProfile({
+            ...payload,
+            _method: 'PATCH',
+          });
+          setTimeout(() => {
+            reloadUserProfile();
+          }, 2000);
+        } catch (err) {
+          console.log('Device id not register');
+          handleSubmitRegist();
+        }
+      };
+      getDeviceID();
     }
   }, [registerStep]);
 
@@ -293,6 +340,39 @@ function Register({
     } catch (err) {
       console.log('Error register:', err);
       setLoading(false);
+    }
+  };
+
+  const handleSubmitRegist = async () => {
+    try {
+      const timeZone = await TimeZone.getTimeZone();
+      const payload = {
+        ...mutateForm,
+        name: values.name,
+        anytime: values.isAnytime,
+        often: values.often,
+        start: moment(values.start_at).format('HH:mm'),
+        end: moment(values.end_at).format('HH:mm'),
+        gender: values.gender,
+        feel: values.selectedFeeling.length ? values.selectedFeeling[0] : null,
+        ways: values.causeFeeling,
+        areas: values.selectedCategory,
+        timezone: timeZone,
+      };
+      const res = await postRegister(payload);
+      handleSetProfile(res);
+      if (res.data.subscription.type === 1 && res.data.themes[0].id !== 6) {
+        await selectTheme({
+          _method: 'PATCH',
+          themes: [6],
+        });
+      }
+      await AsyncStorage.removeItem('isAutoRegister');
+      setTimeout(() => {
+        reloadUserProfile();
+      }, 2000);
+    } catch (err) {
+      console.log('Error register:', err);
     }
   };
 

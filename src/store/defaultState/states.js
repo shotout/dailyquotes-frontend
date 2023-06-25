@@ -132,6 +132,7 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         userProfile: {},
+        // registerData: null,
         listLikedQuote: {
           listDataLike: [],
         },

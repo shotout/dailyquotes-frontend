@@ -206,10 +206,11 @@ function Routes({
   };
 
   const handleSelectTheme = async res => {
+    console.log('disini select theme ya', JSON.stringify(res));
     if (userProfile.data.themes?.length > 0) {
       if (
-        res.themes.length === 0 ||
-        userProfile.data.themes[0].id !== res.themes[0].id
+        res?.themes?.length === 0 ||
+        userProfile.data.themes[0].id !== res?.themes[0]?.id
       ) {
         selectTheme({
           _method: 'PATCH',
@@ -237,7 +238,7 @@ function Routes({
       }
     }
     if (
-      (res.subscription.type === 1 && res.themes[0].id !== 6) ||
+      (res?.subscription?.type === 1 && res?.themes[0]?.id !== 6) ||
       remoteMessage?.data?.id ||
       idQuote
     ) {
@@ -324,6 +325,7 @@ function Routes({
           const res = resProfile;
 
           handleNotificationOpened(resProfile);
+          console.log('disini ya');
           await handleSelectTheme(res);
           setCounterNumber(99);
           handleSubscriptionStatus(res.subscription);

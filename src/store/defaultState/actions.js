@@ -62,7 +62,7 @@ export const fetchListQuote = (params, isPassPremium) => async dispatch =>
       let restPas = [];
       if (!isUserPremium()) {
         const pastQuote = await getListPastQuotes({length: 5, page: 1});
-        if (pastQuote.data.data.length > 0) {
+        if (pastQuote.data.length > 0) {
           restPas = isArray(pastQuote?.data)
             ? pastQuote?.data
             : pastQuote?.data?.data || dummyPastQuotes;
@@ -171,6 +171,7 @@ export const fetchPastQuotes = () => async dispatch =>
     try {
       dispatch({type: types.START_PAST_QUOTES});
       const pastQuote = await getListPastQuotes();
+      alert(pastQuote.data.data.length);
       if (pastQuote.data.data.length > 0) {
         dispatch({
           type: types.SUCCESS_PAST_QUOTES,
