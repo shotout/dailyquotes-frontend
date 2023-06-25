@@ -53,26 +53,6 @@ function Contract({
   const placeholderAnimation = useRef(new Animated.Value(0.07)).current;
   const [device_id, setDeviceId] = useState(null);
 
-  useEffect(() => {
-    handlePress();
-  }, []);
-
-  // useEffect(() => {
-  //   getDeviceID(device_id);
-  // }, [device_id]);
-  // const getDeviceID = async id => {
-  //   try {
-  //     const res = await checkDeviceRegister({
-  //       device_id: id,
-  //     });
-  //     handleSetProfile(res);
-  //     handleSubscriptionStatus(res.data.subscription);
-  //     console.log(res);
-  //   } catch (err) {
-  //     console.log('Device id not register');
-  //   }
-  // };
-
   const handlePress = async () => {
     // onLongPress()
     setAnimatedStart(true);
