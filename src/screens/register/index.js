@@ -348,15 +348,15 @@ function Register({
       const timeZone = await TimeZone.getTimeZone();
       const payload = {
         ...mutateForm,
-        name: 'User',
-        anytime: null,
-        often: 15,
-        start: '08:00',
-        end: '20:00',
-        gender: '',
-        feel: 6,
-        ways: [6],
-        areas: [1, 2, 3, 4, 5, 6, 7, 8],
+        name: values.name,
+        anytime: values.isAnytime,
+        often: values.often,
+        start: moment(values.start_at).format('HH:mm'),
+        end: moment(values.end_at).format('HH:mm'),
+        gender: values.gender,
+        feel: values.selectedFeeling.length ? values.selectedFeeling[0] : null,
+        ways: values.causeFeeling,
+        areas: values.selectedCategory,
         timezone: timeZone,
       };
       const res = await postRegister(payload);
