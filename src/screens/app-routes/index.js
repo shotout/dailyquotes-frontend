@@ -356,7 +356,6 @@ function Routes({
           }, 10000);
         };
         fetchUserData();
-
         showLoadingModal();
       } else {
         setCounterNumber(99);
@@ -422,44 +421,6 @@ function Routes({
     }
   };
 
-  const handleSubmitRegist = async () => {
-    try {
-      const timeZone = await TimeZone.getTimeZone();
-      const payload = {
-        ...mutateForm,
-        name: 'User',
-        anytime: null,
-        often: 15,
-        start: '08:00',
-        end: '20:00',
-        gender: '',
-        feel: 6,
-        ways: [6],
-        areas: [1, 2, 3, 4, 5, 6, 7, 8],
-        timezone: timeZone,
-      };
-      const res = await postRegister(payload);
-      handleSetProfile(res);
-      if (res.data.subscription.type === 1 && res.data.themes[0].id !== 6) {
-        await selectTheme({
-          _method: 'PATCH',
-          themes: [6],
-        });
-      }
-
-      await handlePaymentTwo('onboarding');
-
-      await AsyncStorage.setItem('isFinishTutorial', 'no');
-      await fetchListQuote();
-      await fetchCollection();
-      setTimeout(() => {
-        reloadUserProfile();
-      }, 2000);
-    } catch (err) {
-      console.log('Error register:', err);
-    }
-  };
-
   const getUserdata = async () => {
     const goToFirstPage = () => {
       handleAppVersion();
@@ -479,7 +440,7 @@ function Routes({
     } catch (err) {
       DeviceInfo.getUniqueId().then(async uniqueId => {
         try {
-          console.log('Device info running', uniqueId);
+          await messaging().setAPNSToken('test');
           const fcmToken = await messaging().getToken();
           const isSetBefore = await AsyncStorage.getItem('customIcon');
           const id = await Purchasely.getAnonymousUserId();

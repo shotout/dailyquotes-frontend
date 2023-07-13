@@ -165,25 +165,25 @@ function PastQuotes({isVisible, onClose, userProfile, fetchPastQuotes}) {
             });
           }
         } else {
-          const resp = await getListQuotes({
-            length: 15,
-            page: 1,
-          });
-          if (Array.isArray(resp.data)) {
-            setListDataPast({
-              listData: res.data || [],
-              isLoading: false,
-              total: 0,
-              page: 1,
-            });
-          } else {
-            setListDataPast({
-              listData: resp.data?.data || [],
-              isLoading: false,
-              total: resp.data.total,
-              page: 1,
-            });
-          }
+          // const resp = await getListQuotes({
+          //   length: 15,
+          //   page: 1,
+          // });
+          // if (Array.isArray(resp.data)) {
+          //   setListDataPast({
+          //     listData: res.data || [],
+          //     isLoading: false,
+          //     total: 0,
+          //     page: 1,
+          //   });
+          // } else {
+          //   setListDataPast({
+          //     listData: resp.data?.data || [],
+          //     isLoading: false,
+          //     total: resp.data.total,
+          //     page: 1,
+          //   });
+          // }
         }
       }, 200);
     } catch (err) {
@@ -208,16 +208,16 @@ function PastQuotes({isVisible, onClose, userProfile, fetchPastQuotes}) {
               page: listDataPast.page + 1,
             });
           } else {
-            const resp = await getListQuotes({
-              length: 15,
-              page: 1,
-            });
-            setListDataPast({
-              ...listDataPast,
-              listData: [...listDataPast.listData, ...resp.data],
-              isloading: false,
-              page: listDataPast.page + 1,
-            });
+            // const resp = await getListQuotes({
+            //   length: 15,
+            //   page: 1,
+            // });
+            // setListDataPast({
+            //   ...listDataPast,
+            //   listData: [...listDataPast.listData, ...resp.data],
+            //   isloading: false,
+            //   page: listDataPast.page + 1,
+            // });
           }
         }
       }

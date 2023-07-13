@@ -55,7 +55,7 @@ export const fetchListQuote = (params, isPassPremium) => async dispatch =>
       }
       dispatch({type: types.START_FETCH_QUOTES});
       const quote = await getListQuotes({
-        length: isFreeUserPremium || isPassPremium ? 1000 : 10,
+        length: isFreeUserPremium || isPassPremium ? 1000 : 15,
         page: 1,
         ...params,
       });
@@ -67,14 +67,14 @@ export const fetchListQuote = (params, isPassPremium) => async dispatch =>
             ? pastQuote?.data
             : pastQuote?.data?.data || dummyPastQuotes;
         } else {
-          const resp = await getListQuotes({
-            length: 15,
-            page: 1,
-            ...params,
-          });
-          restPas = isArray(resp?.data)
-            ? resp?.data
-            : resp?.data?.data || dummyPastQuotes;
+          // const resp = await getListQuotes({
+          //   length: 15,
+          //   page: 1,
+          //   ...params,
+          // });
+          // restPas = isArray(resp?.data)
+          //   ? resp?.data
+          //   : resp?.data?.data || dummyPastQuotes;
         }
       }
       if (quote.data?.data?.length > 0) {
@@ -177,19 +177,15 @@ export const fetchPastQuotes = () => async dispatch =>
           payload: pastQuote.data,
         });
       } else {
-        const resp = await getListQuotes({
-          length: 15,
-          page: 1,
-        });
-        dispatch({
-          type: types.SUCCESS_PAST_QUOTES,
-          payload: resp.data,
-        });
+        // const resp = await getListQuotes({
+        //   length: 15,
+        //   page: 1,
+        // });
+        // dispatch({
+        //   type: types.SUCCESS_PAST_QUOTES,
+        //   payload: resp.data,
+        // });
       }
-      dispatch({
-        type: types.SUCCESS_PAST_QUOTES,
-        payload: pastQuote.data,
-      });
       resolve(pastQuote);
     } catch (err) {
       console.log('ERr fetch past quotes:', err);

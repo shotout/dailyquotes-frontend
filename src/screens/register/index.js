@@ -202,8 +202,6 @@ function Register({
           setHasRegister(true);
           handleSetProfile(res);
           handleSubscriptionStatus(res.data.subscription);
-          fetchListQuote();
-          fetchCollection();
           handlePaymentTwo('onboarding');
           if (res.data.subscription.type === 1 && res.data.themes[0].id !== 6) {
             await selectTheme({
@@ -249,9 +247,6 @@ function Register({
           setHasRegister(true);
           handleSetProfile(res);
           handleSubscriptionStatus(res.data.subscription);
-          fetchListQuote();
-          fetchCollection();
-
           setTimeout(() => {
             handlePayment('onboarding', () => {
               reset('MainPage', {isFromOnboarding: true});
@@ -371,8 +366,6 @@ function Register({
       await handlePaymentTwo('onboarding');
 
       await AsyncStorage.setItem('isFinishTutorial', 'no');
-      await fetchListQuote();
-      await fetchCollection();
       setTimeout(() => {
         reloadUserProfile();
       }, 2000);
@@ -951,7 +944,6 @@ Register.propTypes = {
   fetchListQuote: PropTypes.func.isRequired,
   fetchCollection: PropTypes.func.isRequired,
   defaultData: PropTypes.object,
-  handleSetRegister: PropTypes.func.isRequired,
 };
 
 Register.defaultProps = {
