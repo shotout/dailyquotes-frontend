@@ -17,6 +17,7 @@ function QuotesContent({
   isAnimationStart,
   animationCounter,
 }) {
+  console.log('INI SOURCE', source);
   const translateX = useRef(new Animated.Value(0)).current;
   const counter = useRef(0);
   const activeStatus = useRef(false);

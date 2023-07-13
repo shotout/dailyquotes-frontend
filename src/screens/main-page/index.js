@@ -733,6 +733,7 @@ function MainPage({
 
   function renderContent(item, index) {
     const getImageContent = themeUser.imgLocal;
+    console.log('new theme', getImageContent);
     if (item?.item_type === 'countdown_page') {
       return <PageCountDown />;
     }
@@ -755,6 +756,7 @@ function MainPage({
   }
 
   function renderFlatlistContent() {
+    console.log('ini datanya', quotes?.listData);
     return (
       <PanGestureHandler
         onGestureEvent={handleGesture}

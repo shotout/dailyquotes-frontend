@@ -202,6 +202,8 @@ function Register({
           setHasRegister(true);
           handleSetProfile(res);
           handleSubscriptionStatus(res.data.subscription);
+          fetchListQuote();
+          fetchCollection();
           handlePaymentTwo('onboarding');
           if (res.data.subscription.type === 1 && res.data.themes[0].id !== 6) {
             await selectTheme({
