@@ -433,8 +433,6 @@ PODS:
   - react-native-purchasely (2.4.1):
     - Purchasely (= 3.4.1)
     - React-Core
-  - react-native-purchasely-google (2.4.1):
-    - React-Core
   - react-native-safe-area-context (4.4.1):
     - RCT-Folly
     - RCTRequired
@@ -629,7 +627,6 @@ DEPENDENCIES:
   - react-native-date-picker (from `../node_modules/react-native-date-picker`)
   - react-native-in-app-review (from `../node_modules/react-native-in-app-review`)
   - react-native-purchasely (from `../node_modules/react-native-purchasely`)
-  - "react-native-purchasely-google (from `../node_modules/@purchasely/react-native-purchasely-google`)"
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - "react-native-skadnetwork (from `../node_modules/@brigad/react-native-skadnetwork`)"
   - react-native-splash-screen (from `../node_modules/react-native-splash-screen`)
@@ -758,8 +755,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-in-app-review"
   react-native-purchasely:
     :path: "../node_modules/react-native-purchasely"
-  react-native-purchasely-google:
-    :path: "../node_modules/@purchasely/react-native-purchasely-google"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
   react-native-skadnetwork:
@@ -887,7 +882,6 @@ SPEC CHECKSUMS:
   react-native-date-picker: 55193347d8d0f40948f441ffd4e5db6f0a8fbe13
   react-native-in-app-review: a073f67c5f3392af6ea7fb383217cdb1aa2aa726
   react-native-purchasely: b205ebcfaf21c4aa96921e8e62a5e4950a5346d0
-  react-native-purchasely-google: 77decf9904336a29212f83b24363892ba4a9ec05
   react-native-safe-area-context: 99b24a0c5acd0d5dcac2b1a7f18c49ea317be99a
   react-native-skadnetwork: b960e4aa81d51e6f4f447d08eab1eb5ad05cc3e1
   react-native-splash-screen: 4312f786b13a81b5169ef346d76d33bc0c6dc457
