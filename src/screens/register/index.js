@@ -65,6 +65,7 @@ import {
   storeRegistrationData,
 } from '../../store/defaultState/actions';
 import {sizing} from '../../shared/styling';
+import {sign} from 'react-native-pure-jwt';
 
 const registerBackground = require('../../assets/images/background_register.png');
 const Convetti = require('../../assets/lottie/hello.json');
@@ -88,6 +89,7 @@ function Register({
   const [toggleRandomCategories, setToggleRandomCategories] = useState(false);
   const [showModalIcon, setShowModalIcon] = useState(false);
   const [isLoading, setLoading] = useState(false);
+  const [token, setToken] = useState('');
   const [mutateForm, setMutateForm] = useState({
     style: 1,
     fcm_token: null,
@@ -112,6 +114,8 @@ function Register({
     specific_goal: null,
     important_change: null,
     commit_goal: '12',
+    platform: Platform.OS,
+    token: token,
   });
   const handleAfterRegister = async () => {
     console.log('AFter register called');
@@ -124,6 +128,9 @@ function Register({
     setCounterNumber(99);
   };
 
+  useEffect(() => {
+    createToken();
+  }, []);
   useEffect(() => {
     const handleInitial = async () => {
       setSubstep(registerData?.substep || substep);
@@ -148,6 +155,7 @@ function Register({
       try {
         console.log('Device info running', uniqueId);
         const fcmToken = await messaging().getToken();
+        console.log('token info running', fcmToken);
         const isSetBefore = await AsyncStorage.getItem('customIcon');
         const id = await Purchasely.getAnonymousUserId();
         setMutateForm({
@@ -175,6 +183,23 @@ function Register({
 
     return () => backHandler.remove();
   }, []);
+  const createToken = async () => {
+    try {
+      const token = await sign(
+        {
+          name: ''
+        },
+        'pEsR74eADk6PTuvcOwPtUt16f8=', // Secret Key
+        {
+          alg: 'HS256', // Algoritma
+        },
+      );
+      setToken(token);
+      return token;
+    } catch (error) {
+      console.error('Error generating token:', error);
+    }
+  };
 
   useEffect(() => {
     if (registerStep === 8) {
@@ -195,6 +220,8 @@ function Register({
             ways: values.causeFeeling,
             areas: values.selectedCategory,
             timezone: timeZone,
+            platform: Platform.OS,
+            token: token,
           };
           const res = await checkDeviceRegister({
             device_id: mutateForm.device_id,
@@ -242,6 +269,8 @@ function Register({
             ways: values.causeFeeling,
             areas: values.selectedCategory,
             timezone: timeZone,
+            platform: Platform.OS,
+            token: token,
           };
           const res = await checkDeviceRegister({
             device_id: mutateForm.device_id,
@@ -250,9 +279,9 @@ function Register({
           handleSetProfile(res);
           handleSubscriptionStatus(res.data.subscription);
           setTimeout(() => {
-            handlePayment('onboarding', () => {
+            // handlePayment('onboarding', () => {
               reset('MainPage', {isFromOnboarding: true});
-            });
+            // });
           }, 200);
 
           if (res.data.subscription.type === 1 && res.data.themes[0].id !== 6) {
@@ -286,6 +315,7 @@ function Register({
         values,
         isHasRegister,
         notificationStep,
+        token,
       });
     }
   }, [
@@ -315,8 +345,11 @@ function Register({
         ways: [6],
         areas: [1, 2, 3, 4, 5, 6, 7, 8],
         timezone: timeZone,
+        platform: Platform.OS,
+        token: token,
       };
       const res = await postRegister(payload);
+      console.log('SUKKSEE='+JSON.stringify(res))
       handleSetProfile(res);
       if (res.data.subscription.type === 1 && res.data.themes[0].id !== 6) {
         await selectTheme({
@@ -324,9 +357,9 @@ function Register({
           themes: [6],
         });
       }
-      if (showPaywall) {
-        await handlePayment('onboarding');
-      }
+      // if (showPaywall) {
+      //   await handlePayment('onboarding');
+      // }
       setHasRegister(true);
       await AsyncStorage.setItem('isFinishTutorial', 'yes');
       handleAfterRegister();
@@ -355,8 +388,11 @@ function Register({
         ways: values.causeFeeling,
         areas: values.selectedCategory,
         timezone: timeZone,
+        platform: Platform.OS,
+        token: token,
       };
       const res = await postRegister(payload);
+   
       handleSetProfile(res);
       if (res.data.subscription.type === 1 && res.data.themes[0].id !== 6) {
         await selectTheme({
@@ -364,7 +400,8 @@ function Register({
           themes: [6],
         });
       }
-
+      await fetchListQuote();
+      await fetchCollection();
       await handlePaymentTwo('onboarding');
 
       await AsyncStorage.setItem('isFinishTutorial', 'no');
@@ -388,6 +425,8 @@ function Register({
             ways: values.causeFeeling,
             areas: values.selectedCategory,
             timezone: timeZone,
+            platform: Platform.OS,
+            token: token,
           };
           const res = await checkDeviceRegister({
             device_id: mutateForm.device_id,

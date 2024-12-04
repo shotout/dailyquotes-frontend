@@ -116,7 +116,7 @@ function ModalSetting({contentRef, onClose, collections}) {
     return (
       <View style={styles.wrapper}>
         <View style={styles.listCardWrap}>
-          {renderSubscription()}
+          {/* {renderSubscription()} */}
           <ListContent
             title="Account & preferences"
             icon={<IconUser width="100%" height="100%" />}

@@ -72,7 +72,7 @@ const appOpenAd = AppOpenAd.createForAdRequest(adUnitId, {
 
 const Stack = createNativeStackNavigator();
 
-appOpenAd.load();
+// appOpenAd.load();
 
 function Routes({
   getInitialData,
@@ -288,9 +288,9 @@ function Routes({
             setPaywallNotification(detail.notification.data);
             loadingRef.current = false;
           } else {
-            setTimeout(() => {
-              handlePayment(detail.notification.data?.placement);
-            }, 1000);
+            // setTimeout(() => {
+            //   handlePayment(detail.notification.data?.placement);
+            // }, 1000);
           }
         }
       }
@@ -330,7 +330,7 @@ function Routes({
       } else if (userProfile.token) {
         const fetchUserData = async () => {
           if (!isUserPremium()) {
-            handleShowAds();
+            // handleShowAds();
           }
           const setting = await getSetting();
           if (setting.data.value !== 'true') {
@@ -477,7 +477,7 @@ function Routes({
               }),
             );
             handleSubscriptionStatus(resp.data.subscription);
-            handlePaymentTwo('onboarding');
+            // handlePaymentTwo('onboarding');
             if (
               resp.data.subscription.type === 1 &&
               resp.data.themes[0].id !== 6
@@ -563,37 +563,37 @@ function Routes({
     setInitialLoaderStatus(false);
     getUserdata();
     purchaselyListener();
-    const subscription = AppState.addEventListener(
-      'change',
-      async nextAppState => {
-        if (
-          appState.current.match(/inactive|background/) &&
-          nextAppState === 'active'
-        ) {
-          resetNotificationBadge();
-          handleUpdateTimezone();
-        }
-        if (appState.current.match('background') && nextAppState === 'active') {
-          appOpenAd.load();
-          if (
-            paywallStatus &&
-            paywallStatus.current !== 'PRESENTATION_CLOSED'
-          ) {
-            if (Platform.OS === 'ios') {
-              handleLoadInAppAds();
-            }
-          } else {
-            appOpenAd.load();
-          }
-        } else {
-          paywallStatus.current = 'READY';
-          appOpenAd.load();
-        }
+    // const subscription = AppState.addEventListener(
+    //   'change',
+    //   async nextAppState => {
+    //     if (
+    //       appState.current.match(/inactive|background/) &&
+    //       nextAppState === 'active'
+    //     ) {
+    //       resetNotificationBadge();
+    //       handleUpdateTimezone();
+    //     }
+    //     if (appState.current.match('background') && nextAppState === 'active') {
+    //       appOpenAd.load();
+    //       if (
+    //         paywallStatus &&
+    //         paywallStatus.current !== 'PRESENTATION_CLOSED'
+    //       ) {
+    //         if (Platform.OS === 'ios') {
+    //           handleLoadInAppAds();
+    //         }
+    //       } else {
+    //         appOpenAd.load();
+    //       }
+    //     } else {
+    //       paywallStatus.current = 'READY';
+    //       appOpenAd.load();
+    //     }
 
-        appState.current = nextAppState;
-        setAppStateVisible(appState.current);
-      },
-    );
+    //     appState.current = nextAppState;
+    //     setAppStateVisible(appState.current);
+    //   },
+    // );
 
     const unsubscribeAppOpenAds = appOpenAd.addAdEventListener(
       AdEventType.CLOSED,
@@ -623,11 +623,11 @@ function Routes({
       },
     );
     return () => {
-      subscription.remove();
-      Purchasely.removeEventListener();
-      unsubscribeAppOpenAds();
-      listenerOpenApps();
-      listenerIAPAds();
+      // subscription.remove();
+      // Purchasely.removeEventListener();
+      // unsubscribeAppOpenAds();
+      // listenerOpenApps();
+      // listenerIAPAds();
     };
   }, []);
 

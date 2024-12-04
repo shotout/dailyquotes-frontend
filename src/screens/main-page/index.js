@@ -131,6 +131,7 @@ function MainPage({
   animationCounter,
   fetchListQuote,
 }) {
+
   const limitIndex = 6;
   const isFromOnboarding = route.params?.isFromOnboarding;
   const initialIndexContent = isUserPremium() ? 0 : limitIndex;
@@ -733,7 +734,6 @@ function MainPage({
 
   function renderContent(item, index) {
     const getImageContent = themeUser.imgLocal;
-    console.log('new theme', getImageContent);
     if (item?.item_type === 'countdown_page') {
       return <PageCountDown />;
     }

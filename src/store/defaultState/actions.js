@@ -61,21 +61,26 @@ export const fetchListQuote = (params, isPassPremium) => async dispatch =>
       });
       let restPas = [];
       if (!isUserPremium()) {
-        const pastQuote = await getListPastQuotes({length: 5, page: 1});
-        if (pastQuote.data.length > 0) {
-          restPas = isArray(pastQuote?.data)
-            ? pastQuote?.data
-            : pastQuote?.data?.data || dummyPastQuotes;
-        } else {
-          // const resp = await getListQuotes({
-          //   length: 15,
-          //   page: 1,
-          //   ...params,
-          // });
-          // restPas = isArray(resp?.data)
-          //   ? resp?.data
-          //   : resp?.data?.data || dummyPastQuotes;
+        try {
+          const pastQuote = await getListPastQuotes({length: 5, page: 1});
+          if (pastQuote.data.length > 0) {
+            restPas = isArray(pastQuote?.data)
+              ? pastQuote?.data
+              : pastQuote?.data?.data || dummyPastQuotes;
+          } else {
+            // const resp = await getListQuotes({
+            //   length: 15,
+            //   page: 1,
+            //   ...params,
+            // });
+            // restPas = isArray(resp?.data)
+            //   ? resp?.data
+            //   : resp?.data?.data || dummyPastQuotes;
+          }
+        } catch (error) {
+          alert(JSON.stringify(error))
         }
+       
       }
       if (quote.data?.data?.length > 0) {
         let overallData = [...restPas, ...quote.data.data];

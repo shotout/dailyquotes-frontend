@@ -148,10 +148,10 @@ export const handlePayment = async (vendorId, cb) =>
       let stringVendor = vendorId;
       const purchaseId = await Purchasely.getAnonymousUserId();
       if (vendorId === 'onboarding') {
-        await setSubcription({
-          subscription_type: 5,
-          purchasely_id: purchaseId,
-        });
+        // await setSubcription({
+        //   subscription_type: 5,
+        //   purchasely_id: purchaseId,
+        // });
       } else if (!stringVendor) {
         if (currentDate <= endDate) {
           stringVendor = 'offer_no_purchase_after_onboarding_paywall';
@@ -218,12 +218,12 @@ export const handlePaymentTwo = async (vendorId, cb) =>
   new Promise(async (resolve, reject) => {
     try {
       const purchaseId = await Purchasely.getAnonymousUserId();
-      if (vendorId === 'onboarding') {
-        await setSubcription({
-          subscription_type: 5,
-          purchasely_id: purchaseId,
-        });
-      }
+      // if (vendorId === 'onboarding') {
+      //   await setSubcription({
+      //     subscription_type: 5,
+      //     purchasely_id: purchaseId,
+      //   });
+      // }
       const user = store.getState().defaultState.userProfile;
       if (user.token) {
         await reloadUserProfile();

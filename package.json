@@ -62,6 +62,7 @@
     "react-native-permissions": "^3.8.0",
     "react-native-popover-view": "^5.1.7",
     "react-native-purchasely": "^2.4.1",
+    "react-native-pure-jwt": "^3.0.2",
     "react-native-responsive-fontsize": "^0.5.1",
     "react-native-safe-area-context": "^4.4.1",
     "react-native-screens": "^3.17.0",

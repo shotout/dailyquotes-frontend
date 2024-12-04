@@ -1,6 +1,6 @@
 // Prod version
-export const BACKEND_URL = 'https://backend-motivation.walletads.io';
-export const API_URL = 'https://backend-motivation.walletads.io/api/v1';
+export const BACKEND_URL = 'https://prod.mooti.app';
+export const API_URL = 'https://prod.mooti.app/api/v1';
 
 // dev version
 // export const BACKEND_URL = 'https://backend-motivation.walletads.io';
